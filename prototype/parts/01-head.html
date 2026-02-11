@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navis Marine — Yacht Configurator</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: '#1a1a2e', light: '#2d2d44', '50': '#f0f0f3' },
+            primary: { DEFAULT: '#2ea3f2', dark: '#1e85c5', light: '#e8f4fd', '50': '#f0f8ff' },
+            gold: { DEFAULT: '#c9a961', light: '#f5f0e4' },
+            slate: { 750: '#293548' }
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-out',
+            'slide-in': 'slideIn 0.3s ease-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+          },
+          keyframes: {
+            fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
+            slideIn: { from: { transform: 'translateX(-16px)', opacity: '0' }, to: { transform: 'translateX(0)', opacity: '1' } },
+            slideUp: { from: { transform: 'translateY(12px)', opacity: '0' }, to: { transform: 'translateY(0)', opacity: '1' } },
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Screen transitions */
+    .screen-enter { animation: fadeIn 0.25s ease-out, slideUp 0.25s ease-out; }
+
+    /* Sidebar nav hover */
+    .nav-item { transition: all 0.15s ease; }
+
+    /* Card hover lift */
+    .card-hover { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+    .card-hover:hover { box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); transform: translateY(-2px); }
+
+    /* Checkbox custom */
+    .equip-check:checked { background-color: #2ea3f2; border-color: #2ea3f2; }
+
+    /* Price counter animation */
+    .price-animate { transition: all 0.3s ease; }
+
+    /* Accordion content */
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .accordion-content.open { max-height: 2000px; }
+
+    /* Tab underline */
+    .tab-active { border-bottom: 2px solid #2ea3f2; color: #1a1a2e; }
+
+    /* Mobile sidebar slide */
+    .sidebar-open { transform: translateX(0) !important; }
+
+    /* Step indicator */
+    .step-circle { transition: all 0.2s ease; }
+
+    /* Boat card selection */
+    .boat-selected { border-color: #2ea3f2 !important; box-shadow: 0 0 0 3px rgba(46,163,242,0.2) !important; }
+
+    /* Modal backdrop */
+    .modal-backdrop { backdrop-filter: blur(4px); }
+
+    /* Gradient text */
+    .text-gradient { background: linear-gradient(135deg, #2ea3f2, #1a1a2e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body class="font-body antialiased bg-slate-50 text-slate-700">

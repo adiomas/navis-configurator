@@ -1,0 +1,611 @@
+
+<script>
+// ================================================================
+// MOCK DATA
+// ================================================================
+const BOATS = [
+  {
+    id: 'grande-120', name: 'Azimut Grande 120', brand: 'Azimut', model: 'Grande 120', year: 2024, category: 'new', basePrice: 12500000,
+    heroImage: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=500&fit=crop&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=600&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1599809275671-b5942cabc7a2?w=600&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=600&h=400&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?w=600&h=400&fit=crop&q=80'
+    ],
+    specs: {
+      'Tehničke specifikacije': [['Duljina', '41 m'], ['Širina', '8.5 m'], ['Gaz', '2.1 m'], ['Bruto tonaža', '2.847 GT'], ['Kapacitet', '16 gostiju / 12 posade']],
+      'Interijer': [['Master suite', '2'], ['Kabine za goste', '6'], ['Kupaonice', '7'], ['Kapacitet blagovanja', '24 gosta']],
+      'Performanse': [['Max brzina', '15.5 čv'], ['Brzina krstarenja', '12 čv'], ['Domet', '3.000 nm'], ['Gorivo', '50.000 L']]
+    },
+    equipment: [
+      { category: 'Interijer', items: [
+        { id: 'i1', name: 'Premium talijanska koža', desc: 'Ručno obrađena koža iz Toskane', price: 85000, standard: false },
+        { id: 'i2', name: 'Mramorna podna obloga', desc: 'Calacatta mramor, ručno polirani', price: 120000, standard: false },
+        { id: 'i3', name: 'Steinway & Sons klavir', desc: 'Model B, prilagođen za plovidbu', price: 185000, standard: false },
+        { id: 'i4', name: 'Custom umjetnička kolekcija', desc: 'Kusirirana suvremena umjetnost', price: 65000, standard: false }
+      ]},
+      { category: 'Navigacija', items: [
+        { id: 'n1', name: 'GPS navigacijski sustav', desc: 'Raymarine Axiom XL 16"', price: 0, standard: true },
+        { id: 'n2', name: 'Satelitski WiFi sustav', desc: 'Starlink Maritime', price: 45000, standard: false },
+        { id: 'n3', name: 'Napredni radar sustav', desc: 'Furuno DRS25A, domet 96nm', price: 32000, standard: false }
+      ]},
+      { category: 'Motori', items: [
+        { id: 'e1', name: 'Dual MTU 12V2000 M93', desc: 'Standardni pogon', price: 0, standard: true },
+        { id: 'e2', name: 'Generator upgrade paket', desc: 'Kohler 80kW dual', price: 28000, standard: false }
+      ]},
+      { category: 'Audio / Video', items: [
+        { id: 'a1', name: 'Dolby Atmos kino sustav', desc: 'Privatni kino s projektorom', price: 95000, standard: false },
+        { id: 'a2', name: 'Multi-room audio sustav', desc: 'Sonance, 12 zona', price: 55000, standard: false }
+      ]},
+      { category: 'Paluba', items: [
+        { id: 'p1', name: 'Jacuzzi na palubi', desc: 'Infinity edge, 6 osoba', price: 75000, standard: false },
+        { id: 'p2', name: 'Tender garaža', desc: 'Williams Turbojet 385', price: 45000, standard: false }
+      ]}
+    ]
+  },
+  {
+    id: 's8', name: 'Azimut S8', brand: 'Azimut', model: 'S8', year: 2024, category: 'new', basePrice: 4200000,
+    heroImage: 'https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=800&h=500&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=600&h=400&fit=crop&q=80'],
+    specs: {
+      'Tehničke specifikacije': [['Duljina', '24.7 m'], ['Širina', '6.3 m'], ['Gaz', '1.6 m'], ['Kapacitet', '8 gostiju / 4 posade']],
+      'Interijer': [['Master suite', '1'], ['Kabine za goste', '3'], ['Kupaonice', '3']],
+      'Performanse': [['Max brzina', '30 čv'], ['Brzina krstarenja', '24 čv'], ['Domet', '2.000 nm']]
+    },
+    equipment: [
+      { category: 'Interijer', items: [
+        { id: 's8-i1', name: 'Moderna kožna unutrašnjost', desc: 'Italian design', price: 35000, standard: false },
+        { id: 's8-i2', name: 'Orah drveni akcenti', desc: 'Ručna izrada', price: 28000, standard: false }
+      ]},
+      { category: 'Navigacija', items: [
+        { id: 's8-n1', name: 'GPS navigacija', desc: 'Standard paket', price: 0, standard: true },
+        { id: 's8-n2', name: 'Integrirani WiFi', desc: '4G/5G sustav', price: 15000, standard: false }
+      ]},
+      { category: 'Motori', items: [{ id: 's8-e1', name: 'Twin MAN V8 1200', desc: 'Standard', price: 0, standard: true }]}
+    ]
+  },
+  {
+    id: 'magellano-66', name: 'Azimut Magellano 66', brand: 'Azimut', model: 'Magellano 66', year: 2024, category: 'new', basePrice: 3800000,
+    heroImage: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=800&h=500&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=600&h=400&fit=crop&q=80'],
+    specs: {
+      'Tehničke specifikacije': [['Duljina', '20.1 m'], ['Širina', '5.3 m'], ['Kapacitet', '6 gostiju / 2 posade']],
+      'Interijer': [['Master suite', '1'], ['Kabine', '3'], ['Kupaonice', '2']],
+      'Performanse': [['Max brzina', '18 čv'], ['Domet', '1.800 nm']]
+    },
+    equipment: [
+      { category: 'Interijer', items: [{ id: 'm-i1', name: 'Teak podovi', desc: 'Premium Burma teak', price: 42000, standard: false }]},
+      { category: 'Navigacija', items: [{ id: 'm-n1', name: 'GPS navigacija', desc: 'Standard', price: 0, standard: true }]},
+      { category: 'Motori', items: [{ id: 'm-e1', name: 'Twin Volvo IPS 800', desc: 'Standard', price: 0, standard: true }]}
+    ]
+  },
+  {
+    id: 'verve-47', name: 'Azimut Verve 47', brand: 'Azimut', model: 'Verve 47', year: 2025, category: 'new', basePrice: 1950000,
+    heroImage: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&h=500&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=600&h=400&fit=crop&q=80'],
+    specs: {
+      'Tehničke specifikacije': [['Duljina', '14.3 m'], ['Širina', '4.2 m'], ['Kapacitet', '4 gostiju']],
+      'Interijer': [['Kabine', '1'], ['Kupaonice', '1']],
+      'Performanse': [['Max brzina', '34 čv'], ['Domet', '800 nm']]
+    },
+    equipment: [
+      { category: 'Navigacija', items: [{ id: 'v-n1', name: 'GPS navigacija', desc: 'Standard', price: 0, standard: true }]},
+      { category: 'Motori', items: [{ id: 'v-e1', name: 'Twin Mercury 400hp', desc: 'Standard', price: 0, standard: true }]}
+    ]
+  },
+  {
+    id: 'flybridge-78', name: 'Azimut Flybridge 78', brand: 'Azimut', model: 'Flybridge 78', year: 2024, category: 'new', basePrice: 6500000,
+    heroImage: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=500&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop&q=80', 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=600&h=400&fit=crop&q=80'],
+    specs: {
+      'Tehničke specifikacije': [['Duljina', '24 m'], ['Širina', '6.2 m'], ['Kapacitet', '8 gostiju / 4 posade']],
+      'Interijer': [['Master suite', '1'], ['Kabine', '3'], ['Kupaonice', '3']],
+      'Performanse': [['Max brzina', '28 čv'], ['Domet', '1.500 nm']]
+    },
+    equipment: [
+      { category: 'Interijer', items: [{ id: 'f-i1', name: 'Premium paket unutrašnjosti', desc: 'Koža + drvo + mramor', price: 65000, standard: false }]},
+      { category: 'Navigacija', items: [
+        { id: 'f-n1', name: 'GPS navigacija', desc: 'Standard', price: 0, standard: true },
+        { id: 'f-n2', name: 'Autopilot sustav', desc: 'Raymarine Evolution', price: 22000, standard: false }
+      ]},
+      { category: 'Motori', items: [{ id: 'f-e1', name: 'Twin MAN V12 1550', desc: 'Standard', price: 0, standard: true }]},
+      { category: 'Paluba', items: [{ id: 'f-p1', name: 'Flybridge jacuzzi', desc: '4 osobe', price: 48000, standard: false }]}
+    ]
+  },
+  {
+    id: 's7', name: 'Azimut S7', brand: 'Azimut', model: 'S7', year: 2025, category: 'new', basePrice: 3200000,
+    heroImage: 'https://images.unsplash.com/photo-1562281302-809108fd533c?w=800&h=500&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1562281302-809108fd533c?w=600&h=400&fit=crop&q=80'],
+    specs: {
+      'Tehničke specifikacije': [['Duljina', '21.6 m'], ['Širina', '5.2 m'], ['Kapacitet', '6 gostiju / 2 posade']],
+      'Interijer': [['Master suite', '1'], ['Kabine', '2'], ['Kupaonice', '2']],
+      'Performanse': [['Max brzina', '32 čv'], ['Domet', '1.400 nm']]
+    },
+    equipment: [
+      { category: 'Interijer', items: [{ id: 's7-i1', name: 'Sportski interijer paket', desc: 'Carbon + koža', price: 38000, standard: false }]},
+      { category: 'Navigacija', items: [{ id: 's7-n1', name: 'GPS navigacija', desc: 'Standard', price: 0, standard: true }]},
+      { category: 'Motori', items: [{ id: 's7-e1', name: 'Twin MAN V8 1000', desc: 'Standard', price: 0, standard: true }]}
+    ]
+  }
+];
+
+const QUOTES = [
+  { id: 'NM-2025-042', boatId: 'grande-120', boatName: 'Azimut Grande 120', clientName: 'Jean-Pierre Moreau', clientEmail: 'jp.moreau@shipping.fr', clientPhone: '+33 1 42 86 97 01', clientCompany: 'Moreau Maritime', status: 'sent', basePrice: 12500000, optionsTotal: 220500, totalPrice: 12720500, date: '2025-02-05' },
+  { id: 'NM-2025-041', boatId: 's8', boatName: 'Azimut S8', clientName: 'Marco Bellini', clientEmail: 'marco@bellini-yachts.it', clientPhone: '+39 06 123 4567', clientCompany: 'Bellini Yachts', status: 'draft', basePrice: 4200000, optionsTotal: 185000, totalPrice: 4385000, date: '2025-02-03' },
+  { id: 'NM-2025-040', boatId: 'flybridge-78', boatName: 'Azimut Flybridge 78', clientName: 'Hans Müller', clientEmail: 'hans@mueller-group.de', clientPhone: '+49 89 123 456', clientCompany: 'Müller Group', status: 'accepted', basePrice: 6500000, optionsTotal: 392000, totalPrice: 6892000, date: '2025-01-28' },
+  { id: 'NM-2025-039', boatId: 'magellano-66', boatName: 'Azimut Magellano 66', clientName: 'Elena Petrova', clientEmail: 'elena@petrova.ru', clientPhone: '+7 495 123 4567', clientCompany: 'Petrova Holdings', status: 'rejected', basePrice: 3800000, optionsTotal: 325000, totalPrice: 4125000, date: '2025-01-20' },
+  { id: 'NM-2025-038', boatId: 'verve-47', boatName: 'Azimut Verve 47', clientName: 'Thomas Anderson', clientEmail: 'thomas@anderson.ch', clientPhone: '+41 44 123 4567', clientCompany: 'Anderson Capital', status: 'accepted', basePrice: 1950000, optionsTotal: 230000, totalPrice: 2180000, date: '2025-01-15' },
+  { id: 'NM-2025-037', boatId: 's7', boatName: 'Azimut S7', clientName: 'Sophie Laurent', clientEmail: 'sophie@laurent-marine.fr', clientPhone: '+33 4 91 12 34 56', clientCompany: 'Laurent Marine', status: 'sent', basePrice: 3200000, optionsTotal: 245000, totalPrice: 3445000, date: '2025-01-10' }
+];
+
+const STATUS_MAP = {
+  draft: { label: 'Draft', bg: 'bg-slate-100', text: 'text-slate-600' },
+  sent: { label: 'Sent', bg: 'bg-blue-100', text: 'text-blue-700' },
+  accepted: { label: 'Accepted', bg: 'bg-emerald-100', text: 'text-emerald-700' },
+  rejected: { label: 'Rejected', bg: 'bg-red-100', text: 'text-red-700' }
+};
+
+// ================================================================
+// STATE
+// ================================================================
+const state = {
+  currentScreen: 'dashboard',
+  selectedBoat: null,
+  selectedEquipment: {},
+  clientData: {}
+};
+
+// ================================================================
+// HELPERS
+// ================================================================
+function formatPrice(n) {
+  return '€' + n.toLocaleString('de-DE');
+}
+
+function formatPriceShort(n) {
+  if (n >= 1000000) return '€' + (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return '€' + (n / 1000).toFixed(0) + 'K';
+  return '€' + n;
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function navigate(screenId, data) {
+  // Hide all screens
+  document.querySelectorAll('main > section').forEach(s => { s.classList.add('hidden'); s.classList.remove('screen-enter'); });
+  // Show target
+  const target = document.getElementById('screen-' + screenId);
+  if (target) { target.classList.remove('hidden'); void target.offsetWidth; target.classList.add('screen-enter'); }
+  // Scroll to top
+  const main = document.querySelector('main');
+  if (main) main.scrollTop = 0;
+  // Update sidebar
+  updateSidebar(screenId);
+  // Update breadcrumb
+  updateBreadcrumb(screenId);
+  // Close mobile sidebar
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) { sidebar.classList.remove('sidebar-open'); document.getElementById('sidebar-backdrop').classList.add('hidden'); }
+  // Screen-specific rendering
+  state.currentScreen = screenId;
+  if (screenId === 'dashboard') renderDashboard();
+  if (screenId === 'boats') renderBoatsGrid();
+  if (screenId === 'boat-detail') renderBoatDetail(data);
+  if (screenId === 'equipment') renderEquipmentPage(data);
+  if (screenId === 'config-1') renderConfigStep1();
+  if (screenId === 'config-2') renderConfigStep2();
+  if (screenId === 'config-4') renderReview();
+  if (screenId === 'quotes') renderQuotesTable();
+  if (screenId === 'quote-detail') renderQuoteDetail(data);
+  // Re-init lucide icons
+  if (window.lucide) lucide.createIcons();
+}
+
+const NAV_MAP = {
+  'dashboard': 'dashboard', 'boats': 'boats', 'boat-new': 'boats', 'boat-detail': 'boats', 'equipment': 'boats',
+  'config-1': 'configurator', 'config-2': 'configurator', 'config-3': 'configurator', 'config-4': 'configurator',
+  'quotes': 'quotes', 'quote-detail': 'quotes', 'import': 'import', 'settings': 'settings'
+};
+
+const BREADCRUMBS = {
+  'dashboard': 'Dashboard', 'boats': 'Brodovi', 'boat-new': '<a onclick="navigate(\'boats\')" class="text-primary hover:text-primary-dark cursor-pointer">Brodovi</a> <span class="mx-2 text-slate-300">/</span> Novi brod',
+  'boat-detail': '<a onclick="navigate(\'boats\')" class="text-primary hover:text-primary-dark cursor-pointer">Brodovi</a> <span class="mx-2 text-slate-300">/</span> Detalji',
+  'equipment': '<a onclick="navigate(\'boats\')" class="text-primary hover:text-primary-dark cursor-pointer">Brodovi</a> <span class="mx-2 text-slate-300">/</span> Oprema',
+  'config-1': 'Konfigurator <span class="mx-2 text-slate-300">/</span> Odabir jahte',
+  'config-2': 'Konfigurator <span class="mx-2 text-slate-300">/</span> Oprema',
+  'config-3': 'Konfigurator <span class="mx-2 text-slate-300">/</span> Klijent',
+  'config-4': 'Konfigurator <span class="mx-2 text-slate-300">/</span> Pregled',
+  'quotes': 'Ponude', 'quote-detail': '<a onclick="navigate(\'quotes\')" class="text-primary hover:text-primary-dark cursor-pointer">Ponude</a> <span class="mx-2 text-slate-300">/</span> Detalj',
+  'import': 'Excel Import', 'settings': 'Postavke'
+};
+
+function updateSidebar(screenId) {
+  const navKey = NAV_MAP[screenId] || screenId;
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    if (btn.dataset.nav === navKey) {
+      btn.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary text-white';
+    } else {
+      btn.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white';
+    }
+  });
+}
+
+function updateBreadcrumb(screenId) {
+  const bc = document.getElementById('breadcrumb');
+  if (bc) bc.innerHTML = '<span class="text-slate-500 text-sm">' + (BREADCRUMBS[screenId] || screenId) + '</span>';
+}
+
+// ================================================================
+// RENDER FUNCTIONS
+// ================================================================
+function renderDashboard() {
+  const tbody = document.getElementById('dashboard-quotes-body');
+  if (!tbody) return;
+  tbody.innerHTML = QUOTES.slice(0, 5).map(q => {
+    const s = STATUS_MAP[q.status];
+    return `<tr class="hover:bg-slate-50 transition cursor-pointer" onclick="navigate('quote-detail', '${q.id}')">
+      <td class="px-5 py-3.5 font-medium text-navy">${q.id}</td>
+      <td class="px-5 py-3.5 text-slate-600">${q.boatName}</td>
+      <td class="px-5 py-3.5 text-slate-600">${q.clientName}</td>
+      <td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
+      <td class="px-5 py-3.5 text-right font-semibold text-navy tabular-nums">${formatPriceShort(q.totalPrice)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderBoatsGrid() {
+  const grid = document.getElementById('boats-grid');
+  if (!grid) return;
+  grid.innerHTML = BOATS.map(b => `
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden card-hover cursor-pointer group" onclick="navigate('boat-detail', '${b.id}')">
+      <div class="relative overflow-hidden">
+        <img src="${b.heroImage}" alt="${b.name}" class="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        <div class="absolute top-3 left-3">
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${b.category === 'new' ? 'bg-emerald-400/90 text-white' : 'bg-amber-400/90 text-white'}">${b.category === 'new' ? 'Novo' : 'Rabljeno'}</span>
+        </div>
+      </div>
+      <div class="p-5">
+        <h3 class="font-semibold text-navy text-base mb-1">${b.name}</h3>
+        <p class="text-xs text-slate-400 mb-3">${b.year} · ${b.brand}</p>
+        <div class="flex items-end justify-between">
+          <div class="font-display text-lg font-bold text-primary">${formatPrice(b.basePrice)}</div>
+          <span class="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition">Detalji →</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderBoatDetail(boatId) {
+  const boat = BOATS.find(b => b.id === boatId) || BOATS[0];
+  state.selectedBoat = boat;
+  document.getElementById('detail-hero').src = boat.heroImage;
+  document.getElementById('detail-name').textContent = boat.name;
+  document.getElementById('detail-price').textContent = formatPrice(boat.basePrice);
+  document.getElementById('detail-year-badge').textContent = boat.year;
+  document.getElementById('detail-category-badge').textContent = boat.category === 'new' ? 'Novo' : 'Rabljeno';
+  // Thumbnails
+  const thumbs = document.getElementById('detail-thumbnails');
+  thumbs.innerHTML = boat.images.map(img => `<img src="${img}" class="w-20 h-14 rounded-lg object-cover cursor-pointer border-2 border-transparent hover:border-primary transition flex-shrink-0" onclick="document.getElementById('detail-hero').src=this.src" />`).join('');
+  // Specs
+  const specsDiv = document.getElementById('detail-specs');
+  specsDiv.innerHTML = Object.entries(boat.specs).map(([cat, items]) => `
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">${cat}</h4>
+      <div class="space-y-2">${items.map(([l,v]) => `<div class="flex justify-between text-sm"><span class="text-slate-500">${l}</span><span class="font-medium text-navy">${v}</span></div>`).join('')}</div>
+    </div>
+  `).join('');
+  // Gallery
+  const gallery = document.getElementById('detail-gallery');
+  gallery.innerHTML = boat.images.map(img => `<img src="${img}" class="w-full aspect-[4/3] rounded-xl object-cover cursor-pointer hover:opacity-90 transition" />`).join('');
+  // Equipment tab
+  const equipList = document.getElementById('detail-equipment-list');
+  equipList.innerHTML = boat.equipment.map(cat => `
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">${cat.category}</h4>
+      <div class="space-y-2">${cat.items.map(item => `
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-600">${item.name}</span>
+          <span class="${item.standard ? 'text-emerald-500 font-medium' : 'font-semibold text-primary tabular-nums'}">${item.standard ? 'Uključeno' : formatPrice(item.price)}</span>
+        </div>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+function navigateEquipment() {
+  navigate('equipment', state.selectedBoat?.id);
+}
+
+function renderEquipmentPage(boatId) {
+  const boat = BOATS.find(b => b.id === boatId) || state.selectedBoat || BOATS[0];
+  state.selectedBoat = boat;
+  document.getElementById('equipment-boat-name').textContent = boat.name;
+}
+
+function renderConfigStep1() {
+  const grid = document.getElementById('config-boat-grid');
+  if (!grid) return;
+  grid.innerHTML = BOATS.map(b => `
+    <div class="bg-white rounded-xl border-2 border-slate-200 overflow-hidden cursor-pointer card-hover transition-all ${state.selectedBoat?.id === b.id ? 'boat-selected' : ''}" onclick="selectConfigBoat('${b.id}')">
+      <img src="${b.heroImage}" alt="${b.name}" class="w-full aspect-[4/3] object-cover" loading="lazy" />
+      <div class="p-4">
+        <h3 class="font-semibold text-navy text-sm mb-0.5">${b.name}</h3>
+        <p class="text-xs text-slate-400 mb-2">${b.year} · ${b.brand}</p>
+        <div class="font-display text-base font-bold text-primary">${formatPrice(b.basePrice)}</div>
+      </div>
+    </div>
+  `).join('');
+  // Show panel if boat already selected
+  if (state.selectedBoat) updateConfigPanel(state.selectedBoat);
+}
+
+function selectConfigBoat(boatId) {
+  const boat = BOATS.find(b => b.id === boatId);
+  state.selectedBoat = boat;
+  state.selectedEquipment = {};
+  // Update card selection
+  document.querySelectorAll('#config-boat-grid > div').forEach(card => card.classList.remove('boat-selected'));
+  event.currentTarget.closest('.bg-white')?.classList.add('boat-selected');
+  updateConfigPanel(boat);
+  if (window.lucide) lucide.createIcons();
+}
+
+function updateConfigPanel(boat) {
+  const panel = document.getElementById('config-detail-panel');
+  panel.classList.remove('hidden');
+  document.getElementById('config-panel-image').src = boat.heroImage;
+  document.getElementById('config-panel-name').textContent = boat.name;
+  document.getElementById('config-panel-meta').textContent = `${boat.year} · ${boat.brand}`;
+  document.getElementById('config-panel-price').textContent = formatPrice(boat.basePrice);
+  const specsHtml = Object.values(boat.specs).flat().slice(0, 5).map(([l,v]) => `<div class="flex justify-between text-sm"><span class="text-slate-400">${l}</span><span class="font-medium text-navy">${v}</span></div>`).join('');
+  document.getElementById('config-panel-specs').innerHTML = specsHtml;
+}
+
+function proceedToStep2() {
+  if (!state.selectedBoat) return;
+  state.selectedEquipment = {};
+  navigate('config-2');
+}
+
+function renderConfigStep2() {
+  const boat = state.selectedBoat;
+  if (!boat) { navigate('config-1'); return; }
+  document.getElementById('config2-boat-thumb').src = boat.heroImage;
+  document.getElementById('config2-boat-name').textContent = boat.name;
+  document.getElementById('config2-boat-meta').textContent = `${boat.year} · ${boat.brand}`;
+  document.getElementById('config2-base-price').textContent = formatPrice(boat.basePrice);
+  // Render equipment list
+  const list = document.getElementById('config-equipment-list');
+  list.innerHTML = boat.equipment.map(cat => `
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
+        <div class="flex items-center gap-3">
+          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform"></i>
+          <span class="font-semibold text-navy">${cat.category}</span>
+          <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">${cat.items.length}</span>
+        </div>
+      </button>
+      <div class="accordion-content open border-t border-slate-100">
+        <div class="divide-y divide-slate-50">
+          ${cat.items.map(item => `
+            <label class="flex items-center gap-4 px-5 py-3.5 cursor-pointer hover:bg-slate-50/50 transition ${item.standard ? 'bg-emerald-50/30' : ''}">
+              <input type="checkbox" ${item.standard ? 'checked disabled' : ''} ${state.selectedEquipment[item.id] ? 'checked' : ''}
+                     onchange="toggleEquipment('${item.id}', ${item.price}, this.checked)"
+                     class="w-4 h-4 rounded border-slate-300 ${item.standard ? 'text-emerald-500 cursor-not-allowed' : 'text-primary focus:ring-primary/20 cursor-pointer'}" />
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-navy">${item.name}</span>
+                  ${item.standard ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-semibold uppercase tracking-wider rounded-full">Uključeno</span>' : ''}
+                </div>
+                ${item.desc ? `<div class="text-xs text-slate-400 mt-0.5">${item.desc}</div>` : ''}
+              </div>
+              <span class="text-sm ${item.standard ? 'font-medium text-slate-400' : 'font-semibold text-primary'} tabular-nums whitespace-nowrap">${item.standard ? 'Standard' : formatPrice(item.price)}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+  updatePriceSummary();
+}
+
+function toggleEquipment(itemId, price, checked) {
+  if (checked) { state.selectedEquipment[itemId] = price; }
+  else { delete state.selectedEquipment[itemId]; }
+  updatePriceSummary();
+}
+
+function updatePriceSummary() {
+  const boat = state.selectedBoat;
+  if (!boat) return;
+  const equipTotal = Object.values(state.selectedEquipment).reduce((a, b) => a + b, 0);
+  const grandTotal = boat.basePrice + equipTotal;
+  document.getElementById('config2-equip-total').textContent = formatPrice(equipTotal);
+  document.getElementById('config2-grand-total').textContent = formatPrice(grandTotal);
+  // Selected items list
+  const container = document.getElementById('config2-selected-items');
+  const entries = Object.entries(state.selectedEquipment);
+  if (entries.length === 0) {
+    container.innerHTML = '<p class="text-xs text-slate-400 italic">Nema odabranih opcija</p>';
+  } else {
+    container.innerHTML = entries.map(([id, price]) => {
+      const item = boat.equipment.flatMap(c => c.items).find(i => i.id === id);
+      return `<div class="flex justify-between text-xs"><span class="text-slate-600 truncate mr-2">${item?.name || id}</span><span class="font-medium text-navy tabular-nums whitespace-nowrap">${formatPrice(price)}</span></div>`;
+    }).join('');
+  }
+}
+
+function proceedToStep3() { navigate('config-3'); }
+
+function proceedToStep4() {
+  state.clientData = {
+    name: document.getElementById('client-name')?.value || '',
+    company: document.getElementById('client-company')?.value || '',
+    email: document.getElementById('client-email')?.value || '',
+    phone: document.getElementById('client-phone')?.value || '',
+    notes: document.getElementById('client-notes')?.value || ''
+  };
+  navigate('config-4');
+}
+
+function renderReview() {
+  const boat = state.selectedBoat;
+  if (!boat) { navigate('config-1'); return; }
+  const equipTotal = Object.values(state.selectedEquipment).reduce((a, b) => a + b, 0);
+  const grandTotal = boat.basePrice + equipTotal;
+  document.getElementById('review-boat-image').src = boat.heroImage;
+  document.getElementById('review-boat-name').textContent = boat.name;
+  document.getElementById('review-boat-meta').textContent = `${boat.year} · ${boat.brand}`;
+  const firstSpecs = Object.values(boat.specs).flat().slice(0, 3).map(([l,v]) => `${l}: ${v}`).join(' · ');
+  document.getElementById('review-boat-specs-brief').textContent = firstSpecs;
+  document.getElementById('review-base-price').textContent = formatPrice(boat.basePrice);
+  document.getElementById('review-equip-total').textContent = formatPrice(equipTotal);
+  document.getElementById('review-grand-total').textContent = formatPrice(grandTotal);
+  // Equipment
+  const equipDiv = document.getElementById('review-equipment');
+  const selectedItems = Object.keys(state.selectedEquipment);
+  if (selectedItems.length === 0) {
+    equipDiv.innerHTML = '<p class="text-sm text-slate-400 italic">Nema odabranih dodatnih opcija</p>';
+  } else {
+    const byCategory = {};
+    boat.equipment.forEach(cat => {
+      const items = cat.items.filter(i => selectedItems.includes(i.id));
+      if (items.length > 0) byCategory[cat.category] = items;
+    });
+    equipDiv.innerHTML = Object.entries(byCategory).map(([cat, items]) => `
+      <div>
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">${cat}</div>
+        ${items.map(i => `<div class="flex justify-between text-sm"><span class="text-slate-600">${i.name}</span><span class="font-medium text-navy tabular-nums">${formatPrice(i.price)}</span></div>`).join('')}
+      </div>
+    `).join('');
+  }
+  // Client
+  const cd = state.clientData;
+  document.getElementById('review-client-name').textContent = cd.name || '—';
+  document.getElementById('review-client-company').textContent = cd.company || '—';
+  document.getElementById('review-client-email').textContent = cd.email || '—';
+  document.getElementById('review-client-phone').textContent = cd.phone || '—';
+  document.getElementById('review-notes').textContent = cd.notes || 'Nema napomena';
+}
+
+function renderQuotesTable() {
+  const tbody = document.getElementById('quotes-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = QUOTES.map(q => {
+    const s = STATUS_MAP[q.status];
+    return `<tr class="hover:bg-slate-50 transition">
+      <td class="px-5 py-4 font-medium text-navy">${q.id}</td>
+      <td class="px-5 py-4 text-slate-600">${q.boatName}</td>
+      <td class="px-5 py-4 font-medium text-navy">${q.clientName}</td>
+      <td class="px-5 py-4 hidden md:table-cell text-slate-400">${q.clientEmail}</td>
+      <td class="px-5 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
+      <td class="px-5 py-4 text-right font-semibold text-navy tabular-nums">${formatPrice(q.totalPrice)}</td>
+      <td class="px-5 py-4 hidden lg:table-cell text-slate-400 text-sm">${q.date}</td>
+      <td class="px-5 py-4 text-center">
+        <button onclick="navigate('quote-detail', '${q.id}')" class="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded transition" title="Pregledaj">
+          <i data-lucide="eye" class="w-4 h-4"></i>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderQuoteDetail(quoteId) {
+  const quote = QUOTES.find(q => q.id === quoteId) || QUOTES[0];
+  const boat = BOATS.find(b => b.id === quote.boatId);
+  const s = STATUS_MAP[quote.status];
+  document.getElementById('qd-number').textContent = quote.id;
+  document.getElementById('qd-status-badge').className = `px-3 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`;
+  document.getElementById('qd-status-badge').textContent = s.label;
+  document.getElementById('qd-client-name').textContent = quote.clientName;
+  document.getElementById('qd-client-company').textContent = quote.clientCompany;
+  document.getElementById('qd-client-email').textContent = quote.clientEmail;
+  document.getElementById('qd-client-phone').textContent = quote.clientPhone;
+  if (boat) {
+    document.getElementById('qd-boat-image').src = boat.heroImage;
+    document.getElementById('qd-boat-name').textContent = boat.name;
+  }
+}
+
+// ================================================================
+// UI INTERACTIONS
+// ================================================================
+function toggleAccordion(btn) {
+  const content = btn.nextElementSibling;
+  const arrow = btn.querySelector('.accordion-arrow');
+  content.classList.toggle('open');
+  if (arrow) arrow.style.transform = content.classList.contains('open') ? '' : 'rotate(-90deg)';
+}
+
+function switchDetailTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-slate-400'); });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+  const btn = document.querySelector(`[data-tab="${tabId}"]`);
+  if (btn) { btn.classList.add('tab-active'); btn.classList.remove('text-slate-400'); }
+  const content = document.getElementById('tab-' + tabId);
+  if (content) content.classList.remove('hidden');
+}
+
+function switchSettingsTab(tabId) {
+  document.querySelectorAll('.settings-tab-btn').forEach(b => { b.className = 'settings-tab-btn text-left px-4 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50 transition'; });
+  document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.add('hidden'));
+  const btn = document.querySelector(`[data-settings-tab="${tabId}"]`);
+  if (btn) btn.className = 'settings-tab-btn text-left px-4 py-2.5 rounded-lg text-sm font-medium bg-primary/10 text-primary transition';
+  const content = document.getElementById('settings-' + tabId);
+  if (content) content.classList.remove('hidden');
+}
+
+function advanceImportStep(step) {
+  [1,2,3].forEach(s => {
+    document.getElementById('import-step-' + s).classList.toggle('hidden', s !== step);
+    const ind = document.getElementById('import-step-' + s + '-indicator');
+    const circle = ind?.querySelector('div');
+    const text = ind?.querySelector('span');
+    if (s < step) {
+      if (circle) circle.className = 'w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold';
+      if (text) { text.className = 'text-sm font-semibold text-emerald-600 hidden sm:block'; }
+    } else if (s === step) {
+      if (circle) circle.className = 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold';
+      if (text) { text.className = 'text-sm font-semibold text-navy hidden sm:block'; }
+    } else {
+      if (circle) circle.className = 'w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold';
+      if (text) { text.className = 'text-sm font-medium text-slate-400 hidden sm:block'; }
+    }
+  });
+  if (window.lucide) lucide.createIcons();
+}
+
+function toggleMobileSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  sidebar.classList.toggle('sidebar-open');
+  backdrop.classList.toggle('hidden');
+}
+
+function showEquipmentModal() { document.getElementById('modal-equipment').classList.remove('hidden'); if (window.lucide) lucide.createIcons(); }
+function showPdfModal() { document.getElementById('modal-pdf').classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function handleLogin(e) {
+  e.preventDefault();
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-shell').classList.remove('hidden');
+  navigate('dashboard');
+}
+
+function handleLogout() {
+  document.getElementById('app-shell').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+}
+
+// ================================================================
+// INIT
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.lucide) lucide.createIcons();
+});
+</script>
+</body>
+</html>
