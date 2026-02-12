@@ -225,9 +225,9 @@ function updateSidebar(screenId) {
   const navKey = NAV_MAP[screenId] || screenId;
   document.querySelectorAll('[data-nav]').forEach(btn => {
     if (btn.dataset.nav === navKey) {
-      btn.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary text-white';
+      btn.className = 'nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium bg-primary text-white';
     } else {
-      btn.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white';
+      btn.className = 'nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white';
     }
   });
 }
@@ -246,11 +246,11 @@ function renderDashboard() {
   tbody.innerHTML = QUOTES.slice(0, 5).map(q => {
     const s = STATUS_MAP[q.status];
     return `<tr class="hover:bg-slate-50 transition cursor-pointer" onclick="navigate('quote-detail', '${q.id}')">
-      <td class="px-5 py-3.5 font-medium text-navy">${q.id}</td>
-      <td class="px-5 py-3.5 text-slate-600">${q.boatName}</td>
-      <td class="px-5 py-3.5 text-slate-600">${q.clientName}</td>
-      <td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
-      <td class="px-5 py-3.5 text-right font-semibold text-navy tabular-nums">${formatPriceShort(q.totalPrice)}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 font-medium text-navy text-xs md:text-sm">${q.id}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 text-xs md:text-sm">${q.boatName}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 text-xs md:text-sm hidden md:table-cell">${q.clientName}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 text-right font-semibold text-navy tabular-nums text-xs md:text-sm">${formatPriceShort(q.totalPrice)}</td>
     </tr>`;
   }).join('');
 }
@@ -261,17 +261,17 @@ function renderBoatsGrid() {
   grid.innerHTML = BOATS.map(b => `
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden card-hover cursor-pointer group" onclick="navigate('boat-detail', '${b.id}')">
       <div class="relative overflow-hidden">
-        <img src="${b.heroImage}" alt="${b.name}" class="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div class="absolute top-3 left-3">
-          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${b.category === 'new' ? 'bg-emerald-400/90 text-white' : 'bg-amber-400/90 text-white'}">${b.category === 'new' ? 'Novo' : 'Rabljeno'}</span>
+        <img src="${b.heroImage}" alt="${b.name}" class="w-full h-32 md:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        <div class="absolute top-2 left-2">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${b.category === 'new' ? 'bg-emerald-400/90 text-white' : 'bg-amber-400/90 text-white'}">${b.category === 'new' ? 'Novo' : 'Rabljeno'}</span>
         </div>
       </div>
-      <div class="p-5">
-        <h3 class="font-semibold text-navy text-base mb-1">${b.name}</h3>
-        <p class="text-xs text-slate-400 mb-3">${b.year} · ${b.brand}</p>
+      <div class="p-2.5 md:p-3">
+        <h3 class="font-semibold text-navy text-sm md:text-base mb-0.5 truncate">${b.name}</h3>
+        <p class="text-[11px] text-slate-400 mb-1.5">${b.year} · ${b.brand}</p>
         <div class="flex items-end justify-between">
-          <div class="font-display text-lg font-bold text-primary">${formatPrice(b.basePrice)}</div>
-          <span class="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition">Detalji →</span>
+          <div class="font-display text-sm md:text-base font-bold text-primary">${formatPrice(b.basePrice)}</div>
+          <span class="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition hidden md:inline">Detalji →</span>
         </div>
       </div>
     </div>
@@ -327,34 +327,89 @@ function renderEquipmentPage(boatId) {
 function renderConfigStep1() {
   const grid = document.getElementById('config-boat-grid');
   if (!grid) return;
-  grid.innerHTML = BOATS.map(b => `
-    <div class="bg-white rounded-xl border-2 border-slate-200 overflow-hidden cursor-pointer card-hover transition-all ${state.selectedBoat?.id === b.id ? 'boat-selected' : ''}" onclick="selectConfigBoat('${b.id}')">
-      <img src="${b.heroImage}" alt="${b.name}" class="w-full aspect-[4/3] object-cover" loading="lazy" />
-      <div class="p-4">
-        <h3 class="font-semibold text-navy text-sm mb-0.5">${b.name}</h3>
-        <p class="text-xs text-slate-400 mb-2">${b.year} · ${b.brand}</p>
-        <div class="font-display text-base font-bold text-primary">${formatPrice(b.basePrice)}</div>
+  const isDesktop = window.innerWidth >= 1024;
+  grid.innerHTML = BOATS.map(b => {
+    const specsHtml = Object.values(b.specs).flat().slice(0, 4).map(([l,v]) => `<div class="flex justify-between text-sm"><span class="text-slate-400">${l}</span><span class="font-medium text-navy">${v}</span></div>`).join('');
+    return `
+    <div class="bg-white rounded-xl border-2 ${state.selectedBoat?.id === b.id ? 'border-primary shadow-lg shadow-primary/10' : 'border-slate-200'} overflow-hidden cursor-pointer card-hover transition-all" data-boat-card="${b.id}" onclick="selectConfigBoat('${b.id}', this)">
+      <div class="relative overflow-hidden">
+        <img src="${b.heroImage}" alt="${b.name}" class="w-full h-40 sm:h-32 lg:h-40 object-cover" loading="lazy" />
+        <div class="absolute top-2 right-2">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 text-navy backdrop-blur-sm">${b.year}</span>
+        </div>
+        ${state.selectedBoat?.id === b.id ? '<div class="absolute top-2 left-2"><div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div></div>' : ''}
       </div>
-    </div>
-  `).join('');
-  // Show panel if boat already selected
+      <div class="p-3">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <h3 class="font-semibold text-navy text-sm md:text-base truncate">${b.name}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">${b.brand}</p>
+          </div>
+          <div class="font-display text-sm md:text-base font-bold text-primary whitespace-nowrap">${formatPrice(b.basePrice)}</div>
+        </div>
+      </div>
+      <!-- Inline expand detail (mobile/tablet) — hidden on lg where side panel is used -->
+      <div class="boat-card-detail lg:hidden ${state.selectedBoat?.id === b.id ? 'expanded' : ''}" data-boat-expand="${b.id}">
+        <div class="px-3 pb-3 border-t border-slate-100 pt-3">
+          <div class="space-y-1.5 mb-3">${specsHtml}</div>
+          <button onclick="event.stopPropagation(); proceedToStep2()" class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition shadow-sm shadow-primary/25 text-sm">
+            Konfiguriraj ovu jahtu →
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Show desktop panel if boat already selected
   if (state.selectedBoat) updateConfigPanel(state.selectedBoat);
 }
 
-function selectConfigBoat(boatId) {
+function selectConfigBoat(boatId, cardEl) {
   const boat = BOATS.find(b => b.id === boatId);
   state.selectedBoat = boat;
   state.selectedEquipment = {};
-  // Update card selection
-  document.querySelectorAll('#config-boat-grid > div').forEach(card => card.classList.remove('boat-selected'));
-  event.currentTarget.closest('.bg-white')?.classList.add('boat-selected');
+  // Collapse all expanded cards
+  document.querySelectorAll('.boat-card-detail.expanded').forEach(d => d.classList.remove('expanded'));
+  // Remove selection from all cards
+  document.querySelectorAll('[data-boat-card]').forEach(card => {
+    card.classList.remove('border-primary', 'shadow-lg', 'shadow-primary/10');
+    card.classList.add('border-slate-200');
+    // Remove check icon
+    const checkIcon = card.querySelector('.absolute.top-2.left-2');
+    if (checkIcon) checkIcon.remove();
+  });
+  // Select clicked card
+  if (cardEl) {
+    cardEl.classList.remove('border-slate-200');
+    cardEl.classList.add('border-primary', 'shadow-lg', 'shadow-primary/10');
+    // Add check icon
+    const imgWrapper = cardEl.querySelector('.relative.overflow-hidden');
+    if (imgWrapper && !imgWrapper.querySelector('.absolute.top-2.left-2')) {
+      const check = document.createElement('div');
+      check.className = 'absolute top-2 left-2';
+      check.innerHTML = '<div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>';
+      imgWrapper.appendChild(check);
+    }
+    // Expand inline detail on mobile/tablet
+    const expandEl = cardEl.querySelector('.boat-card-detail');
+    if (expandEl) expandEl.classList.add('expanded');
+    // Scroll card into view on mobile
+    if (window.innerWidth < 1024) {
+      setTimeout(() => cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+  }
+  // Update desktop panel
   updateConfigPanel(boat);
   if (window.lucide) lucide.createIcons();
 }
 
 function updateConfigPanel(boat) {
   const panel = document.getElementById('config-detail-panel');
-  panel.classList.remove('hidden');
+  if (!panel) return;
+  // Only show on desktop (lg+)
+  if (window.innerWidth >= 1024) {
+    panel.classList.remove('hidden');
+    panel.classList.add('lg:block');
+  }
   document.getElementById('config-panel-image').src = boat.heroImage;
   document.getElementById('config-panel-name').textContent = boat.name;
   document.getElementById('config-panel-meta').textContent = `${boat.year} · ${boat.brand}`;
@@ -380,28 +435,28 @@ function renderConfigStep2() {
   const list = document.getElementById('config-equipment-list');
   list.innerHTML = boat.equipment.map(cat => `
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
-        <div class="flex items-center gap-3">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
+        <div class="flex items-center gap-2 md:gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform"></i>
-          <span class="font-semibold text-navy">${cat.category}</span>
+          <span class="font-semibold text-navy text-sm md:text-base">${cat.category}</span>
           <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">${cat.items.length}</span>
         </div>
       </button>
       <div class="accordion-content open border-t border-slate-100">
         <div class="divide-y divide-slate-50">
           ${cat.items.map(item => `
-            <label class="flex items-center gap-4 px-5 py-3.5 cursor-pointer hover:bg-slate-50/50 transition ${item.standard ? 'bg-emerald-50/30' : ''}">
+            <label class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 cursor-pointer hover:bg-slate-50/50 transition ${item.standard ? 'bg-emerald-50/30' : ''}">
               <input type="checkbox" ${item.standard ? 'checked disabled' : ''} ${state.selectedEquipment[item.id] ? 'checked' : ''}
                      onchange="toggleEquipment('${item.id}', ${item.price}, this.checked)"
                      class="w-4 h-4 rounded border-slate-300 ${item.standard ? 'text-emerald-500 cursor-not-allowed' : 'text-primary focus:ring-primary/20 cursor-pointer'}" />
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <span class="text-sm font-medium text-navy">${item.name}</span>
-                  ${item.standard ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-semibold uppercase tracking-wider rounded-full">Uključeno</span>' : ''}
+                  ${item.standard ? '<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-semibold uppercase tracking-wider rounded-full hidden md:inline">Uključeno</span>' : ''}
                 </div>
-                ${item.desc ? `<div class="text-xs text-slate-400 mt-0.5">${item.desc}</div>` : ''}
+                ${item.desc ? `<div class="text-xs text-slate-400 mt-0.5 line-clamp-1">${item.desc}</div>` : ''}
               </div>
-              <span class="text-sm ${item.standard ? 'font-medium text-slate-400' : 'font-semibold text-primary'} tabular-nums whitespace-nowrap">${item.standard ? 'Standard' : formatPrice(item.price)}</span>
+              <span class="text-sm ${item.standard ? 'font-medium text-slate-400' : 'font-semibold text-primary'} tabular-nums whitespace-nowrap">${item.standard ? 'Std.' : formatPrice(item.price)}</span>
             </label>
           `).join('')}
         </div>
@@ -424,6 +479,9 @@ function updatePriceSummary() {
   const grandTotal = boat.basePrice + equipTotal;
   document.getElementById('config2-equip-total').textContent = formatPrice(equipTotal);
   document.getElementById('config2-grand-total').textContent = formatPrice(grandTotal);
+  // Update mobile sticky price bar
+  const mobileTotal = document.getElementById('mobile-grand-total');
+  if (mobileTotal) mobileTotal.textContent = formatPrice(grandTotal);
   // Selected items list
   const container = document.getElementById('config2-selected-items');
   const entries = Object.entries(state.selectedEquipment);
@@ -496,14 +554,14 @@ function renderQuotesTable() {
   tbody.innerHTML = QUOTES.map(q => {
     const s = STATUS_MAP[q.status];
     return `<tr class="hover:bg-slate-50 transition">
-      <td class="px-5 py-4 font-medium text-navy">${q.id}</td>
-      <td class="px-5 py-4 text-slate-600">${q.boatName}</td>
-      <td class="px-5 py-4 font-medium text-navy">${q.clientName}</td>
-      <td class="px-5 py-4 hidden md:table-cell text-slate-400">${q.clientEmail}</td>
-      <td class="px-5 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
-      <td class="px-5 py-4 text-right font-semibold text-navy tabular-nums">${formatPrice(q.totalPrice)}</td>
-      <td class="px-5 py-4 hidden lg:table-cell text-slate-400 text-sm">${q.date}</td>
-      <td class="px-5 py-4 text-center">
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 font-medium text-navy text-xs md:text-sm">${q.id}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-slate-600 text-xs md:text-sm">${q.boatName}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 font-medium text-navy text-xs md:text-sm">${q.clientName}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 hidden md:table-cell text-slate-400 text-xs md:text-sm">${q.clientEmail}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-right font-semibold text-navy tabular-nums text-xs md:text-sm">${formatPrice(q.totalPrice)}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 hidden lg:table-cell text-slate-400 text-xs">${q.date}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-center">
         <button onclick="navigate('quote-detail', '${q.id}')" class="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded transition" title="Pregledaj">
           <i data-lucide="eye" class="w-4 h-4"></i>
         </button>

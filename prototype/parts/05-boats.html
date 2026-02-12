@@ -2,31 +2,31 @@
 <!-- ================================================================ -->
 <!-- BOATS CATALOG                                                     -->
 <!-- ================================================================ -->
-<section id="screen-boats" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-boats" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
     <div>
-      <h1 class="font-display text-2xl font-bold text-navy">Katalog brodova</h1>
-      <p class="text-sm text-slate-400 mt-1">6 brodova u katalogu</p>
+      <h1 class="font-display text-lg md:text-xl lg:text-2xl font-bold text-navy">Katalog brodova</h1>
+      <p class="text-sm text-slate-400 mt-0.5">6 brodova u katalogu</p>
     </div>
-    <button onclick="navigate('boat-new')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
+    <button onclick="navigate('boat-new')" class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
       <i data-lucide="plus" class="w-4 h-4"></i>
       Dodaj brod
     </button>
   </div>
 
   <!-- Search & Filter -->
-  <div class="flex flex-col sm:flex-row gap-3 mb-6">
-    <div class="flex-1 flex items-center bg-white rounded-lg px-4 py-2.5 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
-      <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-3"></i>
+  <div class="flex flex-col sm:flex-row gap-2 mb-3 md:mb-4">
+    <div class="flex-1 flex items-center bg-white rounded-lg px-3 py-2 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
+      <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-2"></i>
       <input type="text" placeholder="Pretraži po nazivu ili modelu..." class="bg-transparent text-sm outline-none w-full placeholder:text-slate-400" />
     </div>
-    <select class="bg-white rounded-lg px-4 py-2.5 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
+    <select class="bg-white rounded-lg px-3 py-2 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
       <option value="all">Sve kategorije</option>
       <option value="new">Novo</option>
       <option value="used">Rabljeno</option>
     </select>
-    <select class="bg-white rounded-lg px-4 py-2.5 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
+    <select class="bg-white rounded-lg px-3 py-2 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
       <option>Sortiraj: Najnovije</option>
       <option>Cijena: Rastuće</option>
       <option>Cijena: Padajuće</option>
@@ -35,7 +35,7 @@
   </div>
 
   <!-- Boats grid -->
-  <div id="boats-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+  <div id="boats-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
     <!-- Rendered by JS -->
   </div>
 </section>

@@ -2,7 +2,7 @@
 <!-- ================================================================ -->
 <!-- QUOTE DETAIL                                                      -->
 <!-- ================================================================ -->
-<section id="screen-quote-detail" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-quote-detail" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div class="flex items-center gap-3">
@@ -11,45 +11,45 @@
       </button>
       <div>
         <div class="flex items-center gap-3">
-          <h1 id="qd-number" class="font-display text-2xl font-bold text-navy">NM-2025-042</h1>
+          <h1 id="qd-number" class="font-display text-lg md:text-xl font-bold text-navy">NM-2025-042</h1>
           <span id="qd-status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Sent</span>
         </div>
         <p id="qd-date" class="text-sm text-slate-400 mt-0.5">Kreirano: 5. veljače 2025.</p>
       </div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <button onclick="showPdfModal()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition">
-        <i data-lucide="download" class="w-4 h-4"></i> Preuzmi PDF
+      <button onclick="showPdfModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i> PDF
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-navy border border-slate-200 hover:bg-slate-50 rounded-lg transition">
-        <i data-lucide="copy" class="w-4 h-4"></i> Dupliciraj
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-navy border border-slate-200 hover:bg-slate-50 rounded-lg transition">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Dupliciraj
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 border border-emerald-200 hover:bg-emerald-50 rounded-lg transition">
-        <i data-lucide="check-circle" class="w-4 h-4"></i> Prihvaćeno
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-emerald-600 border border-emerald-200 hover:bg-emerald-50 rounded-lg transition">
+        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> OK
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 rounded-lg transition">
-        <i data-lucide="x-circle" class="w-4 h-4"></i> Odbijeno
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 rounded-lg transition">
+        <i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Ne
       </button>
     </div>
   </div>
 
   <!-- Status timeline -->
-  <div class="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-3 md:p-4 mb-4 md:mb-5">
     <div class="flex items-center justify-between max-w-xl mx-auto">
       <div class="flex flex-col items-center gap-1">
-        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div>
         <span class="text-xs font-semibold text-emerald-600">Draft</span>
         <span class="text-[10px] text-slate-400">3. velj.</span>
       </div>
       <div class="flex-1 h-px bg-emerald-300 mx-3"></div>
       <div class="flex flex-col items-center gap-1">
-        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></div>
         <span class="text-xs font-semibold text-primary">Sent</span>
         <span class="text-[10px] text-slate-400">5. velj.</span>
       </div>
       <div class="flex-1 h-px bg-slate-200 mx-3"></div>
       <div class="flex flex-col items-center gap-1">
-        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
         <span class="text-xs font-medium text-slate-400">Accepted</span>
         <span class="text-[10px] text-slate-300">—</span>
       </div>
@@ -59,9 +59,9 @@
   <!-- Content -->
   <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <!-- Client -->
-    <div class="p-6 border-b border-slate-100">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Klijent</h3>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 text-sm">
         <div><div class="text-slate-400 text-xs mb-0.5">Ime</div><div id="qd-client-name" class="font-medium text-navy">Jean-Pierre Moreau</div></div>
         <div><div class="text-slate-400 text-xs mb-0.5">Tvrtka</div><div id="qd-client-company" class="font-medium text-navy">Moreau Maritime</div></div>
         <div><div class="text-slate-400 text-xs mb-0.5">Email</div><div id="qd-client-email" class="font-medium text-navy">jp.moreau@shipping.fr</div></div>
@@ -70,10 +70,10 @@
     </div>
 
     <!-- Boat -->
-    <div class="p-6 border-b border-slate-100">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Jahta</h3>
-      <div class="flex gap-5">
-        <img id="qd-boat-image" src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=600&h=400&fit=crop&q=80" alt="" class="w-40 h-28 rounded-lg object-cover" />
+      <div class="flex gap-3 md:gap-4">
+        <img id="qd-boat-image" src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=600&h=400&fit=crop&q=80" alt="" class="w-24 h-16 md:w-32 md:h-20 rounded-lg object-cover" />
         <div>
           <div id="qd-boat-name" class="font-display text-lg font-bold text-navy">Azimut Grande 120</div>
           <div id="qd-boat-meta" class="text-sm text-slate-400 mt-0.5">2024 · 41m · 16 gostiju</div>
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Equipment -->
-    <div class="p-6 border-b border-slate-100">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Odabrana oprema</h3>
       <div id="qd-equipment" class="space-y-4">
         <div>
@@ -112,7 +112,7 @@
     </div>
 
     <!-- Pricing -->
-    <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100 bg-slate-50/50">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Cijena</h3>
       <div class="max-w-sm space-y-2">
         <div class="flex justify-between text-sm"><span class="text-slate-500">Bazna cijena</span><span class="font-medium text-navy tabular-nums">€12.500.000</span></div>
@@ -126,8 +126,8 @@
     </div>
 
     <!-- Notes & Terms -->
-    <div class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-3 md:p-4 lg:p-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <div>
           <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Napomene</h3>
           <p id="qd-notes" class="text-sm text-slate-600">Klijent zainteresiran za isporuku u Monaco. Preferira tamnu unutrašnjost.</p>

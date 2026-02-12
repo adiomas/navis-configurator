@@ -68,8 +68,8 @@
     .price-animate { transition: all 0.3s ease; }
 
     /* Accordion content */
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-    .accordion-content.open { max-height: 2000px; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .accordion-content.open { max-height: 1500px; }
 
     /* Tab underline */
     .tab-active { border-bottom: 2px solid #2ea3f2; color: #1a1a2e; }
@@ -88,6 +88,27 @@
 
     /* Gradient text */
     .text-gradient { background: linear-gradient(135deg, #2ea3f2, #1a1a2e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* Sticky price bar (config step 2 mobile) */
+    .sticky-price-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; box-shadow: 0 -4px 12px rgba(0,0,0,0.06); z-index: 35; padding: 10px 16px; display: none; }
+    @media (max-width: 767px) { .sticky-price-bar { display: flex; align-items: center; justify-content: space-between; } }
+    @supports(padding: max(0px)) {
+      .sticky-price-bar { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    }
+
+    /* Compact card hover — less lift on mobile */
+    @media (max-width: 767px) {
+      .card-hover:hover { transform: none; box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08); }
+    }
+
+    /* Config boat card — mobile inline expand */
+    .boat-card-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease; opacity: 0; }
+    .boat-card-detail.expanded { max-height: 400px; opacity: 1; }
+
+    /* Mobile: extra bottom padding when sticky bar is visible */
+    @media (max-width: 767px) {
+      .has-sticky-bar { padding-bottom: 80px !important; }
+    }
   </style>
 </head>
 <body class="font-body antialiased bg-slate-50 text-slate-700">
@@ -105,9 +126,9 @@
 
   <!-- Login card -->
   <div class="relative z-10 w-full max-w-md mx-4 animate-fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl p-10">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8">
       <!-- Logo -->
-      <div class="text-center mb-8">
+      <div class="text-center mb-5 md:mb-6">
         <div class="inline-flex items-center gap-3 mb-3">
           <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
             <i data-lucide="anchor" class="w-6 h-6 text-white"></i>
@@ -118,7 +139,7 @@
       </div>
 
       <!-- Form -->
-      <form onsubmit="handleLogin(event)" class="space-y-5">
+      <form onsubmit="handleLogin(event)" class="space-y-3 md:space-y-4">
         <div>
           <label class="block text-xs font-semibold text-navy uppercase tracking-wider mb-2">Email</label>
           <input type="email" value="demo@navis-marine.com" placeholder="ime@navis-marine.com"
@@ -143,7 +164,7 @@
       </form>
 
       <!-- Footer -->
-      <p class="text-center text-xs text-slate-400 mt-6">
+      <p class="text-center text-xs text-slate-400 mt-4">
         &copy; 2025 Navis Marine d.o.o. — Ovlašteni distributer Azimut Yachts
       </p>
     </div>
@@ -156,12 +177,12 @@
 <div id="app-shell" class="hidden min-h-screen">
 
   <!-- Mobile sidebar backdrop -->
-  <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black/40 z-40 lg:hidden modal-backdrop" onclick="toggleMobileSidebar()"></div>
+  <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black/40 z-40 md:hidden modal-backdrop" onclick="toggleMobileSidebar()"></div>
 
   <!-- SIDEBAR -->
-  <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full w-60 bg-navy text-white flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full w-52 bg-navy text-white flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300">
     <!-- Logo -->
-    <div class="p-5 border-b border-white/10">
+    <div class="p-3 border-b border-white/10">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
           <i data-lucide="anchor" class="w-5 h-5 text-white"></i>
@@ -176,34 +197,34 @@
     <!-- Navigation -->
     <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
       <button onclick="navigate('dashboard')" data-nav="dashboard"
-              class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
+              class="nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
         <i data-lucide="layout-dashboard" class="w-[18px] h-[18px]"></i>
         <span>Dashboard</span>
       </button>
       <button onclick="navigate('boats')" data-nav="boats"
-              class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
+              class="nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
         <i data-lucide="ship" class="w-[18px] h-[18px]"></i>
         <span>Brodovi</span>
       </button>
       <button onclick="navigate('config-1')" data-nav="configurator"
-              class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
+              class="nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
         <i data-lucide="sliders-horizontal" class="w-[18px] h-[18px]"></i>
         <span>Konfigurator</span>
       </button>
       <button onclick="navigate('quotes')" data-nav="quotes"
-              class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
+              class="nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
         <i data-lucide="file-text" class="w-[18px] h-[18px]"></i>
         <span>Ponude</span>
       </button>
       <button onclick="navigate('import')" data-nav="import"
-              class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
+              class="nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
         <i data-lucide="upload" class="w-[18px] h-[18px]"></i>
         <span>Excel Import</span>
       </button>
 
       <div class="pt-3 mt-3 border-t border-white/10">
         <button onclick="navigate('settings')" data-nav="settings"
-                class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
+                class="nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white">
           <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
           <span>Postavke</span>
         </button>
@@ -211,7 +232,7 @@
     </nav>
 
     <!-- User section -->
-    <div class="p-4 border-t border-white/10">
+    <div class="p-3 border-t border-white/10">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
           <span class="text-sm font-bold text-primary">MK</span>
@@ -228,13 +249,13 @@
   </aside>
 
   <!-- MAIN CONTENT AREA -->
-  <div class="lg:ml-60 h-screen flex flex-col overflow-hidden">
+  <div class="md:ml-52 h-screen flex flex-col overflow-hidden">
 
     <!-- HEADER (fixed, never scrolls) -->
-    <header class="z-30 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0">
+    <header class="z-30 h-12 bg-white border-b border-slate-200 flex items-center justify-between px-3 md:px-5 flex-shrink-0">
       <!-- Left: hamburger + breadcrumb -->
-      <div class="flex items-center gap-4">
-        <button onclick="toggleMobileSidebar()" class="lg:hidden text-slate-500 hover:text-navy transition">
+      <div class="flex items-center gap-2">
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-1.5 -ml-1 text-slate-500 hover:text-navy hover:bg-slate-50 rounded-lg transition" aria-label="Menu">
           <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
         <nav id="breadcrumb" class="flex items-center text-sm">
@@ -242,17 +263,17 @@
         </nav>
       </div>
       <!-- Right: search + notifications + user -->
-      <div class="flex items-center gap-3">
-        <div class="hidden sm:flex items-center bg-slate-50 rounded-lg px-3 py-2 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
+      <div class="flex items-center gap-2">
+        <div class="hidden sm:flex items-center bg-slate-50 rounded-lg px-3 py-1.5 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-2"></i>
-          <input type="text" placeholder="Pretraži..." class="bg-transparent text-sm outline-none w-48 placeholder:text-slate-400" />
+          <input type="text" placeholder="Pretraži..." class="bg-transparent text-sm outline-none w-36 placeholder:text-slate-400" />
         </div>
-        <button class="relative p-2 text-slate-400 hover:text-navy hover:bg-slate-50 rounded-lg transition">
-          <i data-lucide="bell" class="w-5 h-5"></i>
-          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full"></span>
+        <button class="relative p-1.5 text-slate-400 hover:text-navy hover:bg-slate-50 rounded-lg transition">
+          <i data-lucide="bell" class="w-4 h-4 md:w-5 md:h-5"></i>
+          <span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
         </button>
-        <div class="flex items-center gap-2 pl-3 border-l border-slate-200">
-          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
             <span class="text-xs font-bold text-primary">MK</span>
           </div>
           <span class="hidden md:block text-sm font-medium text-navy">Marko</span>
@@ -266,60 +287,60 @@
 <!-- ================================================================ -->
 <!-- DASHBOARD                                                         -->
 <!-- ================================================================ -->
-<section id="screen-dashboard" class="p-6 lg:p-8 screen-enter">
+<section id="screen-dashboard" class="p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Welcome -->
-  <div class="mb-8">
-    <h1 class="font-display text-2xl lg:text-3xl font-bold text-navy">Dobro došli, Marko</h1>
+  <div class="mb-4 md:mb-6">
+    <h1 class="font-display text-lg md:text-xl lg:text-2xl font-bold text-navy">Dobro došli, Marko</h1>
     <p class="text-slate-400 text-sm mt-1">Utorak, 11. veljače 2025.</p>
   </div>
 
   <!-- Stats cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white rounded-xl border border-slate-200 p-5 card-hover">
-      <div class="flex items-center justify-between mb-3">
-        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-          <i data-lucide="file-text" class="w-5 h-5 text-primary"></i>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-6">
+    <div class="bg-white rounded-xl border border-slate-200 p-2.5 md:p-3 lg:p-4 card-hover">
+      <div class="flex items-center justify-between mb-2">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+          <i data-lucide="file-text" class="w-4 h-4 md:w-5 md:h-5 text-primary"></i>
         </div>
-        <span class="text-xs font-medium text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full">+3 ovaj mj.</span>
+        <span class="text-[10px] md:text-xs font-medium text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded-full">+3</span>
       </div>
-      <div class="text-2xl font-bold text-navy">12</div>
-      <div class="text-xs text-slate-400 font-medium uppercase tracking-wide mt-1">Ukupne ponude</div>
+      <div class="text-xl md:text-2xl font-bold text-navy">12</div>
+      <div class="text-[10px] md:text-xs text-slate-400 font-medium uppercase tracking-wide mt-0.5">Ukupne ponude</div>
     </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5 card-hover">
-      <div class="flex items-center justify-between mb-3">
-        <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-          <i data-lucide="clock" class="w-5 h-5 text-amber-500"></i>
+    <div class="bg-white rounded-xl border border-slate-200 p-2.5 md:p-3 lg:p-4 card-hover">
+      <div class="flex items-center justify-between mb-2">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+          <i data-lucide="clock" class="w-4 h-4 md:w-5 md:h-5 text-amber-500"></i>
         </div>
-        <span class="text-xs font-medium text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">2 čekaju</span>
+        <span class="text-[10px] md:text-xs font-medium text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-full">2</span>
       </div>
-      <div class="text-2xl font-bold text-navy">3</div>
-      <div class="text-xs text-slate-400 font-medium uppercase tracking-wide mt-1">Aktivne ponude</div>
+      <div class="text-xl md:text-2xl font-bold text-navy">3</div>
+      <div class="text-[10px] md:text-xs text-slate-400 font-medium uppercase tracking-wide mt-0.5">Aktivne ponude</div>
     </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5 card-hover">
-      <div class="flex items-center justify-between mb-3">
-        <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-          <i data-lucide="trending-up" class="w-5 h-5 text-emerald-500"></i>
+    <div class="bg-white rounded-xl border border-slate-200 p-2.5 md:p-3 lg:p-4 card-hover">
+      <div class="flex items-center justify-between mb-2">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+          <i data-lucide="trending-up" class="w-4 h-4 md:w-5 md:h-5 text-emerald-500"></i>
         </div>
       </div>
-      <div class="text-2xl font-bold text-navy">€34.2M</div>
-      <div class="text-xs text-slate-400 font-medium uppercase tracking-wide mt-1">Ukupni prihod</div>
+      <div class="text-xl md:text-2xl font-bold text-navy">€34.2M</div>
+      <div class="text-[10px] md:text-xs text-slate-400 font-medium uppercase tracking-wide mt-0.5">Ukupni prihod</div>
     </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5 card-hover">
-      <div class="flex items-center justify-between mb-3">
-        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-          <i data-lucide="ship" class="w-5 h-5 text-primary"></i>
+    <div class="bg-white rounded-xl border border-slate-200 p-2.5 md:p-3 lg:p-4 card-hover">
+      <div class="flex items-center justify-between mb-2">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+          <i data-lucide="ship" class="w-4 h-4 md:w-5 md:h-5 text-primary"></i>
         </div>
       </div>
-      <div class="text-2xl font-bold text-navy">6</div>
-      <div class="text-xs text-slate-400 font-medium uppercase tracking-wide mt-1">Brodovi u katalogu</div>
+      <div class="text-xl md:text-2xl font-bold text-navy">6</div>
+      <div class="text-[10px] md:text-xs text-slate-400 font-medium uppercase tracking-wide mt-0.5">Brodovi u katalogu</div>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5">
     <!-- Recent quotes table -->
     <div class="xl:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div class="flex items-center justify-between p-5 border-b border-slate-100">
-        <h2 class="font-display text-lg font-bold text-navy">Nedavne ponude</h2>
+      <div class="flex items-center justify-between p-3 md:p-4 border-b border-slate-100">
+        <h2 class="font-display text-base md:text-lg font-bold text-navy">Nedavne ponude</h2>
         <button onclick="navigate('quotes')" class="text-sm text-primary hover:text-primary-dark font-medium transition">
           Prikaži sve →
         </button>
@@ -328,11 +349,11 @@
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-slate-50 text-left">
-              <th class="px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider"># Ponuda</th>
-              <th class="px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Brod</th>
-              <th class="px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Klijent</th>
-              <th class="px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-              <th class="px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Iznos</th>
+              <th class="px-3 md:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider"># Ponuda</th>
+              <th class="px-3 md:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Brod</th>
+              <th class="px-3 md:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden sm:table-cell">Klijent</th>
+              <th class="px-3 md:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+              <th class="px-3 md:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Iznos</th>
             </tr>
           </thead>
           <tbody id="dashboard-quotes-body">
@@ -343,34 +364,34 @@
     </div>
 
     <!-- Quick actions -->
-    <div class="space-y-4">
-      <h2 class="font-display text-lg font-bold text-navy">Brze akcije</h2>
-      <button onclick="navigate('config-1')" class="w-full bg-primary hover:bg-primary-dark text-white rounded-xl p-5 text-left card-hover transition group">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition">
-            <i data-lucide="plus" class="w-5 h-5"></i>
+    <div class="space-y-2 md:space-y-3">
+      <h2 class="font-display text-base md:text-lg font-bold text-navy">Brze akcije</h2>
+      <button onclick="navigate('config-1')" class="w-full bg-primary hover:bg-primary-dark text-white rounded-xl p-3 md:p-4 text-left card-hover transition group">
+        <div class="flex items-center gap-3 mb-1.5">
+          <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition">
+            <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i>
           </div>
-          <span class="font-semibold text-base">Nova ponuda</span>
+          <span class="font-semibold text-sm md:text-base">Nova ponuda</span>
         </div>
-        <p class="text-sm text-white/70">Pokreni konfigurator i kreiraj novu ponudu za klijenta</p>
+        <p class="text-xs md:text-sm text-white/70">Pokreni konfigurator i kreiraj novu ponudu</p>
       </button>
-      <button onclick="navigate('boats')" class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-5 text-left card-hover transition">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-lg bg-navy/5 flex items-center justify-center">
-            <i data-lucide="ship" class="w-5 h-5 text-navy"></i>
+      <button onclick="navigate('boats')" class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-3 md:p-4 text-left card-hover transition">
+        <div class="flex items-center gap-3 mb-1.5">
+          <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-navy/5 flex items-center justify-center">
+            <i data-lucide="ship" class="w-4 h-4 md:w-5 md:h-5 text-navy"></i>
           </div>
-          <span class="font-semibold text-base text-navy">Katalog brodova</span>
+          <span class="font-semibold text-sm md:text-base text-navy">Katalog brodova</span>
         </div>
-        <p class="text-sm text-slate-400">Pregledaj i uredi brodove u katalogu</p>
+        <p class="text-xs md:text-sm text-slate-400">Pregledaj i uredi brodove u katalogu</p>
       </button>
-      <button onclick="navigate('import')" class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-5 text-left card-hover transition">
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-lg bg-navy/5 flex items-center justify-center">
-            <i data-lucide="upload" class="w-5 h-5 text-navy"></i>
+      <button onclick="navigate('import')" class="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-3 md:p-4 text-left card-hover transition">
+        <div class="flex items-center gap-3 mb-1.5">
+          <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-navy/5 flex items-center justify-center">
+            <i data-lucide="upload" class="w-4 h-4 md:w-5 md:h-5 text-navy"></i>
           </div>
-          <span class="font-semibold text-base text-navy">Import brodova</span>
+          <span class="font-semibold text-sm md:text-base text-navy">Import brodova</span>
         </div>
-        <p class="text-sm text-slate-400">Uvezi brodove iz Excel datoteke</p>
+        <p class="text-xs md:text-sm text-slate-400">Uvezi brodove iz Excel datoteke</p>
       </button>
     </div>
   </div>
@@ -379,31 +400,31 @@
 <!-- ================================================================ -->
 <!-- BOATS CATALOG                                                     -->
 <!-- ================================================================ -->
-<section id="screen-boats" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-boats" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
     <div>
-      <h1 class="font-display text-2xl font-bold text-navy">Katalog brodova</h1>
-      <p class="text-sm text-slate-400 mt-1">6 brodova u katalogu</p>
+      <h1 class="font-display text-lg md:text-xl lg:text-2xl font-bold text-navy">Katalog brodova</h1>
+      <p class="text-sm text-slate-400 mt-0.5">6 brodova u katalogu</p>
     </div>
-    <button onclick="navigate('boat-new')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
+    <button onclick="navigate('boat-new')" class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
       <i data-lucide="plus" class="w-4 h-4"></i>
       Dodaj brod
     </button>
   </div>
 
   <!-- Search & Filter -->
-  <div class="flex flex-col sm:flex-row gap-3 mb-6">
-    <div class="flex-1 flex items-center bg-white rounded-lg px-4 py-2.5 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
-      <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-3"></i>
+  <div class="flex flex-col sm:flex-row gap-2 mb-3 md:mb-4">
+    <div class="flex-1 flex items-center bg-white rounded-lg px-3 py-2 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
+      <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-2"></i>
       <input type="text" placeholder="Pretraži po nazivu ili modelu..." class="bg-transparent text-sm outline-none w-full placeholder:text-slate-400" />
     </div>
-    <select class="bg-white rounded-lg px-4 py-2.5 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
+    <select class="bg-white rounded-lg px-3 py-2 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
       <option value="all">Sve kategorije</option>
       <option value="new">Novo</option>
       <option value="used">Rabljeno</option>
     </select>
-    <select class="bg-white rounded-lg px-4 py-2.5 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
+    <select class="bg-white rounded-lg px-3 py-2 border border-slate-200 text-sm text-slate-600 outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition cursor-pointer">
       <option>Sortiraj: Najnovije</option>
       <option>Cijena: Rastuće</option>
       <option>Cijena: Padajuće</option>
@@ -412,7 +433,7 @@
   </div>
 
   <!-- Boats grid -->
-  <div id="boats-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+  <div id="boats-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
     <!-- Rendered by JS -->
   </div>
 </section>
@@ -420,25 +441,25 @@
 <!-- ================================================================ -->
 <!-- ADD NEW BOAT                                                      -->
 <!-- ================================================================ -->
-<section id="screen-boat-new" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-boat-new" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
-  <div class="flex items-center gap-3 mb-8">
+  <div class="flex items-center gap-3 mb-4 md:mb-6">
     <button onclick="navigate('boats')" class="p-2 hover:bg-slate-100 rounded-lg transition">
       <i data-lucide="arrow-left" class="w-5 h-5 text-slate-500"></i>
     </button>
     <div>
-      <h1 class="font-display text-2xl font-bold text-navy">Novi brod</h1>
+      <h1 class="font-display text-lg md:text-xl font-bold text-navy">Novi brod</h1>
       <p class="text-sm text-slate-400 mt-0.5">Dodaj novi brod u katalog</p>
     </div>
   </div>
 
   <!-- Form -->
   <div class="max-w-4xl">
-    <div class="bg-white rounded-xl border border-slate-200 p-6 lg:p-8 space-y-8">
+    <div class="bg-white rounded-xl border border-slate-200 p-3 md:p-4 lg:p-5 space-y-5 md:space-y-6">
       <!-- Basic info -->
       <div>
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Osnovne informacije</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Osnovne informacije</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div class="md:col-span-2">
             <label class="block text-sm font-semibold text-navy mb-1.5">Naziv broda *</label>
             <input type="text" placeholder="npr. Azimut Grande 120" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
@@ -485,8 +506,8 @@
 
       <!-- Image upload -->
       <div>
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Fotografija</h3>
-        <div class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-primary/50 transition cursor-pointer">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Fotografija</h3>
+        <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 md:p-6 text-center hover:border-primary/50 transition cursor-pointer">
           <div class="w-12 h-12 rounded-lg bg-slate-50 flex items-center justify-center mx-auto mb-3">
             <i data-lucide="image-plus" class="w-6 h-6 text-slate-400"></i>
           </div>
@@ -497,8 +518,8 @@
 
       <!-- Descriptions -->
       <div>
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Opisi</h3>
-        <div class="space-y-4">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Opisi</h3>
+        <div class="space-y-3">
           <div>
             <label class="block text-sm font-semibold text-navy mb-1.5">Opis (Hrvatski)</label>
             <textarea rows="3" placeholder="Opis broda na hrvatskom..." class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none"></textarea>
@@ -528,77 +549,77 @@
 <!-- ================================================================ -->
 <section id="screen-boat-detail" class="hidden screen-enter">
   <!-- Hero image -->
-  <div class="relative h-64 lg:h-80 overflow-hidden">
+  <div class="relative h-44 md:h-56 lg:h-72 overflow-hidden">
     <img id="detail-hero" src="" alt="" class="w-full h-full object-cover" />
     <div class="absolute inset-0 bg-gradient-to-t from-navy/80 via-navy/20 to-transparent"></div>
-    <div class="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
+    <div class="absolute bottom-0 left-0 right-0 p-3 md:p-5 lg:p-6">
       <div class="flex items-end justify-between">
         <div>
-          <div class="flex items-center gap-2 mb-2">
-            <span id="detail-category-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-400/20 text-emerald-300 uppercase tracking-wide">Novo</span>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span id="detail-category-badge" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-400/20 text-emerald-300 uppercase tracking-wide">Novo</span>
             <span id="detail-year-badge" class="text-sm text-white/60">2024</span>
           </div>
-          <h1 id="detail-name" class="font-display text-2xl lg:text-3xl font-bold text-white">Azimut Grande 120</h1>
+          <h1 id="detail-name" class="font-display text-lg md:text-xl lg:text-2xl font-bold text-white">Azimut Grande 120</h1>
         </div>
-        <div class="text-right">
-          <div class="text-xs text-white/50 uppercase tracking-wider mb-1">Bazna cijena</div>
-          <div id="detail-price" class="font-display text-2xl font-bold text-white">€12.500.000</div>
+        <div class="text-right hidden sm:block">
+          <div class="text-[10px] text-white/50 uppercase tracking-wider mb-0.5">Bazna cijena</div>
+          <div id="detail-price" class="font-display text-lg md:text-xl font-bold text-white">€12.500.000</div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Thumbnail gallery -->
-  <div class="px-6 lg:px-8 py-4 bg-white border-b border-slate-200">
-    <div id="detail-thumbnails" class="flex gap-3 overflow-x-auto pb-1">
+  <div class="px-3 md:px-5 py-2 md:py-3 bg-white border-b border-slate-200">
+    <div id="detail-thumbnails" class="flex gap-2 overflow-x-auto pb-1">
       <!-- Rendered by JS -->
     </div>
   </div>
 
   <!-- Content -->
-  <div class="p-6 lg:p-8">
+  <div class="p-3 md:p-4 lg:p-5">
     <!-- Tabs -->
-    <div class="flex gap-6 border-b border-slate-200 mb-6">
-      <button onclick="switchDetailTab('specs')" class="tab-btn pb-3 text-sm font-semibold tab-active" data-tab="specs">Specifikacije</button>
-      <button onclick="switchDetailTab('gallery')" class="tab-btn pb-3 text-sm font-semibold text-slate-400 hover:text-navy transition" data-tab="gallery">Galerija</button>
-      <button onclick="switchDetailTab('equip')" class="tab-btn pb-3 text-sm font-semibold text-slate-400 hover:text-navy transition" data-tab="equip">Oprema</button>
+    <div class="flex gap-4 md:gap-5 border-b border-slate-200 mb-3 md:mb-4">
+      <button onclick="switchDetailTab('specs')" class="tab-btn pb-2.5 text-sm font-semibold tab-active" data-tab="specs">Specifikacije</button>
+      <button onclick="switchDetailTab('gallery')" class="tab-btn pb-2.5 text-sm font-semibold text-slate-400 hover:text-navy transition" data-tab="gallery">Galerija</button>
+      <button onclick="switchDetailTab('equip')" class="tab-btn pb-2.5 text-sm font-semibold text-slate-400 hover:text-navy transition" data-tab="equip">Oprema</button>
     </div>
 
     <!-- Tab: Specs -->
     <div id="tab-specs" class="tab-content">
-      <div id="detail-specs" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div id="detail-specs" class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
         <!-- Rendered by JS -->
       </div>
     </div>
 
     <!-- Tab: Gallery -->
     <div id="tab-gallery" class="tab-content hidden">
-      <div id="detail-gallery" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div id="detail-gallery" class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
         <!-- Rendered by JS -->
       </div>
     </div>
 
     <!-- Tab: Equipment -->
     <div id="tab-equip" class="tab-content hidden">
-      <div id="detail-equipment-list" class="space-y-4">
+      <div id="detail-equipment-list" class="space-y-3">
         <!-- Rendered by JS -->
       </div>
     </div>
 
     <!-- Action bar -->
-    <div class="flex flex-wrap items-center gap-3 mt-8 pt-6 border-t border-slate-200">
-      <button onclick="navigate('boats')" class="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg transition">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> Natrag
+    <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 md:mt-6 md:pt-4 border-t border-slate-200">
+      <button onclick="navigate('boats')" class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm text-slate-500 hover:bg-slate-50 rounded-lg transition">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Natrag
       </button>
       <div class="flex-1"></div>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-navy hover:bg-slate-50 border border-slate-200 rounded-lg transition">
-        <i data-lucide="edit-3" class="w-4 h-4"></i> Uredi
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-navy hover:bg-slate-50 border border-slate-200 rounded-lg transition">
+        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Uredi
       </button>
-      <button onclick="navigateEquipment()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition">
-        <i data-lucide="settings-2" class="w-4 h-4"></i> Upravljaj opremom
+      <button onclick="navigateEquipment()" class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition">
+        <i data-lucide="settings-2" class="w-3.5 h-3.5"></i> Oprema
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition">
-        <i data-lucide="trash-2" class="w-4 h-4"></i> Obriši
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Obriši
       </button>
     </div>
   </div>
@@ -607,7 +628,7 @@
 <!-- ================================================================ -->
 <!-- EQUIPMENT MANAGEMENT                                              -->
 <!-- ================================================================ -->
-<section id="screen-equipment" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-equipment" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
   <div class="flex items-center gap-3 mb-2">
     <button onclick="navigate('boat-detail')" class="p-2 hover:bg-slate-100 rounded-lg transition">
@@ -624,10 +645,10 @@
   </div>
 
   <!-- Equipment accordion -->
-  <div id="equipment-manager" class="mt-6 space-y-4">
+  <div id="equipment-manager" class="mt-4 space-y-2 md:space-y-3">
     <!-- Category: Interijer -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
         <div class="flex items-center gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform"></i>
           <span class="font-semibold text-navy">Interijer</span>
@@ -637,7 +658,7 @@
       </button>
       <div class="accordion-content open border-t border-slate-100">
         <div class="divide-y divide-slate-50">
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-navy">Premium talijanska koža</div>
@@ -649,7 +670,7 @@
               <button class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-navy">Mramorna podna obloga</div>
@@ -661,7 +682,7 @@
               <button class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-navy">Steinway & Sons klavir</div>
@@ -673,7 +694,7 @@
               <button class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-navy">Custom umjetnička kolekcija</div>
@@ -691,7 +712,7 @@
 
     <!-- Category: Navigacija -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
         <div class="flex items-center gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform"></i>
           <span class="font-semibold text-navy">Navigacija</span>
@@ -701,7 +722,7 @@
       </button>
       <div class="accordion-content open border-t border-slate-100">
         <div class="divide-y divide-slate-50">
-          <div class="flex items-center gap-4 px-5 py-3.5 bg-emerald-50/30">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 bg-emerald-50/30">
             <input type="checkbox" checked disabled class="w-4 h-4 rounded border-slate-300 text-emerald-500 cursor-not-allowed" />
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
@@ -716,7 +737,7 @@
               <button class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-navy">Satelitski WiFi sustav</div>
@@ -728,7 +749,7 @@
               <button class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1 min-w-0">
               <div class="text-sm font-medium text-navy">Napredni radar sustav</div>
@@ -746,7 +767,7 @@
 
     <!-- Category: Motori -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
         <div class="flex items-center gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform rotate-[-90deg]"></i>
           <span class="font-semibold text-navy">Motori</span>
@@ -756,12 +777,12 @@
       </button>
       <div class="accordion-content border-t border-slate-100">
         <div class="divide-y divide-slate-50">
-          <div class="flex items-center gap-4 px-5 py-3.5 bg-emerald-50/30">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 bg-emerald-50/30">
             <input type="checkbox" checked disabled class="w-4 h-4 rounded border-slate-300 text-emerald-500 cursor-not-allowed" />
             <div class="flex-1"><div class="flex items-center gap-2"><span class="text-sm font-medium text-navy">Dual MTU 12V2000 M93</span><span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-semibold uppercase tracking-wider rounded-full">Uključeno</span></div></div>
             <span class="text-sm font-medium text-slate-400">Standard</span>
           </div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50 transition">
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50 transition">
             <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
             <div class="flex-1"><div class="text-sm font-medium text-navy">Generator upgrade paket</div></div>
             <span class="text-sm font-semibold text-primary tabular-nums">€28.000</span>
@@ -772,7 +793,7 @@
 
     <!-- Category: Audio/Video -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
         <div class="flex items-center gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform rotate-[-90deg]"></i>
           <span class="font-semibold text-navy">Audio / Video</span>
@@ -782,15 +803,15 @@
       </button>
       <div class="accordion-content border-t border-slate-100">
         <div class="divide-y divide-slate-50">
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Dolby Atmos kino sustav</div></div><span class="text-sm font-semibold text-primary tabular-nums">€95.000</span></div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Multi-room audio sustav</div></div><span class="text-sm font-semibold text-primary tabular-nums">€55.000</span></div>
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Dolby Atmos kino sustav</div></div><span class="text-sm font-semibold text-primary tabular-nums">€95.000</span></div>
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Multi-room audio sustav</div></div><span class="text-sm font-semibold text-primary tabular-nums">€55.000</span></div>
         </div>
       </div>
     </div>
 
     <!-- Category: Paluba -->
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
         <div class="flex items-center gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform rotate-[-90deg]"></i>
           <span class="font-semibold text-navy">Paluba</span>
@@ -800,8 +821,8 @@
       </button>
       <div class="accordion-content border-t border-slate-100">
         <div class="divide-y divide-slate-50">
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Jacuzzi na palubi</div></div><span class="text-sm font-semibold text-primary tabular-nums">€75.000</span></div>
-          <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Tender garaža</div></div><span class="text-sm font-semibold text-primary tabular-nums">€45.000</span></div>
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Jacuzzi na palubi</div></div><span class="text-sm font-semibold text-primary tabular-nums">€75.000</span></div>
+          <div class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 hover:bg-slate-50/50"><input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary" /><div class="flex-1"><div class="text-sm font-medium text-navy">Tender garaža</div></div><span class="text-sm font-semibold text-primary tabular-nums">€45.000</span></div>
         </div>
       </div>
     </div>
@@ -811,16 +832,16 @@
 <!-- ================================================================ -->
 <!-- EXCEL IMPORT WIZARD                                               -->
 <!-- ================================================================ -->
-<section id="screen-import" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-import" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <div class="max-w-3xl mx-auto">
     <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="font-display text-2xl font-bold text-navy">Import brodova</h1>
+    <div class="text-center mb-3 md:mb-5">
+      <h1 class="font-display text-lg md:text-xl font-bold text-navy">Import brodova</h1>
       <p class="text-sm text-slate-400 mt-1">Uvezi brodove iz Excel ili CSV datoteke</p>
     </div>
 
     <!-- Step indicator -->
-    <div class="flex items-center justify-center gap-0 mb-10">
+    <div class="flex items-center justify-center gap-0 mb-4 md:mb-6">
       <div class="flex items-center gap-2" id="import-step-1-indicator">
         <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">1</div>
         <span class="text-sm font-semibold text-navy hidden sm:block">Upload</span>
@@ -838,8 +859,8 @@
     </div>
 
     <!-- Step 1: Upload -->
-    <div id="import-step-1" class="bg-white rounded-xl border border-slate-200 p-8">
-      <div class="border-2 border-dashed border-slate-200 rounded-xl p-12 text-center hover:border-primary/50 transition cursor-pointer" onclick="advanceImportStep(2)">
+    <div id="import-step-1" class="bg-white rounded-xl border border-slate-200 p-4 md:p-6">
+      <div class="border-2 border-dashed border-slate-200 rounded-xl p-6 md:p-8 text-center hover:border-primary/50 transition cursor-pointer" onclick="advanceImportStep(2)">
         <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
           <i data-lucide="upload-cloud" class="w-8 h-8 text-primary"></i>
         </div>
@@ -855,7 +876,7 @@
     </div>
 
     <!-- Step 2: Validation (hidden) -->
-    <div id="import-step-2" class="hidden bg-white rounded-xl border border-slate-200 p-8">
+    <div id="import-step-2" class="hidden bg-white rounded-xl border border-slate-200 p-4 md:p-6">
       <h3 class="font-semibold text-navy mb-4">Pregled podataka</h3>
       <!-- Validation summary -->
       <div class="flex gap-4 mb-6">
@@ -894,7 +915,7 @@
     </div>
 
     <!-- Step 3: Confirm (hidden) -->
-    <div id="import-step-3" class="hidden bg-white rounded-xl border border-slate-200 p-8">
+    <div id="import-step-3" class="hidden bg-white rounded-xl border border-slate-200 p-4 md:p-6">
       <div class="text-center mb-6">
         <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-3">
           <i data-lucide="check-circle" class="w-7 h-7 text-emerald-500"></i>
@@ -923,49 +944,48 @@
 <!-- ================================================================ -->
 <!-- CONFIGURATOR STEP 1 — SELECT BOAT                                 -->
 <!-- ================================================================ -->
-<section id="screen-config-1" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-config-1" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Step indicator -->
-  <div class="mb-8">
-    <div class="flex items-center justify-center gap-0 mb-6">
-      <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">1</div><span class="text-sm font-semibold text-navy hidden sm:block">Odabir jahte</span></div>
-      <div class="w-12 lg:w-20 h-px bg-slate-200 mx-3"></div>
-      <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold">2</div><span class="text-sm font-medium text-slate-400 hidden sm:block">Oprema</span></div>
-      <div class="w-12 lg:w-20 h-px bg-slate-200 mx-3"></div>
-      <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold">3</div><span class="text-sm font-medium text-slate-400 hidden sm:block">Klijent</span></div>
-      <div class="w-12 lg:w-20 h-px bg-slate-200 mx-3"></div>
-      <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold">4</div><span class="text-sm font-medium text-slate-400 hidden sm:block">Pregled</span></div>
+  <div class="mb-3 md:mb-5">
+    <div class="flex items-center justify-center gap-0 mb-3 md:mb-4">
+      <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">1</div><span class="text-sm font-semibold text-navy hidden md:block">Odabir jahte</span></div>
+      <div class="w-8 md:w-16 h-px bg-slate-200 mx-1.5 md:mx-2"></div>
+      <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold">2</div><span class="text-sm font-medium text-slate-400 hidden md:block">Oprema</span></div>
+      <div class="w-8 md:w-16 h-px bg-slate-200 mx-1.5 md:mx-2"></div>
+      <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold">3</div><span class="text-sm font-medium text-slate-400 hidden md:block">Klijent</span></div>
+      <div class="w-8 md:w-16 h-px bg-slate-200 mx-1.5 md:mx-2"></div>
+      <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold">4</div><span class="text-sm font-medium text-slate-400 hidden md:block">Pregled</span></div>
     </div>
-    <h1 class="font-display text-2xl font-bold text-navy text-center">Odaberite jahtu</h1>
-    <p class="text-sm text-slate-400 text-center mt-1">Kliknite na jahtu za prikaz detalja</p>
+    <h1 class="font-display text-lg md:text-xl font-bold text-navy text-center">Odaberite jahtu</h1>
   </div>
 
   <!-- Content: Grid + Detail panel -->
-  <div class="flex gap-6">
+  <div class="flex gap-3 md:gap-4 lg:gap-5">
     <!-- Boat grid -->
     <div class="flex-1">
-      <div id="config-boat-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+      <div id="config-boat-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-3 lg:gap-4">
         <!-- Rendered by JS -->
       </div>
     </div>
 
-    <!-- Detail panel (hidden until boat selected) -->
-    <div id="config-detail-panel" class="hidden w-96 flex-shrink-0">
-      <div class="sticky top-24 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-        <img id="config-panel-image" src="" alt="" class="w-full h-48 object-cover" />
-        <div class="p-5">
-          <h3 id="config-panel-name" class="font-display text-xl font-bold text-navy mb-1"></h3>
-          <p id="config-panel-meta" class="text-sm text-slate-400 mb-4"></p>
+    <!-- Detail panel — desktop only (hidden on mobile, inline expand handles it) -->
+    <div id="config-detail-panel" class="hidden w-72 lg:w-80 flex-shrink-0" data-desktop-panel>
+      <div class="sticky top-16 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+        <img id="config-panel-image" src="" alt="" class="w-full h-36 object-cover" />
+        <div class="p-3 md:p-4">
+          <h3 id="config-panel-name" class="font-display text-lg font-bold text-navy mb-1"></h3>
+          <p id="config-panel-meta" class="text-sm text-slate-400 mb-3"></p>
 
-          <div class="space-y-2 mb-5" id="config-panel-specs">
+          <div class="space-y-2 mb-4" id="config-panel-specs">
             <!-- Rendered by JS -->
           </div>
 
-          <div class="pt-4 border-t border-slate-100">
+          <div class="pt-3 border-t border-slate-100">
             <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Bazna cijena</div>
-            <div id="config-panel-price" class="font-display text-2xl font-bold text-primary"></div>
+            <div id="config-panel-price" class="font-display text-xl font-bold text-primary"></div>
           </div>
 
-          <button onclick="proceedToStep2()" class="w-full mt-5 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition shadow-sm shadow-primary/25">
+          <button onclick="proceedToStep2()" class="w-full mt-4 py-2.5 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition shadow-sm shadow-primary/25 text-sm">
             Konfiguriraj ovu jahtu →
           </button>
         </div>
@@ -974,59 +994,60 @@
   </div>
 </section>
 
+
 <!-- ================================================================ -->
 <!-- CONFIGURATOR STEP 2 — EQUIPMENT CONFIGURATION                     -->
 <!-- ================================================================ -->
-<section id="screen-config-2" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-config-2" class="hidden p-3 md:p-4 lg:p-5 screen-enter has-sticky-bar">
   <!-- Step indicator -->
-  <div class="flex items-center justify-center gap-0 mb-8">
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-sm font-semibold text-emerald-600 hidden sm:block">Jahta</span></div>
-    <div class="w-12 lg:w-20 h-px bg-emerald-300 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">2</div><span class="text-sm font-semibold text-navy hidden sm:block">Oprema</span></div>
-    <div class="w-12 lg:w-20 h-px bg-slate-200 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold">3</div><span class="text-sm font-medium text-slate-400 hidden sm:block">Klijent</span></div>
-    <div class="w-12 lg:w-20 h-px bg-slate-200 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold">4</div><span class="text-sm font-medium text-slate-400 hidden sm:block">Pregled</span></div>
+  <div class="flex items-center justify-center gap-0 mb-3 md:mb-5">
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div><span class="text-sm font-semibold text-emerald-600 hidden md:block">Jahta</span></div>
+    <div class="w-8 md:w-16 h-px bg-emerald-300 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">2</div><span class="text-sm font-semibold text-navy hidden md:block">Oprema</span></div>
+    <div class="w-8 md:w-16 h-px bg-slate-200 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold">3</div><span class="text-sm font-medium text-slate-400 hidden md:block">Klijent</span></div>
+    <div class="w-8 md:w-16 h-px bg-slate-200 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold">4</div><span class="text-sm font-medium text-slate-400 hidden md:block">Pregled</span></div>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-6">
+  <div class="flex flex-col lg:flex-row gap-3 md:gap-4 lg:gap-5">
     <!-- Left: Equipment categories -->
     <div class="flex-1 min-w-0">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="font-display text-xl font-bold text-navy">Konfiguracija opreme</h2>
-        <div class="flex items-center bg-white rounded-lg px-3 py-2 border border-slate-200 focus-within:border-primary transition">
+      <div class="flex items-center justify-between mb-3 md:mb-4">
+        <h2 class="font-display text-lg md:text-xl font-bold text-navy">Konfiguracija opreme</h2>
+        <div class="flex items-center bg-white rounded-lg px-3 py-1.5 border border-slate-200 focus-within:border-primary transition">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-2"></i>
-          <input type="text" placeholder="Pretraži opremu..." class="bg-transparent text-sm outline-none w-40 placeholder:text-slate-400" />
+          <input type="text" placeholder="Pretraži opremu..." class="bg-transparent text-sm outline-none w-32 md:w-40 placeholder:text-slate-400" />
         </div>
       </div>
 
-      <div id="config-equipment-list" class="space-y-4">
+      <div id="config-equipment-list" class="space-y-2 md:space-y-3">
         <!-- Rendered by JS: accordion categories with checkbox items -->
       </div>
     </div>
 
     <!-- Right: Price Summary (sticky) -->
-    <div class="w-full lg:w-[380px] flex-shrink-0">
-      <div class="sticky top-24">
+    <div class="hidden lg:block w-72 lg:w-80 flex-shrink-0">
+      <div class="sticky top-16">
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           <!-- Boat info -->
-          <div class="p-5 border-b border-slate-100 flex items-center gap-4">
-            <img id="config2-boat-thumb" src="" alt="" class="w-16 h-12 rounded-lg object-cover" />
+          <div class="p-3 md:p-4 border-b border-slate-100 flex items-center gap-3">
+            <img id="config2-boat-thumb" src="" alt="" class="w-12 h-9 md:w-16 md:h-12 rounded-lg object-cover" />
             <div>
               <div id="config2-boat-name" class="font-semibold text-navy text-sm"></div>
               <div id="config2-boat-meta" class="text-xs text-slate-400"></div>
             </div>
           </div>
 
-          <div class="p-5">
+          <div class="p-3 md:p-4">
             <!-- Base price -->
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-3">
               <span class="text-sm text-slate-500">Bazna cijena</span>
               <span id="config2-base-price" class="text-sm font-semibold text-navy tabular-nums"></span>
             </div>
 
             <!-- Selected equipment -->
-            <div class="mb-4">
+            <div class="mb-3">
               <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Odabrana oprema</div>
               <div id="config2-selected-items" class="space-y-1.5 max-h-48 overflow-y-auto">
                 <p class="text-xs text-slate-400 italic">Nema odabranih opcija</p>
@@ -1034,24 +1055,24 @@
             </div>
 
             <!-- Equipment total -->
-            <div class="flex justify-between items-center py-3 border-t border-slate-100">
+            <div class="flex justify-between items-center py-2.5 border-t border-slate-100">
               <span class="text-sm text-slate-500">Oprema ukupno</span>
               <span id="config2-equip-total" class="text-sm font-semibold text-primary tabular-nums">€0</span>
             </div>
 
             <!-- Grand total -->
-            <div class="flex justify-between items-center py-4 border-t-2 border-navy/10 mt-2">
-              <span class="text-base font-bold text-navy">UKUPNO</span>
-              <span id="config2-grand-total" class="font-display text-2xl font-bold text-navy tabular-nums"></span>
+            <div class="flex justify-between items-center py-3 border-t-2 border-navy/10 mt-1">
+              <span class="text-sm font-bold text-navy">UKUPNO</span>
+              <span id="config2-grand-total" class="font-display text-lg md:text-xl font-bold text-navy tabular-nums"></span>
             </div>
           </div>
 
           <!-- Navigation buttons -->
-          <div class="px-5 pb-5 flex gap-3">
-            <button onclick="navigate('config-1')" class="flex-1 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition text-center">
+          <div class="px-3 md:px-4 pb-3 md:pb-4 flex gap-3">
+            <button onclick="navigate('config-1')" class="flex-1 py-2 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition text-center">
               ← Natrag
             </button>
-            <button onclick="proceedToStep3()" class="flex-1 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-dark rounded-lg transition text-center shadow-sm">
+            <button onclick="proceedToStep3()" class="flex-1 py-2 text-sm font-semibold text-white bg-primary hover:bg-primary-dark rounded-lg transition text-center shadow-sm">
               Dalje →
             </button>
           </div>
@@ -1059,87 +1080,108 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile navigation buttons (visible below lg) -->
+  <div class="lg:hidden flex gap-3 mt-4">
+    <button onclick="navigate('config-1')" class="flex-1 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition text-center">
+      ← Natrag
+    </button>
+    <button onclick="proceedToStep3()" class="flex-1 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-dark rounded-lg transition text-center shadow-sm">
+      Dalje →
+    </button>
+  </div>
+
+  <!-- Sticky price bar for mobile -->
+  <div id="mobile-price-bar" class="sticky-price-bar">
+    <div>
+      <div class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ukupno</div>
+      <div id="mobile-grand-total" class="text-lg font-display font-bold text-navy tabular-nums">€0</div>
+    </div>
+    <button onclick="proceedToStep3()" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg">
+      Dalje →
+    </button>
+  </div>
 </section>
 
 <!-- ================================================================ -->
 <!-- CONFIGURATOR STEP 3 — CLIENT DATA                                 -->
 <!-- ================================================================ -->
-<section id="screen-config-3" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-config-3" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Step indicator -->
-  <div class="flex items-center justify-center gap-0 mb-8">
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-sm font-semibold text-emerald-600 hidden sm:block">Jahta</span></div>
-    <div class="w-12 lg:w-20 h-px bg-emerald-300 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-sm font-semibold text-emerald-600 hidden sm:block">Oprema</span></div>
-    <div class="w-12 lg:w-20 h-px bg-emerald-300 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">3</div><span class="text-sm font-semibold text-navy hidden sm:block">Klijent</span></div>
-    <div class="w-12 lg:w-20 h-px bg-slate-200 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-bold">4</div><span class="text-sm font-medium text-slate-400 hidden sm:block">Pregled</span></div>
+  <div class="flex items-center justify-center gap-0 mb-3 md:mb-5">
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div><span class="text-sm font-semibold text-emerald-600 hidden md:block">Jahta</span></div>
+    <div class="w-8 md:w-16 h-px bg-emerald-300 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div><span class="text-sm font-semibold text-emerald-600 hidden md:block">Oprema</span></div>
+    <div class="w-8 md:w-16 h-px bg-emerald-300 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">3</div><span class="text-sm font-semibold text-navy hidden md:block">Klijent</span></div>
+    <div class="w-8 md:w-16 h-px bg-slate-200 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-xs font-bold">4</div><span class="text-sm font-medium text-slate-400 hidden md:block">Pregled</span></div>
   </div>
 
   <div class="max-w-2xl mx-auto">
-    <div class="text-center mb-8">
-      <h2 class="font-display text-xl font-bold text-navy">Podaci o klijentu</h2>
+    <div class="text-center mb-4 md:mb-6">
+      <h2 class="font-display text-lg md:text-xl font-bold text-navy">Podaci o klijentu</h2>
       <p class="text-sm text-slate-400 mt-1">Unesite podatke klijenta za ponudu</p>
     </div>
 
-    <div class="bg-white rounded-xl border border-slate-200 p-6 lg:p-8">
-      <div class="space-y-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div class="bg-white rounded-xl border border-slate-200 p-3 md:p-4 lg:p-5">
+      <div class="space-y-3 md:space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label class="block text-sm font-semibold text-navy mb-1.5">Ime i prezime *</label>
+            <label class="block text-sm font-semibold text-navy mb-1">Ime i prezime *</label>
             <input id="client-name" type="text" placeholder="npr. Jean-Pierre Moreau" value="Jean-Pierre Moreau"
-                   class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
+                   class="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
           </div>
           <div>
-            <label class="block text-sm font-semibold text-navy mb-1.5">Tvrtka</label>
+            <label class="block text-sm font-semibold text-navy mb-1">Tvrtka</label>
             <input id="client-company" type="text" placeholder="npr. Moreau Maritime" value="Moreau Maritime"
-                   class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
+                   class="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
-            <label class="block text-sm font-semibold text-navy mb-1.5">Email *</label>
+            <label class="block text-sm font-semibold text-navy mb-1">Email *</label>
             <input id="client-email" type="email" placeholder="email@primjer.com" value="jp.moreau@shipping.fr"
-                   class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
+                   class="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
           </div>
           <div>
-            <label class="block text-sm font-semibold text-navy mb-1.5">Telefon</label>
+            <label class="block text-sm font-semibold text-navy mb-1">Telefon</label>
             <input id="client-phone" type="tel" placeholder="+385 1 234 5678" value="+33 1 42 86 97 01"
-                   class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
+                   class="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-navy mb-2">Jezik ponude</label>
-          <div class="flex gap-4">
-            <label class="flex items-center gap-2 cursor-pointer px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+          <label class="block text-sm font-semibold text-navy mb-1">Jezik ponude</label>
+          <div class="flex flex-col md:flex-row gap-2 md:gap-3">
+            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 md:px-4 md:py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition has-[:checked]:border-primary has-[:checked]:bg-primary/5">
               <input type="radio" name="language" value="hr" class="w-4 h-4 text-primary focus:ring-primary/20" />
-              <span class="text-sm font-medium">🇭🇷 Hrvatski</span>
+              <span class="text-sm font-medium">Hrvatski</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 md:px-4 md:py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 transition has-[:checked]:border-primary has-[:checked]:bg-primary/5">
               <input type="radio" name="language" value="en" checked class="w-4 h-4 text-primary focus:ring-primary/20" />
-              <span class="text-sm font-medium">🇬🇧 English</span>
+              <span class="text-sm font-medium">English</span>
             </label>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-navy mb-1.5">Napomene</label>
+          <label class="block text-sm font-semibold text-navy mb-1">Napomene</label>
           <textarea id="client-notes" rows="3" placeholder="Dodatne napomene za ponudu..."
-                    class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none">Klijent zainteresiran za isporuku u Monaco. Preferira tamnu unutrašnjost.</textarea>
+                    class="w-full px-3 py-2 md:px-4 md:py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none">Klijent zainteresiran za isporuku u Monaco. Preferira tamnu unutrašnjost.</textarea>
         </div>
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center justify-between mt-8 pt-5 border-t border-slate-100">
-        <button onclick="navigate('config-2')" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">
+      <div class="flex items-center justify-between mt-5 pt-3 md:mt-6 md:pt-4 border-t border-slate-100">
+        <button onclick="navigate('config-2')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">
           ← Natrag
         </button>
-        <div class="flex gap-3">
-          <button onclick="navigate('quotes')" class="px-5 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition">
+        <div class="flex gap-2 md:gap-3">
+          <button onclick="navigate('quotes')" class="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition">
             Spremi draft
           </button>
-          <button onclick="proceedToStep4()" class="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
+          <button onclick="proceedToStep4()" class="px-5 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
             Dalje →
           </button>
         </div>
@@ -1151,31 +1193,31 @@
 <!-- ================================================================ -->
 <!-- CONFIGURATOR STEP 4 — REVIEW & PDF                                -->
 <!-- ================================================================ -->
-<section id="screen-config-4" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-config-4" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Step indicator -->
-  <div class="flex items-center justify-center gap-0 mb-8">
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-sm font-semibold text-emerald-600 hidden sm:block">Jahta</span></div>
-    <div class="w-12 lg:w-20 h-px bg-emerald-300 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-sm font-semibold text-emerald-600 hidden sm:block">Oprema</span></div>
-    <div class="w-12 lg:w-20 h-px bg-emerald-300 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div><span class="text-sm font-semibold text-emerald-600 hidden sm:block">Klijent</span></div>
-    <div class="w-12 lg:w-20 h-px bg-emerald-300 mx-3"></div>
-    <div class="flex items-center gap-2"><div class="step-circle w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">4</div><span class="text-sm font-semibold text-navy hidden sm:block">Pregled</span></div>
+  <div class="flex items-center justify-center gap-0 mb-3 md:mb-5">
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div><span class="text-sm font-semibold text-emerald-600 hidden md:block">Jahta</span></div>
+    <div class="w-8 md:w-16 h-px bg-emerald-300 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div><span class="text-sm font-semibold text-emerald-600 hidden md:block">Oprema</span></div>
+    <div class="w-8 md:w-16 h-px bg-emerald-300 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div><span class="text-sm font-semibold text-emerald-600 hidden md:block">Klijent</span></div>
+    <div class="w-8 md:w-16 h-px bg-emerald-300 mx-1.5 md:mx-2"></div>
+    <div class="flex items-center gap-1.5"><div class="step-circle w-6 h-6 md:w-7 md:h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">4</div><span class="text-sm font-semibold text-navy hidden md:block">Pregled</span></div>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-6">
+  <div class="flex flex-col lg:flex-row gap-3 md:gap-4 lg:gap-5">
     <!-- Left: Summary -->
     <div class="flex-1">
-      <h2 class="font-display text-xl font-bold text-navy mb-5">Pregled ponude</h2>
+      <h2 class="font-display text-lg md:text-xl font-bold text-navy mb-3 md:mb-4">Pregled ponude</h2>
 
       <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <!-- Boat section -->
-        <div class="p-6 border-b border-slate-100">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Jahta</h3>
-          <div class="flex gap-4">
-            <img id="review-boat-image" src="" alt="" class="w-32 h-20 rounded-lg object-cover" />
+        <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Jahta</h3>
+          <div class="flex gap-3">
+            <img id="review-boat-image" src="" alt="" class="w-20 h-14 md:w-28 md:h-20 rounded-lg object-cover" />
             <div>
-              <div id="review-boat-name" class="font-semibold text-navy text-lg"></div>
+              <div id="review-boat-name" class="font-semibold text-navy text-base md:text-lg"></div>
               <div id="review-boat-meta" class="text-sm text-slate-400 mt-0.5"></div>
               <div id="review-boat-specs-brief" class="text-xs text-slate-400 mt-1"></div>
             </div>
@@ -1183,16 +1225,16 @@
         </div>
 
         <!-- Equipment section -->
-        <div class="p-6 border-b border-slate-100">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Odabrana oprema</h3>
-          <div id="review-equipment" class="space-y-3">
+        <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Odabrana oprema</h3>
+          <div id="review-equipment" class="space-y-2">
             <!-- Rendered by JS -->
           </div>
         </div>
 
         <!-- Pricing section -->
-        <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Cijena</h3>
+        <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100 bg-slate-50/50">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Cijena</h3>
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
               <span class="text-slate-500">Bazna cijena</span>
@@ -1207,16 +1249,16 @@
               <span class="font-medium text-slate-400 tabular-nums">€0</span>
             </div>
             <div class="border-t border-slate-200 pt-3 mt-3 flex justify-between">
-              <span class="text-base font-bold text-navy">UKUPNO</span>
-              <span id="review-grand-total" class="font-display text-2xl font-bold text-navy tabular-nums"></span>
+              <span class="text-sm font-bold text-navy">UKUPNO</span>
+              <span id="review-grand-total" class="font-display text-lg md:text-xl font-bold text-navy tabular-nums"></span>
             </div>
           </div>
         </div>
 
         <!-- Client section -->
-        <div class="p-6">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Klijent</h3>
-          <div class="grid grid-cols-2 gap-3 text-sm">
+        <div class="p-3 md:p-4 lg:p-5">
+          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Klijent</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 text-sm">
             <div><span class="text-slate-400">Ime:</span> <span id="review-client-name" class="font-medium text-navy"></span></div>
             <div><span class="text-slate-400">Tvrtka:</span> <span id="review-client-company" class="font-medium text-navy"></span></div>
             <div><span class="text-slate-400">Email:</span> <span id="review-client-email" class="font-medium text-navy"></span></div>
@@ -1231,28 +1273,28 @@
     </div>
 
     <!-- Right: Actions -->
-    <div class="w-full lg:w-80 flex-shrink-0">
-      <div class="sticky top-24 space-y-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
+    <div class="w-full lg:w-72 xl:w-80 flex-shrink-0">
+      <div class="sticky top-16 space-y-2 md:space-y-3">
+        <div class="bg-white rounded-xl border border-slate-200 p-3 md:p-4 lg:p-5">
           <h3 class="font-semibold text-navy mb-1">Gotovo!</h3>
-          <p class="text-sm text-slate-400 mb-5">Pregledajte ponudu i generirajte PDF</p>
+          <p class="text-sm text-slate-400 mb-4">Pregledajte ponudu i generirajte PDF</p>
 
-          <button onclick="showPdfModal()" class="w-full py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition shadow-lg shadow-primary/25 flex items-center justify-center gap-2">
-            <i data-lucide="file-down" class="w-5 h-5"></i>
+          <button onclick="showPdfModal()" class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition shadow-lg shadow-primary/25 flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="file-down" class="w-4 h-4"></i>
             Generiraj PDF
           </button>
 
-          <button onclick="navigate('quotes')" class="w-full mt-3 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition text-center">
+          <button onclick="navigate('quotes')" class="w-full mt-2 py-2 text-sm font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition text-center">
             Spremi kao draft
           </button>
 
-          <button onclick="navigate('config-3')" class="w-full mt-2 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition text-center">
+          <button onclick="navigate('config-3')" class="w-full mt-1.5 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition text-center">
             ← Uredi ponudu
           </button>
         </div>
 
         <!-- Quote number preview -->
-        <div class="bg-navy/5 rounded-xl p-5">
+        <div class="bg-navy/5 rounded-xl p-3 md:p-4">
           <div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Broj ponude</div>
           <div class="font-display text-lg font-bold text-navy">NM-2025-043</div>
           <div class="text-xs text-slate-400 mt-2">Datum: 11.02.2025.</div>
@@ -1266,11 +1308,11 @@
 <!-- ================================================================ -->
 <!-- QUOTES LIST                                                       -->
 <!-- ================================================================ -->
-<section id="screen-quotes" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-quotes" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
     <div>
-      <h1 class="font-display text-2xl font-bold text-navy">Povijest ponuda</h1>
+      <h1 class="font-display text-lg md:text-xl font-bold text-navy">Povijest ponuda</h1>
       <p class="text-sm text-slate-400 mt-1">Upravljajte svim kreiranim ponudama</p>
     </div>
     <button onclick="navigate('config-1')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition shadow-sm">
@@ -1280,7 +1322,7 @@
   </div>
 
   <!-- Filters -->
-  <div class="flex flex-col sm:flex-row gap-3 mb-6">
+  <div class="flex flex-col sm:flex-row gap-2 mb-3 md:mb-4">
     <div class="flex-1 flex items-center bg-white rounded-lg px-4 py-2.5 border border-slate-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition">
       <i data-lucide="search" class="w-4 h-4 text-slate-400 mr-3"></i>
       <input type="text" placeholder="Pretraži po broju ponude ili klijentu..." class="bg-transparent text-sm outline-none w-full placeholder:text-slate-400" />
@@ -1300,14 +1342,14 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="bg-slate-50 text-left">
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider"># Ponuda</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Brod</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Klijent</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden md:table-cell">Email</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Iznos</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Datum</th>
-            <th class="px-5 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">Akcije</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider"># Ponuda</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Brod</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Klijent</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden md:table-cell">Email</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Iznos</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden lg:table-cell">Datum</th>
+            <th class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">Akcije</th>
           </tr>
         </thead>
         <tbody id="quotes-table-body" class="divide-y divide-slate-100">
@@ -1330,7 +1372,7 @@
 <!-- ================================================================ -->
 <!-- QUOTE DETAIL                                                      -->
 <!-- ================================================================ -->
-<section id="screen-quote-detail" class="hidden p-6 lg:p-8 screen-enter">
+<section id="screen-quote-detail" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
   <!-- Header -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div class="flex items-center gap-3">
@@ -1339,45 +1381,45 @@
       </button>
       <div>
         <div class="flex items-center gap-3">
-          <h1 id="qd-number" class="font-display text-2xl font-bold text-navy">NM-2025-042</h1>
+          <h1 id="qd-number" class="font-display text-lg md:text-xl font-bold text-navy">NM-2025-042</h1>
           <span id="qd-status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Sent</span>
         </div>
         <p id="qd-date" class="text-sm text-slate-400 mt-0.5">Kreirano: 5. veljače 2025.</p>
       </div>
     </div>
     <div class="flex flex-wrap gap-2">
-      <button onclick="showPdfModal()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition">
-        <i data-lucide="download" class="w-4 h-4"></i> Preuzmi PDF
+      <button onclick="showPdfModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-white bg-primary hover:bg-primary-dark rounded-lg transition">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i> PDF
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-navy border border-slate-200 hover:bg-slate-50 rounded-lg transition">
-        <i data-lucide="copy" class="w-4 h-4"></i> Dupliciraj
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-navy border border-slate-200 hover:bg-slate-50 rounded-lg transition">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Dupliciraj
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 border border-emerald-200 hover:bg-emerald-50 rounded-lg transition">
-        <i data-lucide="check-circle" class="w-4 h-4"></i> Prihvaćeno
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-emerald-600 border border-emerald-200 hover:bg-emerald-50 rounded-lg transition">
+        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> OK
       </button>
-      <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 rounded-lg transition">
-        <i data-lucide="x-circle" class="w-4 h-4"></i> Odbijeno
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-red-500 border border-red-200 hover:bg-red-50 rounded-lg transition">
+        <i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Ne
       </button>
     </div>
   </div>
 
   <!-- Status timeline -->
-  <div class="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+  <div class="bg-white rounded-xl border border-slate-200 p-3 md:p-4 mb-4 md:mb-5">
     <div class="flex items-center justify-between max-w-xl mx-auto">
       <div class="flex flex-col items-center gap-1">
-        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center"><i data-lucide="check" class="w-4 h-4"></i></div>
         <span class="text-xs font-semibold text-emerald-600">Draft</span>
         <span class="text-[10px] text-slate-400">3. velj.</span>
       </div>
       <div class="flex-1 h-px bg-emerald-300 mx-3"></div>
       <div class="flex flex-col items-center gap-1">
-        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></div>
         <span class="text-xs font-semibold text-primary">Sent</span>
         <span class="text-[10px] text-slate-400">5. velj.</span>
       </div>
       <div class="flex-1 h-px bg-slate-200 mx-3"></div>
       <div class="flex flex-col items-center gap-1">
-        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
         <span class="text-xs font-medium text-slate-400">Accepted</span>
         <span class="text-[10px] text-slate-300">—</span>
       </div>
@@ -1387,9 +1429,9 @@
   <!-- Content -->
   <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <!-- Client -->
-    <div class="p-6 border-b border-slate-100">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Klijent</h3>
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 text-sm">
         <div><div class="text-slate-400 text-xs mb-0.5">Ime</div><div id="qd-client-name" class="font-medium text-navy">Jean-Pierre Moreau</div></div>
         <div><div class="text-slate-400 text-xs mb-0.5">Tvrtka</div><div id="qd-client-company" class="font-medium text-navy">Moreau Maritime</div></div>
         <div><div class="text-slate-400 text-xs mb-0.5">Email</div><div id="qd-client-email" class="font-medium text-navy">jp.moreau@shipping.fr</div></div>
@@ -1398,10 +1440,10 @@
     </div>
 
     <!-- Boat -->
-    <div class="p-6 border-b border-slate-100">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Jahta</h3>
-      <div class="flex gap-5">
-        <img id="qd-boat-image" src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=600&h=400&fit=crop&q=80" alt="" class="w-40 h-28 rounded-lg object-cover" />
+      <div class="flex gap-3 md:gap-4">
+        <img id="qd-boat-image" src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=600&h=400&fit=crop&q=80" alt="" class="w-24 h-16 md:w-32 md:h-20 rounded-lg object-cover" />
         <div>
           <div id="qd-boat-name" class="font-display text-lg font-bold text-navy">Azimut Grande 120</div>
           <div id="qd-boat-meta" class="text-sm text-slate-400 mt-0.5">2024 · 41m · 16 gostiju</div>
@@ -1413,7 +1455,7 @@
     </div>
 
     <!-- Equipment -->
-    <div class="p-6 border-b border-slate-100">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Odabrana oprema</h3>
       <div id="qd-equipment" class="space-y-4">
         <div>
@@ -1440,7 +1482,7 @@
     </div>
 
     <!-- Pricing -->
-    <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+    <div class="p-3 md:p-4 lg:p-5 border-b border-slate-100 bg-slate-50/50">
       <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Cijena</h3>
       <div class="max-w-sm space-y-2">
         <div class="flex justify-between text-sm"><span class="text-slate-500">Bazna cijena</span><span class="font-medium text-navy tabular-nums">€12.500.000</span></div>
@@ -1454,8 +1496,8 @@
     </div>
 
     <!-- Notes & Terms -->
-    <div class="p-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-3 md:p-4 lg:p-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <div>
           <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Napomene</h3>
           <p id="qd-notes" class="text-sm text-slate-600">Klijent zainteresiran za isporuku u Monaco. Preferira tamnu unutrašnjost.</p>
@@ -1477,10 +1519,10 @@
 <!-- ================================================================ -->
 <!-- SETTINGS                                                          -->
 <!-- ================================================================ -->
-<section id="screen-settings" class="hidden p-6 lg:p-8 screen-enter">
-  <h1 class="font-display text-2xl font-bold text-navy mb-8">Postavke</h1>
+<section id="screen-settings" class="hidden p-3 md:p-4 lg:p-5 screen-enter">
+  <h1 class="font-display text-lg md:text-xl font-bold text-navy mb-4 md:mb-6">Postavke</h1>
 
-  <div class="flex flex-col md:flex-row gap-6">
+  <div class="flex flex-col md:flex-row gap-3 md:gap-4 lg:gap-5">
     <!-- Left: Tab navigation -->
     <div class="md:w-48 flex-shrink-0">
       <nav class="flex md:flex-col gap-1">
@@ -1499,9 +1541,9 @@
     <!-- Right: Tab content -->
     <div class="flex-1">
       <!-- Tab: Company -->
-      <div id="settings-company" class="settings-tab-content bg-white rounded-xl border border-slate-200 p-6 lg:p-8">
-        <h2 class="font-display text-lg font-bold text-navy mb-6">Podaci o tvrtki</h2>
-        <div class="space-y-5 max-w-lg">
+      <div id="settings-company" class="settings-tab-content bg-white rounded-xl border border-slate-200 p-4 md:p-5">
+        <h2 class="font-display text-lg font-bold text-navy mb-4">Podaci o tvrtki</h2>
+        <div class="space-y-3 md:space-y-4 max-w-lg">
           <div>
             <label class="block text-sm font-semibold text-navy mb-1.5">Naziv tvrtke</label>
             <input type="text" value="Navis Marine d.o.o." class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
@@ -1542,8 +1584,8 @@
       </div>
 
       <!-- Tab: Terms -->
-      <div id="settings-terms" class="settings-tab-content hidden bg-white rounded-xl border border-slate-200 p-6 lg:p-8">
-        <h2 class="font-display text-lg font-bold text-navy mb-6">Uvjeti ponude</h2>
+      <div id="settings-terms" class="settings-tab-content hidden bg-white rounded-xl border border-slate-200 p-4 md:p-5">
+        <h2 class="font-display text-lg font-bold text-navy mb-4">Uvjeti ponude</h2>
         <p class="text-sm text-slate-400 mb-4">Ovaj tekst će se prikazati na dnu svake generirane PDF ponude.</p>
         <textarea rows="10" class="w-full px-4 py-3 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none font-mono">Ova ponuda vrijedi 30 dana od datuma izdavanja.
 Depozit od 50% potreban je pri potpisu ugovora.
@@ -1558,8 +1600,8 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
       </div>
 
       <!-- Tab: Users -->
-      <div id="settings-users" class="settings-tab-content hidden bg-white rounded-xl border border-slate-200 p-6 lg:p-8">
-        <div class="flex items-center justify-between mb-6">
+      <div id="settings-users" class="settings-tab-content hidden bg-white rounded-xl border border-slate-200 p-4 md:p-5">
+        <div class="flex items-center justify-between mb-4">
           <h2 class="font-display text-lg font-bold text-navy">Korisnici</h2>
           <button class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition">
             <i data-lucide="plus" class="w-4 h-4"></i> Dodaj korisnika
@@ -1605,7 +1647,8 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
 </section>
 
     </main>
-  </div><!-- close lg:ml-60 -->
+  </div><!-- close md:ml-52 -->
+
 </div><!-- close app-shell -->
 
 <!-- ================================================================ -->
@@ -1615,14 +1658,14 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
 <!-- Equipment Add/Edit Modal -->
 <div id="modal-equipment" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black/40 modal-backdrop" onclick="closeModal('modal-equipment')"></div>
-  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-up">
-    <div class="flex items-center justify-between p-6 border-b border-slate-100">
+  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md animate-slide-up">
+    <div class="flex items-center justify-between p-4 md:p-5 border-b border-slate-100">
       <h3 class="font-display text-lg font-bold text-navy">Dodaj stavku opreme</h3>
       <button onclick="closeModal('modal-equipment')" class="p-1 text-slate-400 hover:text-navy transition">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
-    <div class="p-6 space-y-4">
+    <div class="p-4 md:p-5 space-y-3">
       <div>
         <label class="block text-sm font-semibold text-navy mb-1.5">Naziv stavke *</label>
         <input type="text" placeholder="npr. Premium zvučni sustav" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" />
@@ -1646,7 +1689,7 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
         </div>
       </label>
     </div>
-    <div class="flex justify-end gap-3 p-6 border-t border-slate-100">
+    <div class="flex justify-end gap-3 p-4 md:p-5 border-t border-slate-100">
       <button onclick="closeModal('modal-equipment')" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">Odustani</button>
       <button onclick="closeModal('modal-equipment')" class="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition">Spremi</button>
     </div>
@@ -1656,7 +1699,7 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
 <!-- PDF Preview Modal -->
 <div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black/50 modal-backdrop" onclick="closeModal('modal-pdf')"></div>
-  <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-slide-up">
+  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-slide-up">
     <div class="flex items-center justify-between p-5 border-b border-slate-100 flex-shrink-0">
       <h3 class="font-display text-lg font-bold text-navy">PDF Pregled</h3>
       <button onclick="closeModal('modal-pdf')" class="p-1 text-slate-400 hover:text-navy transition">
@@ -1665,7 +1708,7 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
     </div>
 
     <!-- Mock PDF Document -->
-    <div class="flex-1 overflow-y-auto p-6 bg-slate-100">
+    <div class="flex-1 overflow-y-auto p-3 md:p-4 bg-slate-100">
       <div class="bg-white shadow-lg mx-auto max-w-[560px] text-xs" style="aspect-ratio: 1/1.414; padding: 40px;">
         <!-- PDF Header -->
         <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-[#2ea3f2]">
@@ -1969,9 +2012,9 @@ function updateSidebar(screenId) {
   const navKey = NAV_MAP[screenId] || screenId;
   document.querySelectorAll('[data-nav]').forEach(btn => {
     if (btn.dataset.nav === navKey) {
-      btn.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-primary text-white';
+      btn.className = 'nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium bg-primary text-white';
     } else {
-      btn.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white';
+      btn.className = 'nav-item w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white';
     }
   });
 }
@@ -1990,11 +2033,11 @@ function renderDashboard() {
   tbody.innerHTML = QUOTES.slice(0, 5).map(q => {
     const s = STATUS_MAP[q.status];
     return `<tr class="hover:bg-slate-50 transition cursor-pointer" onclick="navigate('quote-detail', '${q.id}')">
-      <td class="px-5 py-3.5 font-medium text-navy">${q.id}</td>
-      <td class="px-5 py-3.5 text-slate-600">${q.boatName}</td>
-      <td class="px-5 py-3.5 text-slate-600">${q.clientName}</td>
-      <td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
-      <td class="px-5 py-3.5 text-right font-semibold text-navy tabular-nums">${formatPriceShort(q.totalPrice)}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 font-medium text-navy text-xs md:text-sm">${q.id}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 text-xs md:text-sm">${q.boatName}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 text-xs md:text-sm hidden md:table-cell">${q.clientName}</td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
+      <td class="px-3 md:px-4 py-2 md:py-2.5 text-right font-semibold text-navy tabular-nums text-xs md:text-sm">${formatPriceShort(q.totalPrice)}</td>
     </tr>`;
   }).join('');
 }
@@ -2005,17 +2048,17 @@ function renderBoatsGrid() {
   grid.innerHTML = BOATS.map(b => `
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden card-hover cursor-pointer group" onclick="navigate('boat-detail', '${b.id}')">
       <div class="relative overflow-hidden">
-        <img src="${b.heroImage}" alt="${b.name}" class="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div class="absolute top-3 left-3">
-          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${b.category === 'new' ? 'bg-emerald-400/90 text-white' : 'bg-amber-400/90 text-white'}">${b.category === 'new' ? 'Novo' : 'Rabljeno'}</span>
+        <img src="${b.heroImage}" alt="${b.name}" class="w-full h-32 md:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        <div class="absolute top-2 left-2">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${b.category === 'new' ? 'bg-emerald-400/90 text-white' : 'bg-amber-400/90 text-white'}">${b.category === 'new' ? 'Novo' : 'Rabljeno'}</span>
         </div>
       </div>
-      <div class="p-5">
-        <h3 class="font-semibold text-navy text-base mb-1">${b.name}</h3>
-        <p class="text-xs text-slate-400 mb-3">${b.year} · ${b.brand}</p>
+      <div class="p-2.5 md:p-3">
+        <h3 class="font-semibold text-navy text-sm md:text-base mb-0.5 truncate">${b.name}</h3>
+        <p class="text-[11px] text-slate-400 mb-1.5">${b.year} · ${b.brand}</p>
         <div class="flex items-end justify-between">
-          <div class="font-display text-lg font-bold text-primary">${formatPrice(b.basePrice)}</div>
-          <span class="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition">Detalji →</span>
+          <div class="font-display text-sm md:text-base font-bold text-primary">${formatPrice(b.basePrice)}</div>
+          <span class="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition hidden md:inline">Detalji →</span>
         </div>
       </div>
     </div>
@@ -2071,34 +2114,89 @@ function renderEquipmentPage(boatId) {
 function renderConfigStep1() {
   const grid = document.getElementById('config-boat-grid');
   if (!grid) return;
-  grid.innerHTML = BOATS.map(b => `
-    <div class="bg-white rounded-xl border-2 border-slate-200 overflow-hidden cursor-pointer card-hover transition-all ${state.selectedBoat?.id === b.id ? 'boat-selected' : ''}" onclick="selectConfigBoat('${b.id}')">
-      <img src="${b.heroImage}" alt="${b.name}" class="w-full aspect-[4/3] object-cover" loading="lazy" />
-      <div class="p-4">
-        <h3 class="font-semibold text-navy text-sm mb-0.5">${b.name}</h3>
-        <p class="text-xs text-slate-400 mb-2">${b.year} · ${b.brand}</p>
-        <div class="font-display text-base font-bold text-primary">${formatPrice(b.basePrice)}</div>
+  const isDesktop = window.innerWidth >= 1024;
+  grid.innerHTML = BOATS.map(b => {
+    const specsHtml = Object.values(b.specs).flat().slice(0, 4).map(([l,v]) => `<div class="flex justify-between text-sm"><span class="text-slate-400">${l}</span><span class="font-medium text-navy">${v}</span></div>`).join('');
+    return `
+    <div class="bg-white rounded-xl border-2 ${state.selectedBoat?.id === b.id ? 'border-primary shadow-lg shadow-primary/10' : 'border-slate-200'} overflow-hidden cursor-pointer card-hover transition-all" data-boat-card="${b.id}" onclick="selectConfigBoat('${b.id}', this)">
+      <div class="relative overflow-hidden">
+        <img src="${b.heroImage}" alt="${b.name}" class="w-full h-40 sm:h-32 lg:h-40 object-cover" loading="lazy" />
+        <div class="absolute top-2 right-2">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 text-navy backdrop-blur-sm">${b.year}</span>
+        </div>
+        ${state.selectedBoat?.id === b.id ? '<div class="absolute top-2 left-2"><div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div></div>' : ''}
       </div>
-    </div>
-  `).join('');
-  // Show panel if boat already selected
+      <div class="p-3">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <h3 class="font-semibold text-navy text-sm md:text-base truncate">${b.name}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">${b.brand}</p>
+          </div>
+          <div class="font-display text-sm md:text-base font-bold text-primary whitespace-nowrap">${formatPrice(b.basePrice)}</div>
+        </div>
+      </div>
+      <!-- Inline expand detail (mobile/tablet) — hidden on lg where side panel is used -->
+      <div class="boat-card-detail lg:hidden ${state.selectedBoat?.id === b.id ? 'expanded' : ''}" data-boat-expand="${b.id}">
+        <div class="px-3 pb-3 border-t border-slate-100 pt-3">
+          <div class="space-y-1.5 mb-3">${specsHtml}</div>
+          <button onclick="event.stopPropagation(); proceedToStep2()" class="w-full py-2.5 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition shadow-sm shadow-primary/25 text-sm">
+            Konfiguriraj ovu jahtu →
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Show desktop panel if boat already selected
   if (state.selectedBoat) updateConfigPanel(state.selectedBoat);
 }
 
-function selectConfigBoat(boatId) {
+function selectConfigBoat(boatId, cardEl) {
   const boat = BOATS.find(b => b.id === boatId);
   state.selectedBoat = boat;
   state.selectedEquipment = {};
-  // Update card selection
-  document.querySelectorAll('#config-boat-grid > div').forEach(card => card.classList.remove('boat-selected'));
-  event.currentTarget.closest('.bg-white')?.classList.add('boat-selected');
+  // Collapse all expanded cards
+  document.querySelectorAll('.boat-card-detail.expanded').forEach(d => d.classList.remove('expanded'));
+  // Remove selection from all cards
+  document.querySelectorAll('[data-boat-card]').forEach(card => {
+    card.classList.remove('border-primary', 'shadow-lg', 'shadow-primary/10');
+    card.classList.add('border-slate-200');
+    // Remove check icon
+    const checkIcon = card.querySelector('.absolute.top-2.left-2');
+    if (checkIcon) checkIcon.remove();
+  });
+  // Select clicked card
+  if (cardEl) {
+    cardEl.classList.remove('border-slate-200');
+    cardEl.classList.add('border-primary', 'shadow-lg', 'shadow-primary/10');
+    // Add check icon
+    const imgWrapper = cardEl.querySelector('.relative.overflow-hidden');
+    if (imgWrapper && !imgWrapper.querySelector('.absolute.top-2.left-2')) {
+      const check = document.createElement('div');
+      check.className = 'absolute top-2 left-2';
+      check.innerHTML = '<div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>';
+      imgWrapper.appendChild(check);
+    }
+    // Expand inline detail on mobile/tablet
+    const expandEl = cardEl.querySelector('.boat-card-detail');
+    if (expandEl) expandEl.classList.add('expanded');
+    // Scroll card into view on mobile
+    if (window.innerWidth < 1024) {
+      setTimeout(() => cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+  }
+  // Update desktop panel
   updateConfigPanel(boat);
   if (window.lucide) lucide.createIcons();
 }
 
 function updateConfigPanel(boat) {
   const panel = document.getElementById('config-detail-panel');
-  panel.classList.remove('hidden');
+  if (!panel) return;
+  // Only show on desktop (lg+)
+  if (window.innerWidth >= 1024) {
+    panel.classList.remove('hidden');
+    panel.classList.add('lg:block');
+  }
   document.getElementById('config-panel-image').src = boat.heroImage;
   document.getElementById('config-panel-name').textContent = boat.name;
   document.getElementById('config-panel-meta').textContent = `${boat.year} · ${boat.brand}`;
@@ -2124,28 +2222,28 @@ function renderConfigStep2() {
   const list = document.getElementById('config-equipment-list');
   list.innerHTML = boat.equipment.map(cat => `
     <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition">
-        <div class="flex items-center gap-3">
+      <button onclick="toggleAccordion(this)" class="w-full flex items-center justify-between p-3 md:p-4 hover:bg-slate-50 transition">
+        <div class="flex items-center gap-2 md:gap-3">
           <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 accordion-arrow transition-transform"></i>
-          <span class="font-semibold text-navy">${cat.category}</span>
+          <span class="font-semibold text-navy text-sm md:text-base">${cat.category}</span>
           <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">${cat.items.length}</span>
         </div>
       </button>
       <div class="accordion-content open border-t border-slate-100">
         <div class="divide-y divide-slate-50">
           ${cat.items.map(item => `
-            <label class="flex items-center gap-4 px-5 py-3.5 cursor-pointer hover:bg-slate-50/50 transition ${item.standard ? 'bg-emerald-50/30' : ''}">
+            <label class="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 cursor-pointer hover:bg-slate-50/50 transition ${item.standard ? 'bg-emerald-50/30' : ''}">
               <input type="checkbox" ${item.standard ? 'checked disabled' : ''} ${state.selectedEquipment[item.id] ? 'checked' : ''}
                      onchange="toggleEquipment('${item.id}', ${item.price}, this.checked)"
                      class="w-4 h-4 rounded border-slate-300 ${item.standard ? 'text-emerald-500 cursor-not-allowed' : 'text-primary focus:ring-primary/20 cursor-pointer'}" />
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <span class="text-sm font-medium text-navy">${item.name}</span>
-                  ${item.standard ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-semibold uppercase tracking-wider rounded-full">Uključeno</span>' : ''}
+                  ${item.standard ? '<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-semibold uppercase tracking-wider rounded-full hidden md:inline">Uključeno</span>' : ''}
                 </div>
-                ${item.desc ? `<div class="text-xs text-slate-400 mt-0.5">${item.desc}</div>` : ''}
+                ${item.desc ? `<div class="text-xs text-slate-400 mt-0.5 line-clamp-1">${item.desc}</div>` : ''}
               </div>
-              <span class="text-sm ${item.standard ? 'font-medium text-slate-400' : 'font-semibold text-primary'} tabular-nums whitespace-nowrap">${item.standard ? 'Standard' : formatPrice(item.price)}</span>
+              <span class="text-sm ${item.standard ? 'font-medium text-slate-400' : 'font-semibold text-primary'} tabular-nums whitespace-nowrap">${item.standard ? 'Std.' : formatPrice(item.price)}</span>
             </label>
           `).join('')}
         </div>
@@ -2168,6 +2266,9 @@ function updatePriceSummary() {
   const grandTotal = boat.basePrice + equipTotal;
   document.getElementById('config2-equip-total').textContent = formatPrice(equipTotal);
   document.getElementById('config2-grand-total').textContent = formatPrice(grandTotal);
+  // Update mobile sticky price bar
+  const mobileTotal = document.getElementById('mobile-grand-total');
+  if (mobileTotal) mobileTotal.textContent = formatPrice(grandTotal);
   // Selected items list
   const container = document.getElementById('config2-selected-items');
   const entries = Object.entries(state.selectedEquipment);
@@ -2240,14 +2341,14 @@ function renderQuotesTable() {
   tbody.innerHTML = QUOTES.map(q => {
     const s = STATUS_MAP[q.status];
     return `<tr class="hover:bg-slate-50 transition">
-      <td class="px-5 py-4 font-medium text-navy">${q.id}</td>
-      <td class="px-5 py-4 text-slate-600">${q.boatName}</td>
-      <td class="px-5 py-4 font-medium text-navy">${q.clientName}</td>
-      <td class="px-5 py-4 hidden md:table-cell text-slate-400">${q.clientEmail}</td>
-      <td class="px-5 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
-      <td class="px-5 py-4 text-right font-semibold text-navy tabular-nums">${formatPrice(q.totalPrice)}</td>
-      <td class="px-5 py-4 hidden lg:table-cell text-slate-400 text-sm">${q.date}</td>
-      <td class="px-5 py-4 text-center">
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 font-medium text-navy text-xs md:text-sm">${q.id}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-slate-600 text-xs md:text-sm">${q.boatName}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 font-medium text-navy text-xs md:text-sm">${q.clientName}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 hidden md:table-cell text-slate-400 text-xs md:text-sm">${q.clientEmail}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] md:text-xs font-semibold ${s.bg} ${s.text}">${s.label}</span></td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-right font-semibold text-navy tabular-nums text-xs md:text-sm">${formatPrice(q.totalPrice)}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 hidden lg:table-cell text-slate-400 text-xs">${q.date}</td>
+      <td class="px-2 md:px-3 lg:px-4 py-2 md:py-2.5 text-center">
         <button onclick="navigate('quote-detail', '${q.id}')" class="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded transition" title="Pregledaj">
           <i data-lucide="eye" class="w-4 h-4"></i>
         </button>

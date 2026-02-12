@@ -68,8 +68,8 @@
     .price-animate { transition: all 0.3s ease; }
 
     /* Accordion content */
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-    .accordion-content.open { max-height: 2000px; }
+    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .accordion-content.open { max-height: 1500px; }
 
     /* Tab underline */
     .tab-active { border-bottom: 2px solid #2ea3f2; color: #1a1a2e; }
@@ -88,6 +88,27 @@
 
     /* Gradient text */
     .text-gradient { background: linear-gradient(135deg, #2ea3f2, #1a1a2e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* Sticky price bar (config step 2 mobile) */
+    .sticky-price-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; box-shadow: 0 -4px 12px rgba(0,0,0,0.06); z-index: 35; padding: 10px 16px; display: none; }
+    @media (max-width: 767px) { .sticky-price-bar { display: flex; align-items: center; justify-content: space-between; } }
+    @supports(padding: max(0px)) {
+      .sticky-price-bar { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    }
+
+    /* Compact card hover — less lift on mobile */
+    @media (max-width: 767px) {
+      .card-hover:hover { transform: none; box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08); }
+    }
+
+    /* Config boat card — mobile inline expand */
+    .boat-card-detail { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease; opacity: 0; }
+    .boat-card-detail.expanded { max-height: 400px; opacity: 1; }
+
+    /* Mobile: extra bottom padding when sticky bar is visible */
+    @media (max-width: 767px) {
+      .has-sticky-bar { padding-bottom: 80px !important; }
+    }
   </style>
 </head>
 <body class="font-body antialiased bg-slate-50 text-slate-700">

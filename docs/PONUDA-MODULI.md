@@ -1,130 +1,146 @@
-# Navis Marine - Konfigurator ponuda brodske opreme
+# Navis Marine — Ponuda za izradu sustava ponuda brodske opreme
 
-## Projekt
-
-Web aplikacija za kreiranje, upravljanje i generiranje ponuda brodske opreme. Omogućuje prodajnom timu brzo sastavljanje profesionalnih ponuda s interaktivnim konfiguratorom i automatskim PDF generiranjem.
-
-**Live prototip:** https://prototype-red-phi.vercel.app
+**Pripremljeno za:** Navis Marine d.o.o.
+**Datum:** veljača 2025.
 
 ---
 
-## Modularna struktura
+## O projektu
 
-Aplikacija je podijeljena na **1 bazni paket + 6 dodatnih modula**. Odabirete bazni paket i module koji vam trebaju.
+Izrađujemo vam **web aplikaciju** kojom ćete moći brzo i profesionalno kreirati ponude za brodsku opremu. Umjesto ručnog sastavljanja u Excelu ili Wordu, vaš prodajni tim će kroz nekoliko klikova odabrati brod, opremu i klijenta — a sustav automatski generira gotovu ponudu s vašim logom i cijenama.
 
----
-
-## BAZNI PAKET (Core) — ~100-120 sati
-
-> Minimum za funkcionalan sustav
-
-| Stavka | Opis |
-|--------|------|
-| Autentikacija | Login/logout, Supabase Auth, upravljanje korisnicima |
-| Katalog brodova | CRUD brodova, specifikacije (5 kategorija), galerija slika |
-| Upravljanje opremom | Kategorije opreme po brodu, standard/optional stavke, cijene |
-| Postavke tvrtke | Naziv, logo, kontakt podaci, uvjeti ponude |
-| Responsive dizajn | Desktop + tablet + mobile, sidebar navigacija |
-| Tech stack | Next.js 15, Supabase, Tailwind CSS, TypeScript |
-| Hosting & deploy | Vercel deploy, SSL, domena |
+**Pogledajte prototip uživo:** https://prototype-red-phi.vercel.app
 
 ---
 
-## MODUL 1: Konfigurator — ~50-70 sati
+## Kako je ponuda strukturirana
 
-> Srce aplikacije - interaktivni wizard za kreiranje ponuda
-
-| Stavka | Opis |
-|--------|------|
-| 4-step wizard | Odabir broda → Oprema → Klijent → Pregled |
-| Live kalkulacija | Real-time ažuriranje cijene pri odabiru opreme |
-| Sticky price panel | Pregled odabranih stavki i ukupne cijene |
-| Podaci klijenta | Forma za ime, email, tvrtku, telefon, napomene |
-| Pregled ponude | Kompletni summary prije generiranja |
+Aplikacija se sastoji od **baznog paketa** koji je obavezan i **5 dodatnih modula** koje birate prema potrebama. Na kraju dokumenta nalaze se 3 gotova paketa s popustom.
 
 ---
 
-## MODUL 2: PDF Ponude — ~30-40 sati
+## Bazni paket — 1.300 €
 
-> Profesionalni PDF dokumenti s brandingom
+> Temelj sustava — sve što vam treba za početak rada
 
-| Stavka | Opis |
-|--------|------|
-| PDF generator | @react-pdf/renderer, automatizirano kreiranje |
-| Navis Marine branding | Logo, boje, font, footer s kontaktima |
-| Sadržaj PDF-a | Brod, oprema po kategorijama, pricing breakdown, uvjeti |
-| Download/preview | Modal s previewom + gumb za download |
-
----
-
-## MODUL 3: Upravljanje ponudama — ~40-50 sati
-
-> Evidencija, praćenje i povijest svih ponuda
-
-| Stavka | Opis |
-|--------|------|
-| Lista ponuda | Tablica s pretragom, filterima (status, datum) |
-| Status tracking | Draft → Sent → Accepted / Rejected, s datumima |
-| Detalj ponude | Pregled svih podataka, oprema, cijena |
-| Dupliciranje | Kopija postojeće ponude za novog klijenta |
-| Automatsko numeriranje | NM-YYYY-XXX format |
+| Što dobivate | |
+|---|---|
+| **Prijava korisnika** | Sigurna prijava za vaš tim, svaki korisnik ima svoj račun |
+| **Katalog brodova** | Unosite brodove s fotografijama, specifikacijama i kategorijama |
+| **Upravljanje opremom** | Definirate standardnu i dodatnu opremu za svaki model broda, s cijenama |
+| **Postavke tvrtke** | Vaš logo, kontakt podaci i uvjeti ponude prikazani na svakom dokumentu |
+| **Radi na svim uređajima** | Računalo, tablet i mobitel — jednako funkcionalno |
+| **Hosting i domena** | Aplikacija dostupna online 24/7, sigurna SSL veza |
 
 ---
 
-## MODUL 4: Excel Import — ~25-35 sati
+## Modul 1: Konfigurator ponuda — 900 €
 
-> Bulk unos brodova iz Excel datoteka
+> Srce aplikacije — interaktivni alat za brzo kreiranje ponuda
 
-| Stavka | Opis |
-|--------|------|
-| Template download | Predložak Excel tablice za ispravno popunjavanje |
-| Upload & validacija | Drag-drop upload, provjera formata i podataka |
-| Preview & potvrda | Pregled podataka prije importa, upozorenja za greške |
-| Bulk kreiranje | Automatski unos brodova u bazu |
-
----
-
-## MODUL 5: Lokalizacija (i18n) — ~30-40 sati
-
-> Višejezična podrška za internacionalno poslovanje
-
-| Stavka | Opis |
-|--------|------|
-| HR/EN sučelje | Kompletni prijevod aplikacije (next-intl) |
-| Dvojezični PDF | Ponude na hrvatskom ili engleskom |
-| Valute | EUR formatiranje, opcija za druge valute |
-| Lokalizirani datumi | Hrvatski format datuma (5. veljače 2025.) |
+| Što dobivate | |
+|---|---|
+| **Vođeni postupak u 4 koraka** | Odaberite brod → Označite opremu → Unesite podatke klijenta → Pregledajte ponudu |
+| **Automatski izračun cijene** | Cijena se ažurira uživo dok birate opremu |
+| **Pregled odabrane opreme** | Stalno vidljiv panel s odabranim stavkama i ukupnom cijenom |
+| **Podaci o klijentu** | Ime, email, tvrtka, telefon, napomene — sve na jednom mjestu |
+| **Završni pregled** | Kompletni pregled ponude prije slanja |
 
 ---
 
-## MODUL 6: Napredne funkcije (Premium) — ~50-70 sati
+## Modul 2: PDF ponude — 500 €
 
-> Za timove koji žele punu kontrolu i analitiku
+> Profesionalni dokumenti s vašim brendom
 
-| Stavka | Opis |
-|--------|------|
-| Dashboard analitika | Grafovi prihoda, konverzije ponuda, top brodovi |
-| Role-based pristup | Admin / Sales / Viewer uloge s različitim pravima |
-| Audit log | Evidencija tko je što mijenjao i kada |
-| Email obavijesti | Notifikacija kad ponuda promijeni status |
-| Backup & export | Export podataka, automatski backupi |
-
----
-
-## Preporučeni paketi
-
-| Paket | Uključeni moduli | Okvirno sati |
-|-------|-------------------|-------------|
-| **Starter** | Core + Konfigurator + PDF | ~180-230h |
-| **Professional** | Core + Konfigurator + PDF + Ponude + Import | ~245-315h |
-| **Enterprise** | Svi moduli | ~325-425h |
+| Što dobivate | |
+|---|---|
+| **Automatsko generiranje PDF-a** | Jedan klik — ponuda je gotova |
+| **Vaš vizualni identitet** | Logo, boje i font Navis Marine na svakom dokumentu |
+| **Detaljan sadržaj** | Brod, oprema razvrstana po kategorijama, raščlamba cijena, uvjeti prodaje |
+| **Pregled i preuzimanje** | Pregledajte PDF prije slanja, preuzmite ili pošaljite klijentu |
 
 ---
 
-## Napomene
+## Modul 3: Evidencija ponuda — 650 €
 
-- **Hosting:** Vercel (besplatan tier za početak, skalabilan po potrebi)
-- **Baza podataka:** Supabase (besplatan tier do 500MB, zatim pay-as-you-go)
-- **Održavanje:** Po dogovoru - mjesečni paket ili po potrebi
-- **Podrška:** Email/chat podrška uključena prvih 30 dana nakon launcha
-- **Sati su okvirni** i ovise o kompleksnosti zahtjeva i eventualnim promjenama tijekom razvoja
+> Sve ponude na jednom mjestu — pretraga, filtriranje, praćenje statusa
+
+| Što dobivate | |
+|---|---|
+| **Popis svih ponuda** | Pretraga po klijentu, brodu, datumu ili statusu |
+| **Praćenje statusa** | Svaka ponuda ima status: skica, poslano, prihvaćeno ili odbijeno |
+| **Detalji ponude** | Otvorite bilo koju ponudu i vidite sve podatke |
+| **Kopiranje ponude** | Kopirajte postojeću ponudu i prilagodite za novog klijenta |
+| **Automatsko numeriranje** | Svaka ponuda dobiva jedinstveni broj (NM-2025-001, NM-2025-002...) |
+
+---
+
+## Modul 4: Višejezičnost — 350 €
+
+> Hrvatski i engleski za internacionalne klijente
+
+| Što dobivate | |
+|---|---|
+| **Aplikacija na dva jezika** | Cijelo sučelje dostupno na hrvatskom i engleskom |
+| **Ponude na oba jezika** | Generirajte PDF ponudu na hrvatskom ili engleskom prema klijentu |
+| **Formatiranje valuta** | Cijene u EUR formatu, mogućnost prikaza u drugim valutama |
+| **Hrvatski formati datuma** | Datumi u formatu "5. veljače 2025." za domaće klijente |
+
+---
+
+## Modul 5: Napredne funkcije — 300 €
+
+> Za timove koji žele punu kontrolu i uvid u poslovanje
+
+| Što dobivate | |
+|---|---|
+| **Kontrolna ploča** | Grafički prikaz prihoda, koliko ponuda je prihvaćeno, najprodavaniji brodovi |
+| **Različite razine pristupa** | Administrator vidi sve, prodavač samo svoje ponude, direktor ima pregled |
+| **Evidencija promjena** | Vidite tko je što mijenjao i kada — potpuna transparentnost |
+| **Email obavijesti** | Automatska obavijest kad ponuda promijeni status |
+| **Sigurnosne kopije** | Automatski backup podataka, mogućnost izvoza u Excel |
+
+---
+
+## Gotovi paketi
+
+| | **Starter** | **Professional** | **Enterprise** |
+|---|---|---|---|
+| Bazni paket | ✓ | ✓ | ✓ |
+| Konfigurator ponuda | ✓ | ✓ | ✓ |
+| PDF ponude | ✓ | ✓ | ✓ |
+| Evidencija ponuda | — | ✓ | ✓ |
+| Višejezičnost | — | — | ✓ |
+| Napredne funkcije | — | — | ✓ |
+| | | | |
+| **Cijena pojedinačno** | ~~2.700 €~~ | ~~3.350 €~~ | ~~4.000 €~~ |
+| **Cijena paketa** | **1.800 €** | **2.100 €** | **2.500 €** |
+| **Ušteda** | 900 € | 1.250 € | 1.500 € |
+
+---
+
+## Što je uključeno u cijenu
+
+- Kompletna izrada aplikacije prema specifikaciji
+- Postavljanje na internet (hosting) — prvih 12 mjeseci besplatno
+- Testiranje i ispravljanje grešaka
+- Obuka vašeg tima za korištenje sustava
+- **30 dana podrške** nakon puštanja u rad
+
+## Opcijski nakon isporuke
+
+| Usluga | Cijena |
+|---|---|
+| Mjesečno održavanje i podrška | 150 €/mj |
+| Hosting nakon prve godine | 20 €/mj |
+| Dodatne prilagodbe | Po dogovoru |
+
+---
+
+## Sljedeći koraci
+
+1. Odaberite paket ili module koji vam odgovaraju
+2. Dogovaramo detalje i rokove
+3. Započinjemo izradu
+
+Za sva pitanja stojimo na raspolaganju.
