@@ -116,6 +116,55 @@
     @media (max-width: 767px) {
       .has-sticky-bar { padding-bottom: 80px !important; }
     }
+
+    /* PDF Document Styles */
+    .pdf-page {
+      background: white;
+      box-shadow: 0 4px 24px -4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      max-width: 595px;
+      margin: 0 auto;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #1a1a2e;
+      position: relative;
+      overflow: hidden;
+    }
+    .pdf-page + .pdf-page { margin-top: 16px; }
+    .pdf-gold-bar { height: 4px; background: linear-gradient(90deg, #c9a961, #e8d5a0, #c9a961); }
+    .pdf-section-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .pdf-table th {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 6px 0;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+    }
+    .pdf-table th:last-child { text-align: right; }
+    .pdf-table td {
+      padding: 5px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 10.5px;
+    }
+    .pdf-table td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
+    .pdf-table .cat-row td {
+      padding-top: 10px;
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
+      border-bottom: none;
+    }
   </style>
 </head>
 <body class="font-body antialiased bg-slate-50 text-slate-700">

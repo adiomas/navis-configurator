@@ -45,91 +45,41 @@
 </div>
 
 <!-- PDF Preview Modal -->
-<div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="absolute inset-0 bg-black/50 modal-backdrop" onclick="closeModal('modal-pdf')"></div>
-  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-slide-up">
-    <div class="flex items-center justify-between p-5 border-b border-slate-100 flex-shrink-0">
-      <h3 class="font-display text-lg font-bold text-navy">PDF Pregled</h3>
-      <button onclick="closeModal('modal-pdf')" class="p-1 text-slate-400 hover:text-navy transition">
+<div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4">
+  <div class="absolute inset-0 bg-black/60 modal-backdrop" onclick="closeModal('modal-pdf')"></div>
+  <div class="relative bg-slate-200 rounded-xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col animate-slide-up">
+    <!-- Modal header -->
+    <div class="flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white rounded-t-xl border-b border-slate-200 flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-navy flex items-center justify-center">
+          <i data-lucide="file-text" class="w-4 h-4 text-gold"></i>
+        </div>
+        <div>
+          <h3 class="font-display text-base font-bold text-navy">Pregled ponude</h3>
+          <p id="pdf-modal-subtitle" class="text-xs text-slate-400">NM-2025-043</p>
+        </div>
+      </div>
+      <button onclick="closeModal('modal-pdf')" class="p-1.5 text-slate-400 hover:text-navy hover:bg-slate-100 rounded-lg transition">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
 
-    <!-- Mock PDF Document -->
-    <div class="flex-1 overflow-y-auto p-3 md:p-4 bg-slate-100">
-      <div class="bg-white shadow-lg mx-auto max-w-[560px] text-xs" style="aspect-ratio: 1/1.414; padding: 40px;">
-        <!-- PDF Header -->
-        <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-[#2ea3f2]">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-[#2ea3f2] rounded flex items-center justify-center">
-              <span class="text-white font-bold text-[10px]">NM</span>
-            </div>
-            <div>
-              <div class="font-bold text-[#1a1a2e] text-sm" style="font-family: 'Playfair Display', serif">Navis Marine</div>
-              <div class="text-[9px] text-slate-400 uppercase tracking-widest">Yacht Quotation</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="font-bold text-[#1a1a2e]">NM-2025-043</div>
-            <div class="text-slate-400">11 February 2025</div>
-          </div>
-        </div>
-
-        <!-- Client -->
-        <div class="mb-5">
-          <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-1">Client</div>
-          <div class="font-semibold text-[#1a1a2e]">Jean-Pierre Moreau</div>
-          <div class="text-slate-500">Moreau Maritime · jp.moreau@shipping.fr</div>
-        </div>
-
-        <!-- Yacht -->
-        <div class="mb-5 p-3 bg-slate-50 rounded">
-          <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-2">Yacht</div>
-          <div class="font-bold text-[#1a1a2e] text-sm" style="font-family: 'Playfair Display', serif">Azimut Grande 120</div>
-          <div class="text-slate-500">2024 · 41m · 16 guests · 12 crew</div>
-        </div>
-
-        <!-- Equipment -->
-        <div class="mb-5">
-          <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-2">Selected Equipment</div>
-          <table class="w-full">
-            <tbody class="divide-y divide-slate-100">
-              <tr><td class="py-1 text-slate-600">Premium Italian Leather</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€85,000</td></tr>
-              <tr><td class="py-1 text-slate-600">Marble Flooring</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€120,000</td></tr>
-              <tr><td class="py-1 text-slate-600">Satellite WiFi System</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€45,000</td></tr>
-              <tr><td class="py-1 text-slate-600">Deck Jacuzzi</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€75,000</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pricing -->
-        <div class="mb-5 p-3 bg-[#1a1a2e] text-white rounded">
-          <div class="flex justify-between mb-1"><span class="text-white/70">Base Price</span><span>€12,500,000</span></div>
-          <div class="flex justify-between mb-1"><span class="text-white/70">Equipment</span><span>€325,000</span></div>
-          <div class="border-t border-white/20 mt-2 pt-2 flex justify-between font-bold text-sm">
-            <span>TOTAL</span><span style="font-family: 'Playfair Display', serif">€12,825,000</span>
-          </div>
-        </div>
-
-        <!-- Terms -->
-        <div class="text-[9px] text-slate-400 border-t border-slate-200 pt-3">
-          <div class="font-bold mb-1">Terms & Conditions</div>
-          <div>Valid for 30 days · VAT not included · 50% deposit required · Delivery: 24-36 months</div>
-        </div>
-
-        <!-- Footer -->
-        <div class="mt-4 pt-3 border-t border-[#2ea3f2] text-center text-[9px] text-slate-400">
-          Navis Marine d.o.o. · Maksimilijanova 41, Zagreb · www.navis-marine.com · +385 1 234 5678
-        </div>
+    <!-- PDF Pages Container -->
+    <div class="flex-1 overflow-y-auto p-3 md:p-5 scroll-touch" style="background: #e2e5e9;">
+      <div id="pdf-pages-container">
+        <!-- Rendered dynamically by showPdfModal() -->
       </div>
     </div>
 
     <!-- Actions -->
-    <div class="flex justify-end gap-3 p-5 border-t border-slate-100 flex-shrink-0">
-      <button onclick="closeModal('modal-pdf')" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">Zatvori</button>
-      <button onclick="closeModal('modal-pdf'); navigate('quotes')" class="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition flex items-center gap-2">
-        <i data-lucide="download" class="w-4 h-4"></i> Preuzmi PDF
-      </button>
+    <div class="flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white rounded-b-xl border-t border-slate-200 flex-shrink-0">
+      <span class="text-xs text-slate-400 hidden sm:block">2 stranice · A4</span>
+      <div class="flex gap-2 ml-auto">
+        <button onclick="closeModal('modal-pdf')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">Zatvori</button>
+        <button onclick="closeModal('modal-pdf'); navigate('quotes')" class="px-5 py-2 bg-navy hover:bg-navy-light text-white text-sm font-semibold rounded-lg transition flex items-center gap-2">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF
+        </button>
+      </div>
     </div>
   </div>
 </div>

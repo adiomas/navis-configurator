@@ -116,6 +116,55 @@
     @media (max-width: 767px) {
       .has-sticky-bar { padding-bottom: 80px !important; }
     }
+
+    /* PDF Document Styles */
+    .pdf-page {
+      background: white;
+      box-shadow: 0 4px 24px -4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      max-width: 595px;
+      margin: 0 auto;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #1a1a2e;
+      position: relative;
+      overflow: hidden;
+    }
+    .pdf-page + .pdf-page { margin-top: 16px; }
+    .pdf-gold-bar { height: 4px; background: linear-gradient(90deg, #c9a961, #e8d5a0, #c9a961); }
+    .pdf-section-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .pdf-table th {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      padding: 6px 0;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+    }
+    .pdf-table th:last-child { text-align: right; }
+    .pdf-table td {
+      padding: 5px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 10.5px;
+    }
+    .pdf-table td:last-child { text-align: right; font-weight: 600; white-space: nowrap; }
+    .pdf-table .cat-row td {
+      padding-top: 10px;
+      font-weight: 700;
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #64748b;
+      border-bottom: none;
+    }
   </style>
 </head>
 <body class="font-body antialiased bg-slate-50 text-slate-700">
@@ -1704,91 +1753,41 @@ Plaćanje u EUR na račun Navis Marine d.o.o.</textarea>
 </div>
 
 <!-- PDF Preview Modal -->
-<div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div class="absolute inset-0 bg-black/50 modal-backdrop" onclick="closeModal('modal-pdf')"></div>
-  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-slide-up">
-    <div class="flex items-center justify-between p-5 border-b border-slate-100 flex-shrink-0">
-      <h3 class="font-display text-lg font-bold text-navy">PDF Pregled</h3>
-      <button onclick="closeModal('modal-pdf')" class="p-1 text-slate-400 hover:text-navy transition">
+<div id="modal-pdf" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 md:p-4">
+  <div class="absolute inset-0 bg-black/60 modal-backdrop" onclick="closeModal('modal-pdf')"></div>
+  <div class="relative bg-slate-200 rounded-xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col animate-slide-up">
+    <!-- Modal header -->
+    <div class="flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white rounded-t-xl border-b border-slate-200 flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-navy flex items-center justify-center">
+          <i data-lucide="file-text" class="w-4 h-4 text-gold"></i>
+        </div>
+        <div>
+          <h3 class="font-display text-base font-bold text-navy">Pregled ponude</h3>
+          <p id="pdf-modal-subtitle" class="text-xs text-slate-400">NM-2025-043</p>
+        </div>
+      </div>
+      <button onclick="closeModal('modal-pdf')" class="p-1.5 text-slate-400 hover:text-navy hover:bg-slate-100 rounded-lg transition">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
 
-    <!-- Mock PDF Document -->
-    <div class="flex-1 overflow-y-auto p-3 md:p-4 bg-slate-100">
-      <div class="bg-white shadow-lg mx-auto max-w-[560px] text-xs" style="aspect-ratio: 1/1.414; padding: 40px;">
-        <!-- PDF Header -->
-        <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-[#2ea3f2]">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-[#2ea3f2] rounded flex items-center justify-center">
-              <span class="text-white font-bold text-[10px]">NM</span>
-            </div>
-            <div>
-              <div class="font-bold text-[#1a1a2e] text-sm" style="font-family: 'Playfair Display', serif">Navis Marine</div>
-              <div class="text-[9px] text-slate-400 uppercase tracking-widest">Yacht Quotation</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="font-bold text-[#1a1a2e]">NM-2025-043</div>
-            <div class="text-slate-400">11 February 2025</div>
-          </div>
-        </div>
-
-        <!-- Client -->
-        <div class="mb-5">
-          <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-1">Client</div>
-          <div class="font-semibold text-[#1a1a2e]">Jean-Pierre Moreau</div>
-          <div class="text-slate-500">Moreau Maritime · jp.moreau@shipping.fr</div>
-        </div>
-
-        <!-- Yacht -->
-        <div class="mb-5 p-3 bg-slate-50 rounded">
-          <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-2">Yacht</div>
-          <div class="font-bold text-[#1a1a2e] text-sm" style="font-family: 'Playfair Display', serif">Azimut Grande 120</div>
-          <div class="text-slate-500">2024 · 41m · 16 guests · 12 crew</div>
-        </div>
-
-        <!-- Equipment -->
-        <div class="mb-5">
-          <div class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mb-2">Selected Equipment</div>
-          <table class="w-full">
-            <tbody class="divide-y divide-slate-100">
-              <tr><td class="py-1 text-slate-600">Premium Italian Leather</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€85,000</td></tr>
-              <tr><td class="py-1 text-slate-600">Marble Flooring</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€120,000</td></tr>
-              <tr><td class="py-1 text-slate-600">Satellite WiFi System</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€45,000</td></tr>
-              <tr><td class="py-1 text-slate-600">Deck Jacuzzi</td><td class="py-1 text-right font-medium text-[#1a1a2e]">€75,000</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pricing -->
-        <div class="mb-5 p-3 bg-[#1a1a2e] text-white rounded">
-          <div class="flex justify-between mb-1"><span class="text-white/70">Base Price</span><span>€12,500,000</span></div>
-          <div class="flex justify-between mb-1"><span class="text-white/70">Equipment</span><span>€325,000</span></div>
-          <div class="border-t border-white/20 mt-2 pt-2 flex justify-between font-bold text-sm">
-            <span>TOTAL</span><span style="font-family: 'Playfair Display', serif">€12,825,000</span>
-          </div>
-        </div>
-
-        <!-- Terms -->
-        <div class="text-[9px] text-slate-400 border-t border-slate-200 pt-3">
-          <div class="font-bold mb-1">Terms & Conditions</div>
-          <div>Valid for 30 days · VAT not included · 50% deposit required · Delivery: 24-36 months</div>
-        </div>
-
-        <!-- Footer -->
-        <div class="mt-4 pt-3 border-t border-[#2ea3f2] text-center text-[9px] text-slate-400">
-          Navis Marine d.o.o. · Maksimilijanova 41, Zagreb · www.navis-marine.com · +385 1 234 5678
-        </div>
+    <!-- PDF Pages Container -->
+    <div class="flex-1 overflow-y-auto p-3 md:p-5 scroll-touch" style="background: #e2e5e9;">
+      <div id="pdf-pages-container">
+        <!-- Rendered dynamically by showPdfModal() -->
       </div>
     </div>
 
     <!-- Actions -->
-    <div class="flex justify-end gap-3 p-5 border-t border-slate-100 flex-shrink-0">
-      <button onclick="closeModal('modal-pdf')" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">Zatvori</button>
-      <button onclick="closeModal('modal-pdf'); navigate('quotes')" class="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg transition flex items-center gap-2">
-        <i data-lucide="download" class="w-4 h-4"></i> Preuzmi PDF
-      </button>
+    <div class="flex items-center justify-between px-4 py-3 md:px-5 md:py-4 bg-white rounded-b-xl border-t border-slate-200 flex-shrink-0">
+      <span class="text-xs text-slate-400 hidden sm:block">2 stranice · A4</span>
+      <div class="flex gap-2 ml-auto">
+        <button onclick="closeModal('modal-pdf')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">Zatvori</button>
+        <button onclick="closeModal('modal-pdf'); navigate('quotes')" class="px-5 py-2 bg-navy hover:bg-navy-light text-white text-sm font-semibold rounded-lg transition flex items-center gap-2">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -2437,8 +2436,162 @@ function toggleMobileSidebar() {
 }
 
 function showEquipmentModal() { document.getElementById('modal-equipment').classList.remove('hidden'); if (window.lucide) lucide.createIcons(); }
-function showPdfModal() { document.getElementById('modal-pdf').classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function showPdfModal() {
+  const boat = state.selectedBoat || BOATS[0];
+  const client = state.clientData && state.clientData.name ? state.clientData : { name: 'Jean-Pierre Moreau', company: 'Moreau Maritime', email: 'jp.moreau@shipping.fr', phone: '+33 1 42 86 97 01', notes: '' };
+  const quoteNum = 'NM-2025-043';
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('hr-HR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const selectedIds = Object.keys(state.selectedEquipment || {});
+  const equipByCategory = {};
+  let equipTotal = 0;
+  (boat.equipment || []).forEach(cat => {
+    cat.items.forEach(item => {
+      if (selectedIds.includes(item.id) && !item.standard) {
+        if (!equipByCategory[cat.category]) equipByCategory[cat.category] = [];
+        equipByCategory[cat.category].push(item);
+        equipTotal += item.price;
+      }
+    });
+  });
+  if (Object.keys(equipByCategory).length === 0) {
+    (boat.equipment || []).forEach(cat => {
+      cat.items.filter(i => !i.standard).slice(0, 2).forEach(item => {
+        if (!equipByCategory[cat.category]) equipByCategory[cat.category] = [];
+        equipByCategory[cat.category].push(item);
+        equipTotal += item.price;
+      });
+    });
+  }
+
+  const grandTotal = boat.basePrice + equipTotal;
+  const specEntries = Object.entries(boat.specs || {});
+  const specsHtml = specEntries.map(([catName, items]) => `
+    <div>
+      <div style="font-size:8px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;">${catName}</div>
+      ${items.slice(0, 4).map(([l, v]) => `<div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0;"><span style="color:#64748b;">${l}</span><span style="font-weight:600;color:#1a1a2e;">${v}</span></div>`).join('')}
+    </div>
+  `).join('');
+
+  let equipRows = '';
+  Object.entries(equipByCategory).forEach(([catName, items]) => {
+    equipRows += `<tr class="cat-row"><td colspan="2">${catName}</td></tr>`;
+    items.forEach(item => {
+      equipRows += `<tr><td style="color:#475569;padding-left:8px;">${item.name}<br><span style="font-size:9px;color:#94a3b8;">${item.desc}</span></td><td>${formatPrice(item.price)}</td></tr>`;
+    });
+  });
+
+  const pdfHtml = `
+    <!-- PAGE 1 -->
+    <div class="pdf-page" style="padding:0;">
+      <div class="pdf-gold-bar"></div>
+      <div style="padding:28px 32px 24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;background:#1a1a2e;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+            </div>
+            <div>
+              <div style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:16px;color:#1a1a2e;line-height:1.2;">Navis Marine</div>
+              <div style="font-size:8px;color:#c9a961;letter-spacing:0.2em;text-transform:uppercase;font-weight:600;">Yacht Quotation</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:13px;font-weight:700;color:#1a1a2e;font-family:'Playfair Display',Georgia,serif;">${quoteNum}</div>
+            <div style="font-size:9.5px;color:#94a3b8;">${dateStr}</div>
+          </div>
+        </div>
+        <div style="position:relative;border-radius:8px;overflow:hidden;margin-bottom:16px;height:180px;background:#f1f5f9;">
+          <img src="${boat.heroImage}" alt="${boat.name}" style="width:100%;height:100%;object-fit:cover;" />
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;background:linear-gradient(transparent,rgba(26,26,46,0.85));">
+            <div style="font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700;color:white;">${boat.name}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.8);">${boat.year} · ${boat.brand} · ${boat.model}</div>
+          </div>
+          <div style="position:absolute;top:10px;right:10px;background:#c9a961;color:white;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.05em;">${boat.year}</div>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:18px;">
+          <div style="flex:1;background:#f8fafc;border-radius:6px;padding:12px 14px;">
+            <div class="pdf-section-label">Klijent</div>
+            <div style="font-weight:700;font-size:12px;color:#1a1a2e;margin-bottom:2px;">${client.name}</div>
+            ${client.company ? `<div style="font-size:10px;color:#64748b;">${client.company}</div>` : ''}
+            <div style="font-size:10px;color:#94a3b8;margin-top:4px;">${client.email}${client.phone ? ` · ${client.phone}` : ''}</div>
+          </div>
+          <div style="flex:1;background:#f8fafc;border-radius:6px;padding:12px 14px;">
+            <div class="pdf-section-label">Detalji ponude</div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0;"><span style="color:#64748b;">Broj ponude</span><span style="font-weight:600;color:#1a1a2e;">${quoteNum}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0;"><span style="color:#64748b;">Datum</span><span style="font-weight:600;color:#1a1a2e;">${dateStr}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;padding:2px 0;"><span style="color:#64748b;">Valjanost</span><span style="font-weight:600;color:#1a1a2e;">30 dana</span></div>
+          </div>
+        </div>
+        <div class="pdf-section-label" style="margin-bottom:8px;">Specifikacije</div>
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(specEntries.length, 3)},1fr);gap:12px;margin-bottom:16px;padding:12px 14px;background:#f8fafc;border-radius:6px;">
+          ${specsHtml}
+        </div>
+        <div style="margin-top:auto;padding-top:12px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:8px;color:#94a3b8;">Navis Marine d.o.o. · Maksimilijanova 41, 10000 Zagreb</div>
+          <div style="font-size:8px;color:#94a3b8;">Stranica 1 / 2</div>
+        </div>
+      </div>
+      <div class="pdf-gold-bar"></div>
+    </div>
+    <!-- PAGE 2 -->
+    <div class="pdf-page" style="padding:0;">
+      <div class="pdf-gold-bar"></div>
+      <div style="padding:24px 32px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:24px;height:24px;background:#1a1a2e;border-radius:5px;display:flex;align-items:center;justify-content:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+            </div>
+            <span style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:12px;color:#1a1a2e;">Navis Marine</span>
+          </div>
+          <span style="font-size:10px;font-weight:600;color:#94a3b8;">${quoteNum}</span>
+        </div>
+        <div class="pdf-section-label">Odabrana oprema</div>
+        <table class="pdf-table" style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+          <thead><tr><th>Stavka</th><th>Cijena</th></tr></thead>
+          <tbody>${equipRows}</tbody>
+        </table>
+        <div style="background:#1a1a2e;border-radius:8px;padding:16px 18px;margin-bottom:18px;">
+          <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;"><span style="color:rgba(255,255,255,0.6);">Bazna cijena jahte</span><span style="color:white;font-weight:500;">${formatPrice(boat.basePrice)}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:11px;"><span style="color:rgba(255,255,255,0.6);">Dodatna oprema</span><span style="color:white;font-weight:500;">${formatPrice(equipTotal)}</span></div>
+          <div style="border-top:1px solid rgba(255,255,255,0.15);margin-top:8px;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);">Ukupno</span>
+            <span style="font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:700;color:#c9a961;">${formatPrice(grandTotal)}</span>
+          </div>
+        </div>
+        ${client.notes ? `<div style="margin-bottom:14px;"><div class="pdf-section-label">Napomene</div><div style="font-size:10px;color:#475569;background:#f8fafc;border-radius:6px;padding:10px 12px;border-left:3px solid #c9a961;">${client.notes}</div></div>` : ''}
+        <div style="margin-bottom:16px;">
+          <div class="pdf-section-label">Uvjeti</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:9.5px;color:#64748b;">
+            <div>• Ponuda vrijedi 30 dana od datuma izdavanja</div>
+            <div>• PDV nije uključen u navedene cijene</div>
+            <div>• Depozit 50% pri potpisu ugovora</div>
+            <div>• Rok isporuke: 24-36 mjeseci</div>
+            <div>• Cijena podložna promjeni tečaja EUR</div>
+            <div>• Garancija prema uvjetima proizvođača</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:24px;margin-bottom:16px;padding-top:8px;">
+          <div style="flex:1;"><div style="border-bottom:1px solid #cbd5e1;margin-bottom:4px;height:32px;"></div><div style="font-size:8.5px;color:#94a3b8;">Prodavatelj — Navis Marine d.o.o.</div></div>
+          <div style="flex:1;"><div style="border-bottom:1px solid #cbd5e1;margin-bottom:4px;height:32px;"></div><div style="font-size:8.5px;color:#94a3b8;">Kupac — ${client.name}</div></div>
+        </div>
+        <div style="border-top:1px solid #e2e8f0;padding-top:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:8px;color:#94a3b8;line-height:1.6;">Navis Marine d.o.o. · OIB: 12345678901 · Maksimilijanova 41, 10000 Zagreb<br>www.navis-marine.com · info@navis-marine.com · +385 1 234 5678</div>
+          <div style="font-size:8px;color:#94a3b8;">Stranica 2 / 2</div>
+        </div>
+      </div>
+      <div class="pdf-gold-bar"></div>
+    </div>
+  `;
+
+  document.getElementById('pdf-pages-container').innerHTML = pdfHtml;
+  document.getElementById('pdf-modal-subtitle').textContent = quoteNum + ' · ' + boat.name;
+  document.getElementById('modal-pdf').classList.remove('hidden');
+}
 
 function handleLogin(e) {
   e.preventDefault();
