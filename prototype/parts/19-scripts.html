@@ -645,6 +645,56 @@ function toggleMobileSidebar() {
 function showEquipmentModal() { document.getElementById('modal-equipment').classList.remove('hidden'); if (window.lucide) lucide.createIcons(); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
+function downloadPdf() {
+  const container = document.getElementById('pdf-pages-container');
+  const btn = document.getElementById('pdf-download-btn');
+  const boat = state.selectedBoat || BOATS[0];
+  const filename = 'NM-2025-043_' + boat.name.replace(/\s+/g, '_') + '.pdf';
+
+  btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Generiranje...';
+  btn.disabled = true;
+
+  const pages = container.querySelectorAll('.pdf-page');
+  const opt = {
+    margin: 0,
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'], avoid: '.pdf-page' }
+  };
+
+  // Clone container so we can style it for export without affecting the modal
+  const clone = container.cloneNode(true);
+  clone.style.width = '595px';
+  clone.querySelectorAll('.pdf-page').forEach(p => {
+    p.style.boxShadow = 'none';
+    p.style.marginTop = '0';
+  });
+  // Add page breaks between pages
+  const clonePages = clone.querySelectorAll('.pdf-page');
+  clonePages.forEach((p, i) => {
+    if (i < clonePages.length - 1) {
+      p.style.pageBreakAfter = 'always';
+    }
+  });
+  document.body.appendChild(clone);
+  clone.style.position = 'absolute';
+  clone.style.left = '-9999px';
+
+  html2pdf().set(opt).from(clone).save().then(() => {
+    document.body.removeChild(clone);
+    btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF';
+    btn.disabled = false;
+    if (window.lucide) lucide.createIcons();
+  }).catch(() => {
+    document.body.removeChild(clone);
+    btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF';
+    btn.disabled = false;
+    if (window.lucide) lucide.createIcons();
+  });
+}
+
 function showPdfModal() {
   const boat = state.selectedBoat || BOATS[0];
   const client = state.clientData && state.clientData.name ? state.clientData : { name: 'Jean-Pierre Moreau', company: 'Moreau Maritime', email: 'jp.moreau@shipping.fr', phone: '+33 1 42 86 97 01', notes: '' };

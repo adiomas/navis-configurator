@@ -76,7 +76,7 @@
       <span class="text-xs text-slate-400 hidden sm:block">2 stranice · A4</span>
       <div class="flex gap-2 ml-auto">
         <button onclick="closeModal('modal-pdf')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition">Zatvori</button>
-        <button onclick="closeModal('modal-pdf'); navigate('quotes')" class="px-5 py-2 bg-navy hover:bg-navy-light text-white text-sm font-semibold rounded-lg transition flex items-center gap-2">
+        <button id="pdf-download-btn" onclick="downloadPdf()" class="px-5 py-2 bg-navy hover:bg-navy-light text-white text-sm font-semibold rounded-lg transition flex items-center gap-2">
           <i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF
         </button>
       </div>
