@@ -2450,34 +2450,37 @@ function downloadPdf() {
   btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Generiranje...';
   btn.disabled = true;
 
-  const clone = container.cloneNode(true);
-  clone.style.width = '595px';
-  clone.querySelectorAll('.pdf-page').forEach(p => {
+  const pages = container.querySelectorAll('.pdf-page');
+  const origStyles = [];
+  pages.forEach((p, i) => {
+    origStyles.push({ boxShadow: p.style.boxShadow, marginTop: p.style.marginTop });
     p.style.boxShadow = 'none';
-    p.style.marginTop = '0';
+    if (i > 0) p.style.marginTop = '0';
+    if (i < pages.length - 1) p.style.pageBreakAfter = 'always';
   });
-  const clonePages = clone.querySelectorAll('.pdf-page');
-  clonePages.forEach((p, i) => {
-    if (i < clonePages.length - 1) p.style.pageBreakAfter = 'always';
-  });
-  document.body.appendChild(clone);
-  clone.style.position = 'absolute';
-  clone.style.left = '-9999px';
 
   html2pdf().set({
     margin: 0,
     filename: filename,
     image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 595 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'], avoid: '.pdf-page' }
-  }).from(clone).save().then(() => {
-    document.body.removeChild(clone);
+    pagebreak: { mode: ['css', 'legacy'] }
+  }).from(container).save().then(() => {
+    pages.forEach((p, i) => {
+      p.style.boxShadow = origStyles[i].boxShadow;
+      p.style.marginTop = origStyles[i].marginTop;
+      p.style.pageBreakAfter = '';
+    });
     btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF';
     btn.disabled = false;
     if (window.lucide) lucide.createIcons();
   }).catch(() => {
-    document.body.removeChild(clone);
+    pages.forEach((p, i) => {
+      p.style.boxShadow = origStyles[i].boxShadow;
+      p.style.marginTop = origStyles[i].marginTop;
+      p.style.pageBreakAfter = '';
+    });
     btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF';
     btn.disabled = false;
     if (window.lucide) lucide.createIcons();
