@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hr" class="scroll-smooth">
+<html lang="hr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,6 +45,13 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
   <style>
+    /* Mobile viewport height fix — dvh accounts for browser chrome */
+    .h-dvh { height: 100dvh; }
+    @supports not (height: 100dvh) { .h-dvh { height: 100vh; } }
+
+    /* Smooth momentum scrolling on iOS */
+    .scroll-touch { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
+
     /* Custom scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
