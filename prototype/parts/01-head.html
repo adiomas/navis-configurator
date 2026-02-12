@@ -124,6 +124,7 @@
     .pdf-page {
       background: white;
       box-shadow: 0 4px 24px -4px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      width: 595px;
       max-width: 595px;
       margin: 0 auto;
       font-size: 11px;
@@ -131,6 +132,10 @@
       color: #1a1a2e;
       position: relative;
       overflow: hidden;
+    }
+    #pdf-pages-container {
+      width: 595px;
+      min-width: 595px;
     }
     .pdf-page + .pdf-page { margin-top: 16px; }
     .pdf-gold-bar { height: 4px; background: linear-gradient(90deg, #c9a961, #e8d5a0, #c9a961); }

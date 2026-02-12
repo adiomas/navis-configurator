@@ -654,41 +654,48 @@ function downloadPdf() {
   btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Generiranje...';
   btn.disabled = true;
 
-  const pages = container.querySelectorAll('.pdf-page');
-  // Temporarily remove shadows for clean capture
-  const origStyles = [];
+  // Create a fixed-width capture container on body for proper A4 rendering
+  const capture = document.createElement('div');
+  capture.style.cssText = 'position:fixed;left:0;top:0;width:595px;min-width:595px;z-index:9999;pointer-events:none;';
+  capture.innerHTML = container.innerHTML;
+  document.body.appendChild(capture);
+
+  const pages = capture.querySelectorAll('.pdf-page');
   pages.forEach((p, i) => {
-    origStyles.push({ boxShadow: p.style.boxShadow, marginTop: p.style.marginTop });
     p.style.boxShadow = 'none';
+    p.style.width = '595px';
+    p.style.maxWidth = '595px';
     if (i > 0) p.style.marginTop = '0';
     if (i < pages.length - 1) p.style.pageBreakAfter = 'always';
   });
 
-  html2pdf().set({
-    margin: 0,
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 595 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'] }
-  }).from(container).save().then(() => {
-    pages.forEach((p, i) => {
-      p.style.boxShadow = origStyles[i].boxShadow;
-      p.style.marginTop = origStyles[i].marginTop;
-      p.style.pageBreakAfter = '';
-    });
+  function resetBtn() {
     btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF';
     btn.disabled = false;
     if (window.lucide) lucide.createIcons();
+  }
+
+  // Wait for images to load before capturing (prevents blank PDF)
+  const images = capture.querySelectorAll('img');
+  const loadPromises = Array.from(images).map(img =>
+    img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })
+  );
+
+  Promise.all(loadPromises).then(() => {
+    return html2pdf().set({
+      margin: 0,
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, scrollX: 0, windowWidth: 595 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    }).from(capture).save();
+  }).then(() => {
+    document.body.removeChild(capture);
+    resetBtn();
   }).catch(() => {
-    pages.forEach((p, i) => {
-      p.style.boxShadow = origStyles[i].boxShadow;
-      p.style.marginTop = origStyles[i].marginTop;
-      p.style.pageBreakAfter = '';
-    });
-    btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Preuzmi PDF';
-    btn.disabled = false;
-    if (window.lucide) lucide.createIcons();
+    if (capture.parentNode) document.body.removeChild(capture);
+    resetBtn();
   });
 }
 
@@ -889,6 +896,22 @@ function showPdfModal() {
   document.getElementById('pdf-pages-container').innerHTML = pdfHtml;
   document.getElementById('pdf-modal-subtitle').textContent = quoteNum + ' · ' + boat.name;
   document.getElementById('modal-pdf').classList.remove('hidden');
+
+  // Scale PDF preview to fit modal on mobile
+  requestAnimationFrame(() => {
+    const wrapper = document.getElementById('pdf-pages-container').parentElement;
+    const pc = document.getElementById('pdf-pages-container');
+    const available = wrapper.clientWidth;
+    if (available < 595) {
+      const s = available / 595;
+      pc.style.transform = 'scale(' + s + ')';
+      pc.style.transformOrigin = 'top center';
+      pc.style.height = (pc.scrollHeight * s) + 'px';
+    } else {
+      pc.style.transform = '';
+      pc.style.height = '';
+    }
+  });
 }
 
 function handleLogin(e) {
