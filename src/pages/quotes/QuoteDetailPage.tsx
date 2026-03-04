@@ -259,7 +259,7 @@ export default function QuoteDetailPage() {
             <select
               value={selectedTemplate}
               onChange={(e) => setSelectedTemplate(e.target.value as PdfTemplateName)}
-              className="h-7 cursor-pointer appearance-none rounded-md border-0 bg-muted/50 px-2 pr-6 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className="h-7 cursor-pointer appearance-none rounded-md border-0 bg-muted/50 px-2 pr-6 text-base md:text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="compact">{t('quotes.templateCompact')}</option>
               <option value="detailed">{t('quotes.templateDetailed')}</option>

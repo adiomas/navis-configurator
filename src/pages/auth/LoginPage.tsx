@@ -69,7 +69,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 {...register('email')}
                 className={cn(
-                  'w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition-colors',
+                  'w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-base md:text-sm outline-none transition-colors',
                   'focus:border-primary focus:ring-1 focus:ring-primary',
                   errors.email ? 'border-red-500' : 'border-border'
                 )}
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 {...register('password')}
                 className={cn(
-                  'w-full rounded-lg border bg-white py-2.5 pl-3 pr-10 text-sm outline-none transition-colors',
+                  'w-full rounded-lg border bg-white py-2.5 pl-3 pr-10 text-base md:text-sm outline-none transition-colors',
                   'focus:border-primary focus:ring-1 focus:ring-primary',
                   errors.password ? 'border-red-500' : 'border-border'
                 )}

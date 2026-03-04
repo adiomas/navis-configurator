@@ -89,16 +89,17 @@ export default function Header({ onMenuClick }: HeaderProps) {
       </button>
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-0.5 text-xs">
+      <nav className="min-w-0 flex items-center gap-0.5 overflow-hidden text-xs">
         {breadcrumbs.map((crumb, index) => (
           <span key={index} className="flex items-center gap-0.5">
             {index > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground" />}
             <span
-              className={
+              className={cn(
+                'truncate',
                 index === breadcrumbs.length - 1
                   ? 'font-medium text-foreground'
                   : 'text-muted-foreground'
-              }
+              )}
             >
               {crumb}
             </span>

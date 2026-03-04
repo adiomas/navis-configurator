@@ -20,8 +20,8 @@ export const ds = {
   table: {
     wrapper: 'overflow-x-auto',
     headerCell:
-      'px-3 py-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium',
-    cell: 'px-3 py-2 text-xs',
+      'px-2 py-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium sm:px-3',
+    cell: 'px-2 py-2 text-xs sm:px-3',
     row: 'border-b border-border/30 last:border-0 hover:bg-muted/50',
     rowClickable:
       'border-b border-border/30 last:border-0 hover:bg-muted/50 cursor-pointer',
@@ -42,9 +42,9 @@ export const ds = {
   },
 
   input: {
-    base: 'h-8 w-full rounded-md border border-input bg-background px-2.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors',
-    textarea: 'w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors',
-    select: 'h-8 w-full appearance-none rounded-md border border-input bg-background px-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer',
+    base: 'h-8 w-full rounded-md border border-input bg-background px-2.5 text-base md:text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors',
+    textarea: 'w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-base md:text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors',
+    select: 'h-8 w-full appearance-none rounded-md border border-input bg-background px-2.5 text-base md:text-xs focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer',
     checkbox: 'h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary',
     label: 'mb-1.5 block text-xs font-medium text-foreground',
     error: 'mt-0.5 text-[11px] text-destructive',

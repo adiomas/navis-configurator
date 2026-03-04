@@ -62,7 +62,7 @@ export const MonthlyTrend = ({ data, isLoading }: MonthlyTrendProps) => {
               tick={{ fontSize: 10, fill: '#6b7280' }}
               tickLine={false}
               axisLine={false}
-              width={55}
+              width={40}
             />
             <Tooltip
               contentStyle={{

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import { cn } from '@/lib/utils'
@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils'
 const SIDEBAR_COLLAPSED_KEY = 'navis-sidebar-collapsed'
 
 export default function DashboardLayout() {
+  const mainRef = useRef<HTMLElement>(null)
+  const { pathname } = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try {
@@ -27,6 +29,11 @@ export default function DashboardLayout() {
       return next
     })
   }, [])
+
+  // Scroll to top on route change
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 })
+  }, [pathname])
 
   // Lock body scroll when mobile sidebar is open
   useEffect(() => {
@@ -57,7 +64,7 @@ export default function DashboardLayout() {
         )}
       >
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
+        <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 md:px-6">
           <Outlet />
         </main>
       </div>

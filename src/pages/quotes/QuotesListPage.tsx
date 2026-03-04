@@ -173,7 +173,7 @@ export default function QuotesListPage() {
             placeholder={t('common.search')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-8 w-full rounded-md border border-input bg-background pl-9 pr-4 text-xs outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-8 w-full rounded-md border border-input bg-background pl-9 pr-4 text-base md:text-xs outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
           />
         </div>
 
@@ -242,7 +242,7 @@ export default function QuotesListPage() {
                 <th className={cn(ds.table.headerCell, 'text-left')}>
                   {t('quotes.quoteNumber')}
                 </th>
-                <th className={cn(ds.table.headerCell, 'text-left')}>
+                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>
                   {t('quotes.boat')}
                 </th>
                 <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>
@@ -285,24 +285,24 @@ export default function QuotesListPage() {
                       >
                         {quote.quote_number}
                       </Link>
-                      {/* Mobile: show client below quote number */}
-                      {company?.name && (
-                        <span className="mt-0.5 block text-[11px] text-muted-foreground sm:hidden">
-                          {company.name}
-                        </span>
-                      )}
-                    </td>
-                    <td className={cn(ds.table.cell, 'text-foreground')}>
-                      {boatName}
-                      {/* Mobile: show price + date below boat name */}
-                      <span className="mt-0.5 flex items-center gap-2 text-[11px] sm:hidden">
-                        <span className="font-medium text-navy">
-                          {formatPrice(Number(quote.total_price ?? 0))}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {formatDate(quote.created_at)}
+                      {/* Mobile: show boat, client, price, date inline */}
+                      <span className="mt-0.5 flex flex-col gap-0.5 text-[11px] sm:hidden">
+                        <span className="text-foreground">{boatName}</span>
+                        {company?.name && (
+                          <span className="text-muted-foreground">{company.name}</span>
+                        )}
+                        <span className="flex items-center gap-2">
+                          <span className="font-medium text-navy">
+                            {formatPrice(Number(quote.total_price ?? 0))}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {formatDate(quote.created_at)}
+                          </span>
                         </span>
                       </span>
+                    </td>
+                    <td className={cn(ds.table.cell, 'hidden text-foreground sm:table-cell')}>
+                      {boatName}
                     </td>
                     <td className={cn(ds.table.cell, 'hidden text-muted-foreground sm:table-cell')}>
                       {company?.name ?? '—'}
@@ -346,7 +346,7 @@ export default function QuotesListPage() {
             <button
               type="button"
               disabled={currentPage <= 1}
-              onClick={() => { setCurrentPage((p) => p - 1); window.scrollTo(0, 0) }}
+              onClick={() => { setCurrentPage((p) => p - 1); document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' }) }}
               className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'disabled:opacity-50')}
             >
               <ChevronLeft className="h-3.5 w-3.5" />
@@ -355,7 +355,7 @@ export default function QuotesListPage() {
             <button
               type="button"
               disabled={currentPage >= totalPages}
-              onClick={() => { setCurrentPage((p) => p + 1); window.scrollTo(0, 0) }}
+              onClick={() => { setCurrentPage((p) => p + 1); document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' }) }}
               className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'disabled:opacity-50')}
             >
               <span className="hidden sm:inline">{t('quotes.next')}</span>

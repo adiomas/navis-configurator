@@ -34,7 +34,7 @@ export const QuoteActions = ({ quoteId, status, onStatusChange, isLoading, canEd
     <div className="flex items-center justify-end gap-1">
       <Link
         to={`/quotes/${quoteId}`}
-        className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:p-2"
         title={t('quotes.view')}
       >
         <Eye className="h-4 w-4" />
@@ -49,7 +49,7 @@ export const QuoteActions = ({ quoteId, status, onStatusChange, isLoading, canEd
             disabled={isLoading}
             onClick={() => onStatusChange(quoteId, target)}
             className={cn(
-              'rounded-lg p-2 text-muted-foreground transition-colors disabled:opacity-50',
+              'hidden rounded-lg p-2 text-muted-foreground transition-colors disabled:opacity-50 sm:inline-flex',
               config.className
             )}
             title={t(`quotes.${target}`)}

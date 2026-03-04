@@ -30,28 +30,34 @@ export const StatsCards = ({ stats, isLoading }: StatsCardsProps) => {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-      {cards.map((card, i) => (
-        <div
-          key={card.label}
-          className={`rounded-lg border border-border/60 bg-white p-3 ${ACCENT_COLORS[i]} border-t-2`}
-        >
-          {isLoading ? (
-            <div className="space-y-2">
-              <div className={cn(ds.skeleton.line, 'h-3 w-16')} />
-              <div className={cn(ds.skeleton.line, 'h-6 w-20')} />
-            </div>
-          ) : (
-            <>
-              <p className={ds.text.label}>
-                {card.label}
-              </p>
-              <p className={cn('mt-1 font-semibold text-navy text-sm sm:text-lg truncate')}>
-                {card.value}
-              </p>
-            </>
-          )}
-        </div>
-      ))}
+      {cards.map((card, i) => {
+        const isLastOdd = cards.length % 2 !== 0 && i === cards.length - 1
+        return (
+          <div
+            key={card.label}
+            className={cn(
+              `rounded-lg border border-border/60 bg-white p-3 ${ACCENT_COLORS[i]} border-t-2`,
+              isLastOdd && 'col-span-2 sm:col-span-1'
+            )}
+          >
+            {isLoading ? (
+              <div className="space-y-2">
+                <div className={cn(ds.skeleton.line, 'h-3 w-16')} />
+                <div className={cn(ds.skeleton.line, 'h-6 w-20')} />
+              </div>
+            ) : (
+              <>
+                <p className={ds.text.label}>
+                  {card.label}
+                </p>
+                <p className={cn('mt-1 font-semibold text-navy text-sm sm:text-base lg:text-lg truncate')}>
+                  {card.value}
+                </p>
+              </>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

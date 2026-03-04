@@ -48,11 +48,11 @@ export const RecentQuotesTable = ({ quotes, isLoading }: RecentQuotesTableProps)
             <thead>
               <tr className="border-b border-border/60">
                 <th className={cn(ds.table.headerCell, 'text-left')}>{t('quotes.quoteNumber')}</th>
-                <th className={cn(ds.table.headerCell, 'text-left')}>{t('quotes.boat')}</th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>{t('quotes.client')}</th>
+                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>{t('quotes.boat')}</th>
+                <th className={cn(ds.table.headerCell, 'hidden text-left md:table-cell')}>{t('quotes.client')}</th>
                 <th className={cn(ds.table.headerCell, 'text-left')}>{t('common.status')}</th>
-                <th className={cn(ds.table.headerCell, 'text-right')}>{t('quotes.amount')}</th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>{t('quotes.date')}</th>
+                <th className={cn(ds.table.headerCell, 'hidden text-right sm:table-cell')}>{t('quotes.amount')}</th>
+                <th className={cn(ds.table.headerCell, 'hidden text-left md:table-cell')}>{t('quotes.date')}</th>
               </tr>
             </thead>
             <tbody>
@@ -62,22 +62,29 @@ export const RecentQuotesTable = ({ quotes, isLoading }: RecentQuotesTableProps)
                   onClick={() => navigate(`/quotes/${quote.id}`)}
                   className={ds.table.rowClickable}
                 >
-                  <td className={cn(ds.table.cell, 'whitespace-nowrap font-medium text-navy')}>
+                  <td className={cn(ds.table.cell, 'font-medium text-navy')}>
                     {quote.quote_number}
+                    {/* Mobile: show boat + amount inline */}
+                    <span className="mt-0.5 flex flex-col gap-0.5 text-[11px] font-normal sm:hidden">
+                      <span className="text-foreground">{quote.boat_name ?? '-'}</span>
+                      <span className="font-medium text-navy">
+                        {quote.total_price ? formatPrice(quote.total_price) : '-'}
+                      </span>
+                    </span>
                   </td>
-                  <td className={cn(ds.table.cell, 'whitespace-nowrap text-foreground')}>
+                  <td className={cn(ds.table.cell, 'hidden text-foreground sm:table-cell')}>
                     {quote.boat_name ?? '-'}
                   </td>
-                  <td className={cn(ds.table.cell, 'hidden whitespace-nowrap text-muted-foreground sm:table-cell')}>
+                  <td className={cn(ds.table.cell, 'hidden text-muted-foreground md:table-cell')}>
                     {quote.company_name ?? '-'}
                   </td>
-                  <td className={cn(ds.table.cell, 'whitespace-nowrap')}>
+                  <td className={ds.table.cell}>
                     <QuoteStatusBadge status={quote.status as QuoteStatus} />
                   </td>
-                  <td className={cn(ds.table.cell, 'whitespace-nowrap text-right font-medium text-navy')}>
+                  <td className={cn(ds.table.cell, 'hidden text-right font-medium text-navy sm:table-cell')}>
                     {quote.total_price ? formatPrice(quote.total_price) : '-'}
                   </td>
-                  <td className={cn(ds.table.cell, 'hidden whitespace-nowrap text-muted-foreground sm:table-cell')}>
+                  <td className={cn(ds.table.cell, 'hidden text-muted-foreground md:table-cell')}>
                     {formatDate(quote.created_at)}
                   </td>
                 </tr>

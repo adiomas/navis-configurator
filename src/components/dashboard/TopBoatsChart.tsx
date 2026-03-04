@@ -33,14 +33,14 @@ export const TopBoatsChart = ({ data, isLoading }: TopBoatsChartProps) => {
           {data.map((boat, i) => {
             const widthPercent = maxRevenue > 0 ? Math.max((boat.revenue / maxRevenue) * 100, 4) : 4
             return (
-              <div key={boat.boatName} className="flex items-center gap-2">
-                <span className="w-4 text-right text-[10px] font-medium text-muted-foreground">
+              <div key={boat.boatName} className="flex items-center gap-1">
+                <span className="w-3 text-right text-[10px] font-medium text-muted-foreground">
                   {i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline justify-between">
+                  <div className="flex items-baseline justify-between gap-1">
                     <span className="truncate text-xs font-medium text-navy">{boat.boatName}</span>
-                    <span className="ml-2 shrink-0 text-xs text-muted-foreground">{formatPrice(boat.revenue)}</span>
+                    <span className="shrink-0 text-[11px] sm:text-xs text-muted-foreground">{formatPrice(boat.revenue)}</span>
                   </div>
                   <div className="mt-0.5 h-1.5 w-full rounded-full bg-muted/40">
                     <div

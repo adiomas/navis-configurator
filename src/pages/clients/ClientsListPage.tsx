@@ -125,7 +125,7 @@ export default function ClientsListPage() {
             placeholder={t('common.search')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9 w-full rounded-lg border border-input bg-background pl-9 pr-4 text-xs outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-9 w-full rounded-lg border border-input bg-background pl-9 pr-4 text-base md:text-xs outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
           />
         </div>
 
