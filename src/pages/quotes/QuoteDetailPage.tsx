@@ -163,12 +163,31 @@ export default function QuoteDetailPage() {
   const handlePreviewPDF = async () => {
     if (!quote || !settings) return
     setIsPreviewing(true)
+    setShowPreview(true)
     try {
       const { generatePDF } = await import('@/lib/pdf-generator')
       const doc = await buildPdfDocument(quote, selectedTemplate)
       const blob = await generatePDF(doc)
       setPreviewBlob(blob)
-      setShowPreview(true)
+    } catch (err) {
+      console.error('PDF preview failed:', err)
+      toast.error(t('quotes.pdfDownloadError'))
+      setShowPreview(false)
+    } finally {
+      setIsPreviewing(false)
+    }
+  }
+
+  const handleTemplateChangeInPreview = async (tmpl: PdfTemplateName) => {
+    setSelectedTemplate(tmpl)
+    if (!quote || !settings) return
+    setIsPreviewing(true)
+    setPreviewBlob(null)
+    try {
+      const { generatePDF } = await import('@/lib/pdf-generator')
+      const doc = await buildPdfDocument(quote, tmpl)
+      const blob = await generatePDF(doc)
+      setPreviewBlob(blob)
     } catch (err) {
       console.error('PDF preview failed:', err)
       toast.error(t('quotes.pdfDownloadError'))
@@ -574,7 +593,10 @@ export default function QuoteDetailPage() {
       <PDFPreviewModal
         isOpen={showPreview}
         pdfBlob={previewBlob}
+        isGenerating={isPreviewing}
         fileName={`${quote.quote_number}_${selectedTemplate}.pdf`}
+        selectedTemplate={selectedTemplate}
+        onTemplateChange={handleTemplateChangeInPreview}
         onClose={() => {
           setShowPreview(false)
           setPreviewBlob(null)
