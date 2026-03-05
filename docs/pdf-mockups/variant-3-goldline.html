@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navis Marine - Quote NM-2025-042 | Gold Line</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { box-shadow: none !important; margin: 0 !important; }
+    .page + .page { page-break-before: always; }
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    color: #333;
+    background: #e0ddd8;
+    line-height: 1.5;
+    font-size: 9.5pt;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: #fff;
+    padding: 24mm 26mm 22mm 26mm;
+    position: relative;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.12);
+  }
+
+  /* ── Colors ── */
+  :root {
+    --navy: #1a1a2e;
+    --gold: #c9a961;
+    --gold-light: #dcc488;
+    --gold-dark: #a88a3f;
+    --text: #2a2a2a;
+    --text-light: #777;
+    --text-muted: #aaa;
+    --border: #e8e4df;
+  }
+
+  /* ── Typography ── */
+  h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--navy);
+  }
+
+  .gold-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold) 80%, transparent 100%);
+    margin: 16px 0;
+  }
+
+  .gold-divider.short {
+    width: 60px;
+    background: var(--gold);
+    margin: 10px auto;
+  }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 10pt;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 4px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-heading::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--gold);
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .header .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22pt;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 5px;
+  }
+
+  .header .logo-tagline {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  /* ── Quote Info Bar ── */
+  .quote-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+
+  .quote-bar .q-item {
+    text-align: center;
+  }
+
+  .quote-bar .q-label {
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+  }
+
+  .quote-bar .q-value {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .quote-bar .q-value.number {
+    font-family: 'Playfair Display', serif;
+    font-size: 12pt;
+  }
+
+  /* ── Two-column Layout ── */
+  .two-col {
+    display: flex;
+    gap: 0;
+    margin-bottom: 22px;
+  }
+
+  .two-col .col {
+    flex: 1;
+    padding: 0 20px;
+  }
+
+  .two-col .col:first-child {
+    padding-left: 0;
+    border-right: 1px solid var(--gold-light);
+  }
+
+  .two-col .col:last-child {
+    padding-right: 0;
+  }
+
+  .col .label {
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold-dark);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .col .company-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 12pt;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .col .detail-text {
+    font-size: 8.5pt;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  .col .detail-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── Vessel + Specs ── */
+  .vessel-header {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .vessel-header .vessel-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18pt;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .vessel-header .vessel-year {
+    font-size: 8pt;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  .specs-strip {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 10px 0;
+    margin-bottom: 20px;
+  }
+
+  .specs-strip .s-item {
+    text-align: center;
+  }
+
+  .specs-strip .s-label {
+    font-size: 6pt;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+  }
+
+  .specs-strip .s-val {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .specs-strip .s-sep {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+  }
+
+  /* ── Equipment Groups ── */
+  .eq-section {
+    margin-bottom: 20px;
+  }
+
+  .eq-category {
+    margin-bottom: 14px;
+  }
+
+  .eq-cat-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 9pt;
+    font-weight: 500;
+    color: var(--navy);
+    padding-bottom: 3px;
+    border-bottom: 1.5px solid var(--gold);
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+
+  .eq-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0 5px 16px;
+    border-bottom: 1px solid #f5f3f0;
+  }
+
+  .eq-item:last-child {
+    border-bottom: none;
+  }
+
+  .eq-item-left {
+    flex: 1;
+  }
+
+  .eq-item .item-name {
+    font-size: 9pt;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .eq-item .item-desc {
+    font-size: 7.5pt;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+
+  .eq-item .item-tag {
+    font-size: 6pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold-dark);
+    margin-left: 6px;
+    font-weight: 600;
+  }
+
+  .eq-item-right {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+
+  .eq-item .item-price {
+    font-size: 9pt;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .eq-item .item-discount {
+    font-size: 8pt;
+    color: #b44;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* ── Pricing Summary ── */
+  .pricing-area {
+    margin-left: auto;
+    width: 260px;
+    margin-bottom: 16px;
+    border-left: 3px solid var(--gold);
+    padding-left: 18px;
+  }
+
+  .pr-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 8.5pt;
+  }
+
+  .pr-row .pr-label { color: var(--text-light); }
+  .pr-row .pr-val {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .pr-row.disc .pr-label,
+  .pr-row.disc .pr-val { color: #b44; }
+
+  .pr-sep {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px 0;
+  }
+
+  /* Grand Total */
+  .grand-total {
+    background: var(--navy);
+    margin-left: auto;
+    width: 260px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .grand-total .gt-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 11pt;
+    font-weight: 500;
+    color: var(--gold);
+  }
+
+  .grand-total .gt-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 15pt;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* ── Footer ── */
+  .page-footer {
+    position: absolute;
+    bottom: 18mm;
+    left: 26mm;
+    right: 26mm;
+  }
+
+  .footer-gold-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 15%, var(--gold) 85%, transparent 100%);
+    margin-bottom: 8px;
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+    color: var(--text-muted);
+  }
+
+  /* ═══ PAGE 2 ═══ */
+  .p2-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .p2-header .p2-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 12pt;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 3px;
+  }
+
+  .p2-header .p2-meta {
+    font-size: 7.5pt;
+    color: var(--text-muted);
+  }
+
+  /* ── Notes ── */
+  .notes-block {
+    margin-bottom: 26px;
+  }
+
+  .note-item {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 8.5pt;
+    border-bottom: 1px solid #f5f3f0;
+  }
+
+  .note-item .n-icon {
+    color: var(--gold);
+    flex-shrink: 0;
+    font-size: 7pt;
+    line-height: 1.8;
+  }
+
+  .note-item .n-label {
+    font-weight: 600;
+    color: var(--navy);
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+
+  .note-item .n-text {
+    color: var(--text-light);
+  }
+
+  /* ── Payment ── */
+  .pay-two-col {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+  }
+
+  .pay-two-col .pay-col {
+    flex: 1;
+    padding: 0 20px;
+  }
+
+  .pay-two-col .pay-col:first-child {
+    padding-left: 0;
+    border-right: 1px solid var(--gold-light);
+  }
+
+  .pay-two-col .pay-col:last-child {
+    padding-right: 0;
+  }
+
+  .pay-col .pay-title {
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold-dark);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .pay-col .pay-text {
+    font-size: 8.5pt;
+    line-height: 1.7;
+    color: var(--text-light);
+  }
+
+  .pay-col .pay-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .pay-col .mono {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 8.5pt;
+    color: var(--navy);
+  }
+
+  /* ── Schedule ── */
+  .schedule-list {
+    margin-bottom: 30px;
+  }
+
+  .sched-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f3f0;
+  }
+
+  .sched-item .sched-phase {
+    flex: 1;
+    font-size: 9pt;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .sched-item .sched-pct {
+    width: 60px;
+    text-align: center;
+    font-size: 8pt;
+    color: var(--gold-dark);
+    font-weight: 600;
+  }
+
+  .sched-item .sched-amount {
+    width: 110px;
+    text-align: right;
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sched-item .sched-date {
+    width: 100px;
+    text-align: right;
+    font-size: 8pt;
+    color: var(--text-muted);
+  }
+
+  /* ── Terms ── */
+  .terms-box {
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .terms-box .t-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 8.5pt;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  .terms-box p {
+    font-size: 7.5pt;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* ── Signatures ── */
+  .sig-area {
+    display: flex;
+    gap: 50px;
+    margin-top: 40px;
+  }
+
+  .sig-block {
+    flex: 1;
+    text-align: center;
+  }
+
+  .sig-line {
+    border-bottom: 1px solid var(--border);
+    height: 45px;
+    margin-bottom: 6px;
+  }
+
+  .sig-label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ PAGE 1 ═══════════════ -->
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-name">NAVIS MARINE</div>
+    <div class="logo-tagline">Authorized Azimut Yachts Dealer</div>
+  </div>
+
+  <div class="gold-divider"></div>
+
+  <!-- Quote Info Bar -->
+  <div class="quote-bar">
+    <div class="q-item">
+      <div class="q-label">Ponuda br.</div>
+      <div class="q-value number">NM-2025-042</div>
+    </div>
+    <div class="q-item">
+      <div class="q-label">Datum</div>
+      <div class="q-value">03.03.2025.</div>
+    </div>
+    <div class="q-item">
+      <div class="q-label">Vrijedi do</div>
+      <div class="q-value">02.04.2025.</div>
+    </div>
+    <div class="q-item">
+      <div class="q-label">Valuta</div>
+      <div class="q-value">EUR</div>
+    </div>
+  </div>
+
+  <!-- Client + Vessel -->
+  <div class="two-col">
+    <div class="col">
+      <div class="label">Kupac</div>
+      <div class="company-name">Marina Bay Yachting d.o.o.</div>
+      <div class="detail-text">
+        Obala kneza Domagoja 12<br>
+        20000 Dubrovnik, Hrvatska<br>
+        OIB: 12345678901<br><br>
+        <strong>Ivan Marinović</strong>, Direktor prodaje<br>
+        ivan@marinabay.hr &bull; +385 20 123 456
+      </div>
+    </div>
+    <div class="col">
+      <div class="label">Plovilo</div>
+      <div class="vessel-header" style="text-align: left;">
+        <div class="vessel-name" style="font-size: 15pt;">Azimut S7</div>
+        <div class="vessel-year" style="text-align: left;">Model 2025</div>
+      </div>
+      <div style="margin-top: 10px;">
+        <div class="detail-text">
+          <strong>Duljina:</strong> 21.6 m &nbsp;&bull;&nbsp; <strong>Širina:</strong> 5.2 m<br>
+          <strong>Gaz:</strong> 1.5 m &nbsp;&bull;&nbsp; <strong>Deplasman:</strong> 38 t<br>
+          <strong>Motori:</strong> 2× MAN V12 1550 KS<br>
+          <strong>Maks. brzina:</strong> 34 čvorova
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gold-divider"></div>
+
+  <!-- Equipment -->
+  <div style="margin-bottom: 4px;">
+    <span class="section-heading">Oprema i dodaci</span>
+  </div>
+  <div style="height: 10px;"></div>
+
+  <div class="eq-section">
+    <!-- Navigation -->
+    <div class="eq-category">
+      <div class="eq-cat-name">Navigacija i elektronika</div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Garmin GPSMAP 8616xsv</span>
+          <span class="item-tag">STD</span>
+          <div class="item-desc">16" multifunkcijski zaslon s integriranim sonarom</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€12.500</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Raymarine Axiom Pro 12 RVX</span>
+          <span class="item-tag">OPT</span>
+          <div class="item-desc">Sekundarni ploter s RealVision 3D sonarom</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-discount">−€890</span>
+          <span class="item-price">€8.010</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Autopilot sustav Garmin Reactor 40</span>
+          <span class="item-tag">STD</span>
+          <div class="item-desc">S GHC 50 zaslonom i kursnom stabilizacijom</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€6.200</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comfort -->
+    <div class="eq-category">
+      <div class="eq-cat-name">Komfor i zabava</div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Fusion Apollo MS-SRX400</span>
+          <span class="item-tag">STD</span>
+          <div class="item-desc">Marine entertainment sustav, 4 zone</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€4.800</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Klima sustav Webasto BlueCool</span>
+          <span class="item-tag">STD</span>
+          <div class="item-desc">48.000 BTU, 3 zone, inverterski kompresor</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€18.500</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Samsung 55" QLED TV</span>
+          <span class="item-tag">OPT</span>
+          <div class="item-desc">Salon TV s marine montažom i anti-glare premazom</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-discount">−€320</span>
+          <span class="item-price">€2.880</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Safety & Deck -->
+    <div class="eq-category">
+      <div class="eq-cat-name">Sigurnost i paluba</div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Hidraulička platforma za kupanje</span>
+          <span class="item-tag">OPT</span>
+          <div class="item-desc">Teak obloga, nosivost 350 kg, daljinski upravljač</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€24.000</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Besenzoni tender dizalica P300 EL</span>
+          <span class="item-tag">OPT</span>
+          <div class="item-desc">Elektro-hidraulička, kapacitet 500 kg</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€15.800</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">Seakeeper 9 girostabilizator</span>
+          <span class="item-tag">OPT</span>
+          <div class="item-desc">Eliminacija ljuljanja do 95%, automatski rad</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€42.000</span>
+        </div>
+      </div>
+      <div class="eq-item">
+        <div class="eq-item-left">
+          <span class="item-name">FLIR M364C termalna kamera</span>
+          <span class="item-tag">OPT</span>
+          <div class="item-desc">Multisenzorska kamera za noćnu navigaciju</div>
+        </div>
+        <div class="eq-item-right">
+          <span class="item-price">€9.800</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing Summary -->
+  <div class="pricing-area">
+    <div class="pr-row">
+      <span class="pr-label">Bazna cijena plovila</span>
+      <span class="pr-val">€1.850.000</span>
+    </div>
+    <div class="pr-row disc">
+      <span class="pr-label">Popust na plovilo (5%)</span>
+      <span class="pr-val">−€92.500</span>
+    </div>
+    <hr class="pr-sep">
+    <div class="pr-row">
+      <span class="pr-label">Plovilo neto</span>
+      <span class="pr-val">€1.757.500</span>
+    </div>
+    <div class="pr-row">
+      <span class="pr-label">Oprema (10 stavki)</span>
+      <span class="pr-val">€145.700</span>
+    </div>
+    <div class="pr-row disc">
+      <span class="pr-label">Popusti na stavke</span>
+      <span class="pr-val">−€1.210</span>
+    </div>
+    <hr class="pr-sep">
+    <div class="pr-row">
+      <span class="pr-label">Oprema neto</span>
+      <span class="pr-val">€144.490</span>
+    </div>
+  </div>
+
+  <!-- Grand Total -->
+  <div class="grand-total">
+    <span class="gt-label">Ukupno</span>
+    <span class="gt-val">€1.901.990</span>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <div class="footer-gold-line"></div>
+    <div class="footer-content">
+      <span>Navis Marine d.o.o. &bull; Uvala Baluni bb, 21000 Split &bull; OIB: 98765432109</span>
+      <span>Stranica 1 od 2</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ PAGE 2 ═══════════════ -->
+<div class="page">
+
+  <!-- Page 2 Header -->
+  <div class="p2-header">
+    <div class="p2-logo">NAVIS MARINE</div>
+    <div class="p2-meta">NM-2025-042 &nbsp;|&nbsp; 03.03.2025.</div>
+  </div>
+
+  <div class="gold-divider"></div>
+
+  <!-- Notes -->
+  <div style="margin-bottom: 4px;">
+    <span class="section-heading">Detalji ponude</span>
+  </div>
+  <div style="height: 10px;"></div>
+
+  <div class="notes-block">
+    <div class="note-item">
+      <span class="n-icon">&#9670;</span>
+      <span class="n-label">Rok isporuke</span>
+      <span class="n-text">16-20 tjedana od potvrde narudžbe i uplate avansa</span>
+    </div>
+    <div class="note-item">
+      <span class="n-icon">&#9670;</span>
+      <span class="n-label">Lokacija isporuke</span>
+      <span class="n-text">Marina Kaštela, Split, Hrvatska</span>
+    </div>
+    <div class="note-item">
+      <span class="n-icon">&#9670;</span>
+      <span class="n-label">Garancija</span>
+      <span class="n-text">2 godine tvorničke garancije Azimut Yachts; 5 godina strukturalna garancija na trup</span>
+    </div>
+    <div class="note-item">
+      <span class="n-icon">&#9670;</span>
+      <span class="n-label">PDV</span>
+      <span class="n-text">Nije uključen u navedene cijene. Sve cijene su u EUR.</span>
+    </div>
+    <div class="note-item">
+      <span class="n-icon">&#9670;</span>
+      <span class="n-label">Tehničke promjene</span>
+      <span class="n-text">Proizvođač zadržava pravo tehničkih promjena bez prethodne najave</span>
+    </div>
+  </div>
+
+  <!-- Payment -->
+  <div style="margin-bottom: 4px;">
+    <span class="section-heading">Podaci za plaćanje</span>
+  </div>
+  <div style="height: 10px;"></div>
+
+  <div class="pay-two-col">
+    <div class="pay-col">
+      <div class="pay-title">Primatelj</div>
+      <div class="pay-text">
+        <strong>Navis Marine d.o.o.</strong><br>
+        Uvala Baluni bb<br>
+        21000 Split, Hrvatska<br>
+        OIB: 98765432109
+      </div>
+    </div>
+    <div class="pay-col">
+      <div class="pay-title">Bankovni podaci</div>
+      <div class="pay-text">
+        <span class="mono">IBAN: HR12 2340 0091 1234 5678 9</span><br>
+        <span class="mono">BIC/SWIFT: PBZGHR2X</span><br>
+        Privredna banka Zagreb d.d.<br>
+        Poziv na broj: 042-2025
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Schedule -->
+  <div style="margin-bottom: 4px;">
+    <span class="section-heading">Plan plaćanja</span>
+  </div>
+  <div style="height: 10px;"></div>
+
+  <div class="schedule-list">
+    <div class="sched-item">
+      <div class="sched-phase">Avans po potpisu ugovora</div>
+      <div class="sched-pct">30%</div>
+      <div class="sched-amount">€570.597</div>
+      <div class="sched-date">10.03.2025.</div>
+    </div>
+    <div class="sched-item">
+      <div class="sched-phase">Početak proizvodnje</div>
+      <div class="sched-pct">30%</div>
+      <div class="sched-amount">€570.597</div>
+      <div class="sched-date">01.05.2025.</div>
+    </div>
+    <div class="sched-item">
+      <div class="sched-phase">Isporuka plovila</div>
+      <div class="sched-pct">40%</div>
+      <div class="sched-amount">€760.796</div>
+      <div class="sched-date">Po isporuci</div>
+    </div>
+  </div>
+
+  <!-- Terms -->
+  <div class="terms-box">
+    <div class="t-title">Uvjeti ponude</div>
+    <p>
+      Ova ponuda vrijedi 30 dana od datuma izdavanja. Cijene su podložne promjenama tečaja EUR na dan plaćanja.
+      Narudžba se smatra potvrđenom po primitku potpisanog ugovora i uplate avansa od 30% ukupne cijene.
+      Navis Marine d.o.o. zadržava pravo vlasništva nad plovilom do podmirenja cjelokupnog iznosa.
+      Svi sporovi rješavaju se pri Trgovačkom sudu u Splitu.
+    </p>
+    <p style="margin-top: 6px;">
+      Tehničke specifikacije i oprema podložni su promjenama od strane proizvođača bez prethodne najave.
+      Oprema navedena u ovoj ponudi predstavlja fiksnu konfiguraciju u trenutku izdavanja ponude.
+      Naknadne promjene konfiguracije mogu utjecati na konačnu cijenu i rok isporuke.
+    </p>
+  </div>
+
+  <!-- Signatures -->
+  <div class="sig-area">
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-label">Za prodavatelja — Navis Marine d.o.o.</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-label">Za kupca — Marina Bay Yachting d.o.o.</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <div class="footer-gold-line"></div>
+    <div class="footer-content">
+      <span>Navis Marine d.o.o. &bull; Uvala Baluni bb, 21000 Split &bull; OIB: 98765432109</span>
+      <span>Stranica 2 od 2</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
