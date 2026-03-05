@@ -53,11 +53,18 @@ Deno.serve(async (req) => {
     }
 
     // Parse request body
-    const { email, full_name, role } = await req.json()
+    const { email, full_name, password, role } = await req.json()
 
-    if (!email || !full_name || !role) {
+    if (!email || !full_name || !password || !role) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: email, full_name, role' }),
+        JSON.stringify({ error: 'Missing required fields: email, full_name, password, role' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (password.length < 6) {
+      return new Response(
+        JSON.stringify({ error: 'Password must be at least 6 characters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -69,15 +76,12 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Generate a random temporary password
-    const tempPassword = crypto.randomUUID().slice(0, 12)
-
     // Create user with service role key (admin API)
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
-      password: tempPassword,
+      password,
       email_confirm: true,
     })
 
@@ -116,7 +120,6 @@ Deno.serve(async (req) => {
           full_name,
           role,
         },
-        temporary_password: tempPassword,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

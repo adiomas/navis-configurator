@@ -138,10 +138,11 @@ export function useUploadLogo() {
         .upload(path, file, { upsert: true })
       if (uploadError) throw uploadError
 
-      // Get public URL
+      // Get public URL with cache-busting param
       const { data: urlData } = supabase.storage
         .from('company-assets')
         .getPublicUrl(path)
+      const publicUrl = `${urlData.publicUrl}?v=${Date.now()}`
 
       // Update company_settings logo_url
       const { data: existing } = await supabase
@@ -153,12 +154,12 @@ export function useUploadLogo() {
       if (existing) {
         const { error } = await supabase
           .from('company_settings')
-          .update({ logo_url: urlData.publicUrl })
+          .update({ logo_url: publicUrl })
           .eq('id', existing.id)
         if (error) throw error
       }
 
-      return urlData.publicUrl
+      return publicUrl
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-settings'] })

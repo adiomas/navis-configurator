@@ -66,7 +66,7 @@ export const router = createBrowserRouter([
           { path: 'templates', element: <AuthGuard requiredRole="admin"><SuspenseWrapper><TemplateGroupsPage /></SuspenseWrapper></AuthGuard> },
           { path: 'settings', element: <AuthGuard requiredRole="admin"><SuspenseWrapper><SettingsPage /></SuspenseWrapper></AuthGuard> },
           { path: 'settings/template-groups', element: <Navigate to="/templates" replace /> },
-          { path: 'settings/users', element: <Navigate to="/settings" replace /> },
+          { path: 'settings/users', element: <Navigate to="/settings?tab=users" replace /> },
           { path: '*', element: <SuspenseWrapper><NotFoundPage /></SuspenseWrapper> },
         ],
       },

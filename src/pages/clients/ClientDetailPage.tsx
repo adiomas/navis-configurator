@@ -316,63 +316,88 @@ export default function ClientDetailPage() {
             <p className={ds.empty.title}>{t('clients.noQuotes')}</p>
           </div>
         ) : (
-          <div className={ds.table.wrapper}>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border/60 bg-muted/50">
-                  <th className={cn(ds.table.headerCell, 'text-left')}>
-                    {t('quotes.quoteNumber')}
-                  </th>
-                  <th className={cn(ds.table.headerCell, 'text-left')}>
-                    {t('quotes.boat')}
-                  </th>
-                  <th className={cn(ds.table.headerCell, 'text-left')}>
-                    {t('common.status')}
-                  </th>
-                  <th className={cn(ds.table.headerCell, 'hidden text-right sm:table-cell')}>
-                    {t('quotes.amount')}
-                  </th>
-                  <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>
-                    {t('quotes.date')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {quotes.map((quote) => (
-                  <tr
-                    key={quote.id}
-                    className={ds.table.rowClickable}
-                    onClick={() => navigate(`/quotes/${quote.id}`)}
-                  >
-                    <td className={ds.table.cell}>
-                      <span className="font-medium text-navy">{quote.quote_number}</span>
-                      {/* Mobile: price + date below */}
-                      <span className="mt-0.5 flex items-center gap-2 text-[11px] sm:hidden">
-                        <span className="font-medium text-navy">
-                          {quote.total_price != null ? formatPrice(quote.total_price) : '—'}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {formatDate(quote.created_at)}
-                        </span>
-                      </span>
-                    </td>
-                    <td className={cn(ds.table.cell, 'text-muted-foreground')}>
+          <>
+            {/* Mobile cards */}
+            <div className="sm:hidden space-y-2 p-3">
+              {quotes.map((quote) => (
+                <div
+                  key={quote.id}
+                  onClick={() => navigate(`/quotes/${quote.id}`)}
+                  className={cn(ds.card.base, 'cursor-pointer px-4 py-3 hover:bg-muted/30 transition-colors')}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-medium text-navy">
+                      {quote.quote_number}
+                    </span>
+                    <QuoteStatusBadge status={quote.status} />
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground truncate mr-2">
                       {quote.boat ? `${quote.boat.brand} ${quote.boat.name}` : '—'}
-                    </td>
-                    <td className={ds.table.cell}>
-                      <QuoteStatusBadge status={quote.status} />
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-right text-foreground sm:table-cell')}>
-                      {quote.total_price != null ? formatPrice(quote.total_price) : '—'}
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-muted-foreground sm:table-cell')}>
-                      {formatDate(quote.created_at)}
-                    </td>
+                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs font-medium text-navy">
+                        {quote.total_price != null ? formatPrice(quote.total_price) : '—'}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatDate(quote.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table */}
+            <div className={cn(ds.table.wrapper, 'hidden sm:block')}>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border/60 bg-muted/50">
+                    <th className={cn(ds.table.headerCell, 'text-left')}>
+                      {t('quotes.quoteNumber')}
+                    </th>
+                    <th className={cn(ds.table.headerCell, 'text-left')}>
+                      {t('quotes.boat')}
+                    </th>
+                    <th className={cn(ds.table.headerCell, 'text-left')}>
+                      {t('common.status')}
+                    </th>
+                    <th className={cn(ds.table.headerCell, 'text-right')}>
+                      {t('quotes.amount')}
+                    </th>
+                    <th className={cn(ds.table.headerCell, 'text-left')}>
+                      {t('quotes.date')}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {quotes.map((quote) => (
+                    <tr
+                      key={quote.id}
+                      className={ds.table.rowClickable}
+                      onClick={() => navigate(`/quotes/${quote.id}`)}
+                    >
+                      <td className={ds.table.cell}>
+                        <span className="font-medium text-navy">{quote.quote_number}</span>
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-muted-foreground')}>
+                        {quote.boat ? `${quote.boat.brand} ${quote.boat.name}` : '—'}
+                      </td>
+                      <td className={ds.table.cell}>
+                        <QuoteStatusBadge status={quote.status} />
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-right text-foreground')}>
+                        {quote.total_price != null ? formatPrice(quote.total_price) : '—'}
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-muted-foreground')}>
+                        {formatDate(quote.created_at)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

@@ -1,12 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { X, Pencil, Trash2, Camera, Plus, Check } from 'lucide-react'
+import { X, Pencil, Trash2, Camera, Plus, Check, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice } from '@/lib/formatters'
 import {
+  useBoats,
   useBoat,
+  useBoatEquipment,
   useUpdateBoat,
   useDeleteBoat,
   useUploadBoatImage,
@@ -14,6 +16,7 @@ import {
   useCreateBoatSpec,
   useUpdateBoatSpec,
   useDeleteBoatSpec,
+  useCopySpecs,
 } from '@/hooks/useBoats'
 import { useAuth } from '@/hooks/useAuth'
 import { BoatForm } from '@/components/boats/BoatForm'
@@ -43,7 +46,9 @@ export const BoatDetailPanel = ({
   const { isAdmin } = useAuth()
   const lang = i18n.language as 'hr' | 'en'
 
-  const { data: boat, isLoading } = useBoat(mode !== 'create' ? (boatId ?? undefined) : undefined)
+  const effectiveId = mode !== 'create' ? (boatId ?? undefined) : undefined
+  const { data: boat, isLoading } = useBoat(effectiveId)
+  const { data: boatEquipment } = useBoatEquipment(effectiveId)
   const updateBoat = useUpdateBoat(boatId ?? '')
   const deleteBoat = useDeleteBoat(boatId ?? '')
   const uploadImage = useUploadBoatImage(boatId ?? '')
@@ -310,7 +315,7 @@ export const BoatDetailPanel = ({
             />
           )}
           {activeTab === 'equipment' && (
-            <BoatEquipmentTab boat={boat} isAdmin={isAdmin} />
+            <BoatEquipmentTab boatId={boat.id} equipmentCategories={boatEquipment ?? []} isAdmin={isAdmin} />
           )}
         </div>
       </div>
@@ -393,6 +398,18 @@ function SpecificationsTab({
   const [newCategoryName, setNewCategoryName] = useState('')
   const [showDeleteSpec, setShowDeleteSpec] = useState<string | null>(null)
 
+  const [showCopyConfirm, setShowCopyConfirm] = useState(false)
+  const [copySourceBoatId, setCopySourceBoatId] = useState<string | null>(null)
+
+  const copySpecs = useCopySpecs(boatId)
+  const { data: allBoats } = useBoats()
+  const { data: sourceBoat } = useBoat(copySourceBoatId ?? undefined)
+
+  const otherBoats = useMemo(
+    () => (allBoats ?? []).filter((b) => b.id !== boatId),
+    [allBoats, boatId]
+  )
+
   const createSpec = useCreateBoatSpec(boatId)
   const updateSpec = useUpdateBoatSpec(boatId)
   const deleteSpec = useDeleteBoatSpec(boatId)
@@ -459,8 +476,44 @@ function SpecificationsTab({
     })
   }
 
+  const handleCopySelect = (sourceId: string) => {
+    setCopySourceBoatId(sourceId)
+    setShowCopyConfirm(true)
+  }
+
+  const handleCopyConfirm = () => {
+    if (!copySourceBoatId) return
+    copySpecs.mutate(copySourceBoatId, {
+      onSuccess: (result) => {
+        toast.success(t('boats.copySpecsSuccess', { count: result.specs }))
+        setCopySourceBoatId(null)
+        setShowCopyConfirm(false)
+      },
+      onError: () => toast.error(t('common.error')),
+    })
+  }
+
   return (
     <div className="space-y-6">
+      {isAdmin && otherBoats.length > 0 && (
+        <div className="relative mb-4">
+          <select
+            onChange={(e) => {
+              if (e.target.value) handleCopySelect(e.target.value)
+              e.target.value = ''
+            }}
+            defaultValue=""
+            className="h-8 w-full appearance-none rounded-md border border-border bg-white px-2 pr-7 text-xs font-medium text-foreground transition-colors hover:bg-muted cursor-pointer"
+          >
+            <option value="" disabled>{t('boats.copySpecsFrom')}</option>
+            {otherBoats.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+          <Copy className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        </div>
+      )}
+
       {Object.entries(groups).map(([category, items]) => (
         <div key={category}>
           <h3 className={cn(ds.card.title, 'mb-3')}>{category}</h3>
@@ -619,6 +672,28 @@ function SpecificationsTab({
         isLoading={deleteSpec.isPending}
         onConfirm={handleDeleteSpec}
         onCancel={() => setShowDeleteSpec(null)}
+      />
+
+      {/* Copy specs confirm */}
+      <ConfirmDialog
+        isOpen={showCopyConfirm && !!sourceBoat}
+        title={t('boats.copySpecsTitle')}
+        description={
+          sourceBoat
+            ? t('boats.copySpecsConfirm', {
+                count: sourceBoat.specs.length,
+                name: allBoats?.find((b) => b.id === copySourceBoatId)?.name ?? '',
+              })
+            : ''
+        }
+        confirmText={t('boats.copySpecsTitle')}
+        cancelText={t('common.cancel')}
+        isLoading={copySpecs.isPending}
+        onConfirm={handleCopyConfirm}
+        onCancel={() => {
+          setShowCopyConfirm(false)
+          setCopySourceBoatId(null)
+        }}
       />
     </div>
   )

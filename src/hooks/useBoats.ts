@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { Boat, BoatInsert, BoatUpdate, BoatWithDetails } from '@/types'
+import type { Boat, BoatInsert, BoatUpdate, BoatWithSpecs, EquipmentCategoryWithItems } from '@/types'
 import type { BoatFormData } from '@/lib/validators'
 
 interface BoatFilters {
@@ -52,24 +52,36 @@ export function useBoats(filters?: BoatFilters) {
 }
 
 export function useBoat(id: string | undefined) {
-  return useQuery<BoatWithDetails>({
+  return useQuery<BoatWithSpecs>({
     queryKey: ['boat', id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('boats')
-        .select(`
-          *,
-          specs:boat_specs(*),
-          images:boat_images(*),
-          equipment_categories(*, items:equipment_items(*))
-        `)
+        .select('*, specs:boat_specs(*), images:boat_images(*)')
         .eq('id', id!)
         .single()
 
       if (error) throw error
-      return data as unknown as BoatWithDetails
+      return data as unknown as BoatWithSpecs
     },
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useBoatEquipment(boatId: string | undefined) {
+  return useQuery<EquipmentCategoryWithItems[]>({
+    queryKey: ['boat', boatId, 'equipment'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('equipment_categories')
+        .select('*, items:equipment_items(*)')
+        .eq('boat_id', boatId!)
+        .order('sort_order')
+      if (error) throw error
+      return data as unknown as EquipmentCategoryWithItems[]
+    },
+    enabled: !!boatId,
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -175,7 +187,7 @@ export function useUploadBoatImage(boatId: string) {
         .from('boat-images')
         .getPublicUrl(filePath)
 
-      const { error: insertError } = await supabase
+      const { data: newImage, error: insertError } = await supabase
         .from('boat_images')
         .insert({
           boat_id: boatId,
@@ -183,10 +195,20 @@ export function useUploadBoatImage(boatId: string) {
           display_url: publicUrl,
           category: 'exterior' as const,
         })
+        .select('id')
+        .single()
       if (insertError) throw insertError
+
+      // Set as hero image (upload button is on the hero area)
+      const { error: rpcError } = await supabase.rpc('set_primary_boat_image', {
+        p_boat_id: boatId,
+        p_image_id: newImage.id,
+      })
+      if (rpcError) throw rpcError
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boat', boatId] })
+      queryClient.invalidateQueries({ queryKey: ['boats'] })
     },
   })
 }
@@ -218,33 +240,11 @@ export function useSetPrimaryImage(boatId: string) {
 
   return useMutation({
     mutationFn: async (imageId: string) => {
-      // Clear all primary flags for this boat
-      const { error: clearError } = await supabase
-        .from('boat_images')
-        .update({ is_primary: false })
-        .eq('boat_id', boatId)
-      if (clearError) throw clearError
-
-      // Set the selected image as primary
-      const { error: setError } = await supabase
-        .from('boat_images')
-        .update({ is_primary: true })
-        .eq('id', imageId)
-      if (setError) throw setError
-
-      // Update boat hero_image_url
-      const { data: image } = await supabase
-        .from('boat_images')
-        .select('display_url')
-        .eq('id', imageId)
-        .single()
-
-      if (image) {
-        await supabase
-          .from('boats')
-          .update({ hero_image_url: image.display_url })
-          .eq('id', boatId)
-      }
+      const { error } = await supabase.rpc('set_primary_boat_image', {
+        p_boat_id: boatId,
+        p_image_id: imageId,
+      })
+      if (error) throw error
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boat', boatId] })
@@ -298,6 +298,42 @@ export function useDeleteBoatSpec(boatId: string) {
         .delete()
         .eq('id', specId)
       if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boat', boatId] })
+    },
+  })
+}
+
+export function useCopySpecs(boatId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (sourceBoatId: string) => {
+      const { data: sourceSpecs, error: fetchError } = await supabase
+        .from('boat_specs')
+        .select('*')
+        .eq('boat_id', sourceBoatId)
+      if (fetchError) throw fetchError
+
+      if (sourceSpecs.length > 0) {
+        const specsToInsert = sourceSpecs.map((spec) => ({
+          boat_id: boatId,
+          label_hr: spec.label_hr,
+          label_en: spec.label_en,
+          value: spec.value,
+          category: spec.category,
+          sort_order: spec.sort_order,
+        }))
+
+        for (let i = 0; i < specsToInsert.length; i += 1000) {
+          const batch = specsToInsert.slice(i, i + 1000)
+          const { error } = await supabase.from('boat_specs').insert(batch)
+          if (error) throw error
+        }
+      }
+
+      return { specs: sourceSpecs.length }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['boat', boatId] })

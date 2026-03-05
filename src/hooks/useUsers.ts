@@ -23,7 +23,7 @@ export function useInviteUser() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: InviteUserFormData): Promise<{ user: { id: string; email: string; full_name: string; role: string }; temporary_password: string }> => {
+    mutationFn: async (data: InviteUserFormData): Promise<{ user: { id: string; email: string; full_name: string; role: string } }> => {
       const { data: session } = await supabase.auth.getSession()
       const token = session.session?.access_token
 
@@ -69,6 +69,67 @@ export function useUpdateUser(userId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+}
+
+export function useDeleteUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { data: session } = await supabase.auth.getSession()
+      const token = session.session?.access_token
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ user_id: userId }),
+        }
+      )
+
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to delete user')
+      }
+      return result
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+  })
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async ({ userId, newPassword }: { userId: string; newPassword: string }) => {
+      const { data: session } = await supabase.auth.getSession()
+      const token = session.session?.access_token
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reset-user-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ user_id: userId, new_password: newPassword }),
+        }
+      )
+
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to reset password')
+      }
+      return result
     },
   })
 }

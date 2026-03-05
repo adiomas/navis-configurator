@@ -149,11 +149,13 @@ export const CompanySettingsForm = ({ initialData }: CompanySettingsFormProps) =
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-4">
             <label htmlFor="settings-iban" className={ds.input.label}>{t('settings.iban')}</label>
-            <input id="settings-iban" {...register('iban')} className={ds.input.base} placeholder="HR..." />
+            <input id="settings-iban" {...register('iban')} className={ds.input.base} placeholder="HR1210010051863000160" />
+            {errors.iban && <p className={ds.input.error}>{errors.iban.message}</p>}
           </div>
           <div>
             <label htmlFor="settings-bic" className={ds.input.label}>{t('settings.bic')}</label>
-            <input id="settings-bic" {...register('bic')} className={ds.input.base} />
+            <input id="settings-bic" {...register('bic')} className={ds.input.base} placeholder="ZABAHR2X" />
+            {errors.bic && <p className={ds.input.error}>{errors.bic.message}</p>}
           </div>
           <div>
             <label htmlFor="settings-bank-name" className={ds.input.label}>{t('settings.bankName')}</label>

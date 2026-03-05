@@ -60,6 +60,26 @@ export function useTemplateGroup(id: string | undefined) {
   })
 }
 
+export function useActiveTemplateGroupIds() {
+  const today = new Date().toISOString().split('T')[0]
+
+  return useQuery<{ id: string; name: string; valid_from: string; valid_until: string; boats: { boat_id: string }[] }[]>({
+    queryKey: ['templateGroups', 'active-ids', today],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quote_template_groups')
+        .select('id, name, valid_from, valid_until, boats:quote_template_group_boats(boat_id)')
+        .eq('is_active', true)
+        .lte('valid_from', today)
+        .gte('valid_until', today)
+        .order('name')
+      if (error) throw error
+      return data as unknown as { id: string; name: string; valid_from: string; valid_until: string; boats: { boat_id: string }[] }[]
+    },
+    staleTime: 60 * 1000,
+  })
+}
+
 export function useActiveTemplateGroups() {
   const today = new Date().toISOString().split('T')[0]
 

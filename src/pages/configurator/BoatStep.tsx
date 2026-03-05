@@ -7,7 +7,7 @@ import { ds } from '@/lib/styles'
 import { formatPrice } from '@/lib/formatters'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useBoats, useBoat } from '@/hooks/useBoats'
-import { useActiveTemplateGroups } from '@/hooks/useTemplateGroups'
+import { useActiveTemplateGroupIds } from '@/hooks/useTemplateGroups'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import type { Boat, BoatCategory } from '@/types'
 
@@ -17,7 +17,7 @@ export default function BoatStep() {
 
   const { data: boats, isLoading, error: boatsError, refetch: refetchBoats } = useBoats()
   const { data: boatDetails } = useBoat(selectedBoat?.id)
-  const { data: activeGroups } = useActiveTemplateGroups()
+  const { data: activeGroups } = useActiveTemplateGroupIds()
 
   const selectedTemplate = activeGroups?.find((g) => g.id === templateGroupId)
   const templateBoatIds = useMemo(
@@ -122,22 +122,24 @@ export default function BoatStep() {
             className={cn(ds.input.base, 'pl-8')}
           />
         </div>
-        <div className="flex overflow-hidden rounded-lg border border-border">
-          {categoryTabs.map((tab) => (
-            <button
-              key={tab.value}
-              type="button"
-              onClick={() => setCategoryFilter(tab.value)}
-              className={cn(
-                'px-2.5 py-1 text-xs font-medium transition-all duration-200 first:rounded-l-lg last:rounded-r-lg',
-                categoryFilter === tab.value
-                  ? 'bg-navy text-white shadow-sm'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="-mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
+          <div className="flex rounded-lg border border-border">
+            {categoryTabs.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setCategoryFilter(tab.value)}
+                className={cn(
+                  'whitespace-nowrap px-2.5 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
+                  categoryFilter === tab.value
+                    ? 'bg-navy text-white'
+                    : 'text-muted-foreground hover:bg-muted',
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

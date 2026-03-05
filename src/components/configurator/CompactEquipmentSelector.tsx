@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Check, ChevronDown, Tag, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -20,6 +21,7 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
 
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [activePopoverItemId, setActivePopoverItemId] = useState<string | null>(null)
+  const [popoverAnchorRect, setPopoverAnchorRect] = useState<DOMRect | null>(null)
 
   const lang = i18n.language as 'hr' | 'en'
 
@@ -195,9 +197,13 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  setActivePopoverItemId(
-                                    activePopoverItemId === item.id ? null : item.id,
-                                  )
+                                  if (activePopoverItemId === item.id) {
+                                    setActivePopoverItemId(null)
+                                    setPopoverAnchorRect(null)
+                                  } else {
+                                    setActivePopoverItemId(item.id)
+                                    setPopoverAnchorRect(e.currentTarget.getBoundingClientRect())
+                                  }
                                 }}
                                 className={cn(
                                   'flex h-7 w-7 items-center justify-center rounded transition-colors',
@@ -228,8 +234,12 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                             existingDiscount={itemDiscount}
                             addDiscount={addDiscount}
                             removeDiscount={removeDiscount}
-                            onClose={() => setActivePopoverItemId(null)}
+                            onClose={() => {
+                              setActivePopoverItemId(null)
+                              setPopoverAnchorRect(null)
+                            }}
                             t={t}
+                            anchorRect={popoverAnchorRect}
                           />
                         )}
                       </div>
@@ -255,6 +265,7 @@ interface ItemDiscountPopoverProps {
   removeDiscount: (id: string) => void
   onClose: () => void
   t: (key: string, options?: Record<string, string>) => string
+  anchorRect: DOMRect | null
 }
 
 function ItemDiscountPopover({
@@ -265,6 +276,7 @@ function ItemDiscountPopover({
   removeDiscount,
   onClose,
   t,
+  anchorRect,
 }: ItemDiscountPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null)
   const [type, setType] = useState<DiscountType>(existingDiscount?.type ?? 'percentage')
@@ -273,6 +285,15 @@ function ItemDiscountPopover({
 
   const stableOnClose = useCallback(() => onClose(), [onClose])
   useClickOutside(popoverRef, stableOnClose)
+
+  // Calculate fixed position for desktop portal popover
+  const popoverPos = (() => {
+    if (!anchorRect) return null
+    const popoverWidth = 256 // w-64 = 16rem = 256px
+    let left = anchorRect.right - popoverWidth
+    if (left < 8) left = 8
+    return { top: anchorRect.bottom + 4, left }
+  })()
 
   const handleApply = () => {
     const numValue = parseFloat(value)
@@ -400,15 +421,19 @@ function ItemDiscountPopover({
         </div>
       </div>
 
-      {/* Desktop: floating popover */}
-      <div className="hidden lg:block">
-        <div
-          ref={popoverRef}
-          className="absolute right-0 top-full z-30 mt-1 w-64 animate-fade-in rounded-lg border border-border bg-card p-3 shadow-lg"
-        >
-          {content}
-        </div>
-      </div>
+      {/* Desktop: portal popover (avoids overflow-hidden clipping) */}
+      {popoverPos && createPortal(
+        <div className="hidden lg:block">
+          <div
+            ref={popoverRef}
+            style={{ top: popoverPos.top, left: popoverPos.left }}
+            className="fixed z-50 w-64 animate-fade-in rounded-lg border border-border bg-card p-3 shadow-lg"
+          >
+            {content}
+          </div>
+        </div>,
+        document.body,
+      )}
     </>
   )
 }

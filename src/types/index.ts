@@ -58,10 +58,9 @@ export type QuoteTemplateGroupDiscountInsert = Tables['quote_template_group_disc
 export type PDFTemplate = Tables['pdf_templates']['Row']
 
 // Composite types for UI
-export type BoatWithDetails = Boat & {
+export type BoatWithSpecs = Boat & {
   specs: BoatSpec[]
   images: BoatImage[]
-  equipment_categories: EquipmentCategoryWithItems[]
 }
 
 export type EquipmentCategoryWithItems = EquipmentCategory & {
@@ -128,4 +127,5 @@ export interface ClientFormData {
 export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'rejected'
 export type BoatCategory = 'new' | 'used'
 export type ClientCategory = 'vip' | 'regular' | 'prospect'
+export type ClientType = 'company' | 'individual'
 export type UserRole = 'admin' | 'sales'

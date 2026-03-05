@@ -50,7 +50,12 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
 
   setStep: (step) => set({ currentStep: step }),
 
-  setBoat: (boat) => set({ selectedBoat: boat }),
+  setBoat: (boat) => set({
+    selectedBoat: boat,
+    selectedEquipment: new Map(),
+    discounts: [],
+    templateGroupId: null,
+  }),
 
   toggleEquipment: (item) =>
     set((state) => {

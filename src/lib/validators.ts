@@ -31,6 +31,7 @@ export const equipmentItemSchema = z.object({
 })
 
 export const companySchema = z.object({
+  client_type: z.enum(['company', 'individual']).default('company'),
   name: z.string().min(1, 'Company name is required'),
   registration_number: z.string().optional(),
   address: z.string().optional(),
@@ -87,8 +88,20 @@ export const companySettingsSchema = z.object({
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   website: z.string().url('Invalid URL').optional().or(z.literal('')),
-  iban: z.string().optional(),
-  bic: z.string().optional(),
+  iban: z.string()
+    .transform((v) => v.replace(/\s/g, '').toUpperCase())
+    .pipe(
+      z.string()
+        .regex(/^[A-Z]{2}\d{2}[A-Z0-9]{4,30}$/, 'Invalid IBAN format (e.g. HR1210010051863000160)')
+        .or(z.literal(''))
+    ),
+  bic: z.string()
+    .transform((v) => v.replace(/\s/g, '').toUpperCase())
+    .pipe(
+      z.string()
+        .regex(/^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/, 'Invalid BIC/SWIFT format (e.g. ZABAHR2X)')
+        .or(z.literal(''))
+    ),
   bank_name: z.string().optional(),
   default_currency: z.string().default('EUR'),
   default_language: z.enum(['hr', 'en']).default('hr'),
@@ -97,6 +110,7 @@ export const companySettingsSchema = z.object({
 export const inviteUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.enum(['admin', 'sales']),
 })
 

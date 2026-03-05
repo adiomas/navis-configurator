@@ -5,7 +5,7 @@ import { QueryErrorState } from '@/components/ui/QueryErrorState'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { useDebounce } from '@/hooks/useDebounce'
-import { useBoat } from '@/hooks/useBoats'
+import { useBoat, useBoatEquipment } from '@/hooks/useBoats'
 import { useTemplateGroup } from '@/hooks/useTemplateGroups'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import { CompactEquipmentSelector } from '@/components/configurator/CompactEquipmentSelector'
@@ -26,8 +26,11 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
     templateGroupId,
   } = useConfiguratorStore()
 
-  const { data: boatDetails, isLoading, error: boatError, refetch: refetchBoat } = useBoat(selectedBoat?.id)
+  const { data: boatDetails, isLoading: boatLoading, error: boatError, refetch: refetchBoat } = useBoat(selectedBoat?.id)
+  const { data: equipmentCategories, isLoading: equipmentLoading, error: equipmentError, refetch: refetchEquipment } = useBoatEquipment(selectedBoat?.id)
   const { data: templateGroup } = useTemplateGroup(templateGroupId ?? undefined)
+
+  const isLoading = boatLoading || equipmentLoading
 
   const templateAppliedRef = useRef(false)
 
@@ -36,10 +39,10 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
 
   // Auto-select standard items
   useEffect(() => {
-    if (!boatDetails?.equipment_categories) return
+    if (!equipmentCategories) return
 
     const standardItems: EquipmentItem[] = []
-    for (const cat of boatDetails.equipment_categories) {
+    for (const cat of equipmentCategories) {
       for (const item of cat.items) {
         if (item.is_standard) standardItems.push(item)
       }
@@ -56,18 +59,18 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
       }
     }
     if (changed) setSelectedEquipment(next)
-  }, [boatDetails?.equipment_categories]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [equipmentCategories]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-configure from template group
   useEffect(() => {
-    if (!templateGroup || !selectedBoat || !boatDetails?.equipment_categories || templateAppliedRef.current) return
+    if (!templateGroup || !selectedBoat || !equipmentCategories || templateAppliedRef.current) return
     templateAppliedRef.current = true
 
     const templateEquipment = templateGroup.equipment.filter(
       (e) => e.boat_id === selectedBoat.id,
     )
     if (templateEquipment.length > 0) {
-      const allItems = boatDetails.equipment_categories.flatMap((cat) => cat.items)
+      const allItems = equipmentCategories.flatMap((cat) => cat.items)
       const next = new Map(selectedEquipment)
       for (const te of templateEquipment) {
         const item = allItems.find((i) => i.id === te.equipment_item_id)
@@ -85,7 +88,7 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
         description: td.description ?? undefined,
       })
     }
-  }, [templateGroup, selectedBoat, boatDetails?.equipment_categories]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [templateGroup, selectedBoat, equipmentCategories]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLoading) {
     return (
@@ -98,7 +101,7 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
     )
   }
 
-  if (boatError) return <QueryErrorState onRetry={refetchBoat} />
+  if (boatError || equipmentError) return <QueryErrorState onRetry={() => { refetchBoat(); refetchEquipment() }} />
 
   if (!boatDetails || !selectedBoat) {
     return (
@@ -109,7 +112,7 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
     )
   }
 
-  const categories = boatDetails.equipment_categories ?? []
+  const categories = equipmentCategories ?? []
 
   return (
     <div className="space-y-3">

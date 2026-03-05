@@ -1,4 +1,3 @@
-import bwipjs from 'bwip-js'
 import type { CompanySettings } from '@/types'
 
 interface HUB3Params {
@@ -54,9 +53,14 @@ export async function generateHUB3Barcode(
   companyName: string,
   settings: CompanySettings,
   language: string,
+  depositPercentage?: number | null,
 ): Promise<string | null> {
   if (language !== 'hr') return null
   if (!settings.iban) return null
+
+  const description = depositPercentage && depositPercentage > 0 && depositPercentage < 100
+    ? `Predujam ${depositPercentage}% - ${quoteNumber}`
+    : `Ponuda ${quoteNumber}`
 
   const hub3Data = generateHUB3Data({
     amount: totalAmount,
@@ -69,17 +73,18 @@ export async function generateHUB3Barcode(
     model: 'HR00',
     callNumber: quoteNumber.replace(/[^0-9-]/g, ''),
     purposeCode: 'SALE',
-    description: `Ponuda ${quoteNumber}`,
+    description,
   })
 
   try {
-    const canvas = bwipjs.toCanvas(document.createElement('canvas'), {
+    const bwipjs = await import('bwip-js')
+    const canvas = bwipjs.default.toCanvas(document.createElement('canvas'), {
       bcid: 'pdf417',
       text: hub3Data,
       scale: 2,
       height: 20,
       width: 200,
-    } as bwipjs.RenderOptions)
+    })
 
     return canvas.toDataURL('image/png')
   } catch (err) {

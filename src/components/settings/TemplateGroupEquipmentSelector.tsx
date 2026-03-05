@@ -3,7 +3,7 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/formatters'
-import { useBoat } from '@/hooks/useBoats'
+import { useBoat, useBoatEquipment } from '@/hooks/useBoats'
 import type { EquipmentItem } from '@/types'
 
 interface EquipmentSelection {
@@ -62,7 +62,8 @@ interface BoatEquipmentSectionProps {
 function BoatEquipmentSection({ boatId, value, onChange }: BoatEquipmentSectionProps) {
   const { i18n } = useTranslation()
   const { t } = useTranslation()
-  const { data: boatDetails, isLoading } = useBoat(boatId)
+  const { data: boatDetails } = useBoat(boatId)
+  const { data: equipmentCategories, isLoading } = useBoatEquipment(boatId)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
 
   const lang = i18n.language as 'hr' | 'en'
@@ -103,9 +104,9 @@ function BoatEquipmentSection({ boatId, value, onChange }: BoatEquipmentSectionP
     return <div className="h-12 animate-pulse rounded-xl bg-muted" />
   }
 
-  if (!boatDetails) return null
+  if (!boatDetails || !equipmentCategories) return null
 
-  const categories = boatDetails.equipment_categories ?? []
+  const categories = equipmentCategories
 
   return (
     <div className="overflow-hidden rounded-xl border border-border">

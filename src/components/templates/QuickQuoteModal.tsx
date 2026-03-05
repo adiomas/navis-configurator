@@ -9,7 +9,7 @@ import { CompanyForm } from '@/components/clients/CompanyForm'
 import { useTemplateGroup } from '@/hooks/useTemplateGroups'
 import { useCreateQuote } from '@/hooks/useQuotes'
 import { useCreateCompany } from '@/hooks/useCompanies'
-import { useBoat } from '@/hooks/useBoats'
+import { useBoatEquipment } from '@/hooks/useBoats'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/formatters'
 import type { CompanyWithContacts, ConfiguratorDiscount } from '@/types'
@@ -43,8 +43,8 @@ export const QuickQuoteModal = ({
   const boats = group?.boats ?? []
   const effectiveBoatId = boats.length === 1 ? boats[0].boat_id : selectedBoatId
 
-  // Load selected boat details (for equipment categories)
-  const { data: boatDetails } = useBoat(effectiveBoatId ?? undefined)
+  // Load selected boat's equipment categories
+  const { data: boatEquipment } = useBoatEquipment(effectiveBoatId ?? undefined)
 
   // Get template equipment for selected boat
   const templateEquipment = useMemo(() => {
@@ -68,8 +68,9 @@ export const QuickQuoteModal = ({
 
   // Get boat base price (special price from template or original)
   const selectedTemplateBoat = boats.find((b) => b.boat_id === effectiveBoatId)
+  const selectedBoatData = boats.find((b) => b.boat_id === effectiveBoatId)?.boat
   const boatBasePrice =
-    selectedTemplateBoat?.special_price ?? boatDetails?.base_price ?? 0
+    selectedTemplateBoat?.special_price ?? selectedBoatData?.base_price ?? 0
 
   const canCreate = !!effectiveBoatId && selectedCompanies.length > 0
 
@@ -94,7 +95,7 @@ export const QuickQuoteModal = ({
   }
 
   const handleCreateQuotes = async () => {
-    if (!effectiveBoatId || selectedCompanies.length === 0 || !boatDetails) return
+    if (!effectiveBoatId || selectedCompanies.length === 0 || !boatEquipment) return
 
     const total = selectedCompanies.length
     setBatchProgress({ current: 0, total })
@@ -121,7 +122,7 @@ export const QuickQuoteModal = ({
           discounts,
           templateGroupId,
           status: 'draft',
-          categories: boatDetails.equipment_categories ?? [],
+          categories: boatEquipment,
         })
       } catch {
         // Stop on first error — already created quotes remain as drafts

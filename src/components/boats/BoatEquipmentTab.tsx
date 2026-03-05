@@ -7,7 +7,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice } from '@/lib/formatters'
-import { useBoats, useBoat } from '@/hooks/useBoats'
+import { useBoats, useBoatEquipment } from '@/hooks/useBoats'
 import {
   useCreateCategory,
   useUpdateCategory,
@@ -24,15 +24,16 @@ import { EquipmentCategoryForm } from '@/components/equipment/EquipmentCategoryF
 import { EquipmentItemForm } from '@/components/equipment/EquipmentItemForm'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { SortableItem } from '@/components/ui/SortableItem'
-import type { BoatWithDetails, EquipmentCategory, EquipmentCategoryWithItems, EquipmentItem } from '@/types'
+import type { EquipmentCategory, EquipmentCategoryWithItems, EquipmentItem } from '@/types'
 import type { EquipmentCategoryFormData, EquipmentItemFormData } from '@/lib/validators'
 
 interface BoatEquipmentTabProps {
-  boat: BoatWithDetails
+  boatId: string
+  equipmentCategories: EquipmentCategoryWithItems[]
   isAdmin: boolean
 }
 
-export const BoatEquipmentTab = ({ boat, isAdmin }: BoatEquipmentTabProps) => {
+export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatEquipmentTabProps) => {
   const { t, i18n } = useTranslation()
   const lang = (i18n.language === 'hr' ? 'hr' : 'en') as 'hr' | 'en'
   const { data: allBoats } = useBoats()
@@ -52,7 +53,7 @@ export const BoatEquipmentTab = ({ boat, isAdmin }: BoatEquipmentTabProps) => {
 
   // Accordion state — all open by default
   const [openCategories, setOpenCategories] = useState<Set<string>>(
-    () => new Set(boat.equipment_categories.map((c) => c.id))
+    () => new Set(equipmentCategories.map((c) => c.id))
   )
 
   // Bulk select state
@@ -64,25 +65,25 @@ export const BoatEquipmentTab = ({ boat, isAdmin }: BoatEquipmentTabProps) => {
   const [copySourceBoatId, setCopySourceBoatId] = useState<string | null>(null)
 
   // Mutations
-  const createCategory = useCreateCategory(boat.id)
-  const updateCategory = useUpdateCategory(boat.id)
-  const deleteCategory = useDeleteCategory(boat.id)
-  const createItem = useCreateItem(boat.id)
-  const updateItem = useUpdateItem(boat.id)
-  const deleteItem = useDeleteItem(boat.id)
-  const copyEquipment = useCopyEquipment(boat.id)
-  const reorderCategories = useReorderCategories(boat.id)
-  const reorderItems = useReorderItems(boat.id)
-  const deleteItems = useDeleteItems(boat.id)
+  const createCategory = useCreateCategory(boatId)
+  const updateCategory = useUpdateCategory(boatId)
+  const deleteCategory = useDeleteCategory(boatId)
+  const createItem = useCreateItem(boatId)
+  const updateItem = useUpdateItem(boatId)
+  const deleteItem = useDeleteItem(boatId)
+  const copyEquipment = useCopyEquipment(boatId)
+  const reorderCategories = useReorderCategories(boatId)
+  const reorderItems = useReorderItems(boatId)
+  const deleteItems = useDeleteItems(boatId)
 
-  const categories = boat.equipment_categories ?? []
+  const categories = equipmentCategories ?? []
 
   const otherBoats = useMemo(
-    () => (allBoats ?? []).filter((b) => b.id !== boat.id),
-    [allBoats, boat.id]
+    () => (allBoats ?? []).filter((b) => b.id !== boatId),
+    [allBoats, boatId]
   )
 
-  const { data: sourceBoat } = useBoat(copySourceBoatId ?? undefined)
+  const { data: sourceBoatEquipment } = useBoatEquipment(copySourceBoatId ?? undefined)
 
   const toggle = (categoryId: string) => {
     setOpenCategories((prev) => {
@@ -555,14 +556,14 @@ export const BoatEquipmentTab = ({ boat, isAdmin }: BoatEquipmentTabProps) => {
 
       {/* Copy Equipment Confirm */}
       <ConfirmDialog
-        isOpen={showCopyConfirm && !!sourceBoat}
+        isOpen={showCopyConfirm && !!sourceBoatEquipment}
         title={t('equipment.copyEquipmentTitle')}
         description={
-          sourceBoat
+          sourceBoatEquipment
             ? t('equipment.copyConfirm', {
-                categories: sourceBoat.equipment_categories.length,
-                items: sourceBoat.equipment_categories.flatMap((c) => c.items).length,
-                name: sourceBoat.name,
+                categories: sourceBoatEquipment.length,
+                items: sourceBoatEquipment.flatMap((c) => c.items).length,
+                name: allBoats?.find((b) => b.id === copySourceBoatId)?.name ?? '',
               })
             : ''
         }

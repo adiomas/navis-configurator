@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Search, Plus, FileText, ChevronLeft, ChevronRight, ChevronDown, Zap, X } from 'lucide-react'
+import { Search, Plus, FileText, ChevronLeft, ChevronRight, ChevronDown, Zap, X, Eye, Send, Check, RotateCcw } from 'lucide-react'
 import { QueryErrorState } from '@/components/ui/QueryErrorState'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
@@ -177,8 +177,8 @@ export default function QuotesListPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="-mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="min-w-0 -mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
             <div className="flex rounded-lg border border-border">
               {statusTabs.map((tab) => (
                 <button
@@ -235,105 +235,173 @@ export default function QuotesListPage() {
           onAdd={handleNewQuote}
         />
       ) : (
-        <div className={cn(ds.table.wrapper, ds.card.base)}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border/60 bg-muted/50">
-                <th className={cn(ds.table.headerCell, 'text-left')}>
-                  {t('quotes.quoteNumber')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>
-                  {t('quotes.boat')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>
-                  {t('quotes.client')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left lg:table-cell')}>
-                  {t('quotes.createdBy')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'text-left')}>
-                  {t('common.status')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-right sm:table-cell')}>
-                  {t('quotes.amount')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left md:table-cell')}>
-                  {t('quotes.date')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'text-right')}>
-                  {t('common.actions')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {quotes.map((quote) => {
-                const boat = quote.boat as { id: string; name: string; hero_image_url: string | null } | null
-                const company = quote.company as { id: string; name: string } | null
-                const createdByProfile = quote.created_by_profile as { id: string; full_name: string } | null
-                const boatName = boat?.name ?? '—'
+        <>
+          {/* Mobile cards */}
+          <div className="sm:hidden space-y-2">
+            {quotes.map((quote) => {
+              const boat = quote.boat as { id: string; name: string; hero_image_url: string | null } | null
+              const company = quote.company as { id: string; name: string } | null
+              const boatName = boat?.name ?? '—'
+              const canEdit = isAdmin || quote.created_by === user?.id
+              const status = quote.status as QuoteStatus
+              const statusTransitions: Record<QuoteStatus, { target: QuoteStatus; icon: typeof Send; className: string }[]> = {
+                draft: [{ target: 'sent', icon: Send, className: 'hover:bg-primary/10 hover:text-primary' }],
+                sent: [
+                  { target: 'accepted', icon: Check, className: 'hover:bg-emerald-50 hover:text-emerald-600' },
+                  { target: 'rejected', icon: X, className: 'hover:bg-red-50 hover:text-red-600' },
+                ],
+                accepted: [{ target: 'draft', icon: RotateCcw, className: 'hover:bg-muted hover:text-foreground' }],
+                rejected: [{ target: 'draft', icon: RotateCcw, className: 'hover:bg-muted hover:text-foreground' }],
+              }
 
-                return (
-                  <tr
-                    key={quote.id}
-                    onMouseEnter={() => prefetchQuote(quote.id)}
-                    className={ds.table.rowClickable}
-                  >
-                    <td className={ds.table.cell}>
+              return (
+                <div
+                  key={quote.id}
+                  className={cn(ds.card.base, 'px-4 py-3')}
+                >
+                  <div className="flex items-center justify-between">
+                    <Link
+                      to={`/quotes/${quote.id}`}
+                      className="font-mono text-xs font-medium text-navy transition-colors hover:text-primary"
+                    >
+                      {quote.quote_number}
+                    </Link>
+                    <QuoteStatusBadge status={status} />
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5 text-[11px]">
+                    <span className="text-foreground truncate">{boatName}</span>
+                    {company?.name && (
+                      <>
+                        <span className="text-muted-foreground">·</span>
+                        <span className="text-muted-foreground truncate">{company.name}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-navy">
+                        {formatPrice(Number(quote.total_price ?? 0))}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {formatDate(quote.created_at)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
                       <Link
                         to={`/quotes/${quote.id}`}
-                        className="font-mono text-xs font-medium text-navy transition-colors hover:text-primary"
+                        className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        title={t('quotes.view')}
                       >
-                        {quote.quote_number}
+                        <Eye className="h-4 w-4" />
                       </Link>
-                      {/* Mobile: show boat, client, price, date inline */}
-                      <span className="mt-0.5 flex flex-col gap-0.5 text-[11px] sm:hidden">
-                        <span className="text-foreground">{boatName}</span>
-                        {company?.name && (
-                          <span className="text-muted-foreground">{company.name}</span>
-                        )}
-                        <span className="flex items-center gap-2">
-                          <span className="font-medium text-navy">
-                            {formatPrice(Number(quote.total_price ?? 0))}
-                          </span>
-                          <span className="text-muted-foreground">
-                            {formatDate(quote.created_at)}
-                          </span>
-                        </span>
-                      </span>
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-foreground sm:table-cell')}>
-                      {boatName}
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-muted-foreground sm:table-cell')}>
-                      {company?.name ?? '—'}
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-muted-foreground lg:table-cell')}>
-                      {createdByProfile?.full_name ?? '—'}
-                    </td>
-                    <td className={ds.table.cell}>
-                      <QuoteStatusBadge status={quote.status as QuoteStatus} />
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-right font-medium sm:table-cell')}>
-                      {formatPrice(Number(quote.total_price ?? 0))}
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-muted-foreground md:table-cell')}>
-                      {formatDate(quote.created_at)}
-                    </td>
-                    <td className={ds.table.cell}>
-                      <QuoteActions
-                        quoteId={quote.id}
-                        status={quote.status as QuoteStatus}
-                        onStatusChange={handleStatusChange}
-                        isLoading={updateStatus.isPending}
-                        canEdit={isAdmin || quote.created_by === user?.id}
-                      />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                      {canEdit && statusTransitions[status]?.map(({ target, icon: Icon, className }) => (
+                        <button
+                          key={target}
+                          type="button"
+                          disabled={updateStatus.isPending}
+                          onClick={() => handleStatusChange(quote.id, target)}
+                          className={cn(
+                            'rounded-lg p-1.5 text-muted-foreground transition-colors disabled:opacity-50',
+                            className
+                          )}
+                          title={t(`quotes.${target}`)}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Desktop table */}
+          <div className={cn(ds.table.wrapper, ds.card.base, 'hidden sm:block')}>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/60 bg-muted/50">
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('quotes.quoteNumber')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('quotes.boat')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('quotes.client')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'hidden text-left lg:table-cell')}>
+                    {t('quotes.createdBy')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('common.status')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-right')}>
+                    {t('quotes.amount')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'hidden text-left md:table-cell')}>
+                    {t('quotes.date')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-right')}>
+                    {t('common.actions')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {quotes.map((quote) => {
+                  const boat = quote.boat as { id: string; name: string; hero_image_url: string | null } | null
+                  const company = quote.company as { id: string; name: string } | null
+                  const createdByProfile = quote.created_by_profile as { id: string; full_name: string } | null
+                  const boatName = boat?.name ?? '—'
+
+                  return (
+                    <tr
+                      key={quote.id}
+                      onMouseEnter={() => prefetchQuote(quote.id)}
+                      className={ds.table.rowClickable}
+                    >
+                      <td className={ds.table.cell}>
+                        <Link
+                          to={`/quotes/${quote.id}`}
+                          className="font-mono text-xs font-medium text-navy transition-colors hover:text-primary"
+                        >
+                          {quote.quote_number}
+                        </Link>
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-foreground')}>
+                        {boatName}
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-muted-foreground')}>
+                        {company?.name ?? '—'}
+                      </td>
+                      <td className={cn(ds.table.cell, 'hidden text-muted-foreground lg:table-cell')}>
+                        {createdByProfile?.full_name ?? '—'}
+                      </td>
+                      <td className={ds.table.cell}>
+                        <QuoteStatusBadge status={quote.status as QuoteStatus} />
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-right font-medium')}>
+                        {formatPrice(Number(quote.total_price ?? 0))}
+                      </td>
+                      <td className={cn(ds.table.cell, 'hidden text-muted-foreground md:table-cell')}>
+                        {formatDate(quote.created_at)}
+                      </td>
+                      <td className={ds.table.cell}>
+                        <QuoteActions
+                          quoteId={quote.id}
+                          status={quote.status as QuoteStatus}
+                          onStatusChange={handleStatusChange}
+                          isLoading={updateStatus.isPending}
+                          canEdit={isAdmin || quote.created_by === user?.id}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* Pagination */}
@@ -382,30 +450,47 @@ export default function QuotesListPage() {
 
 function TableSkeleton() {
   return (
-    <div className={cn('overflow-hidden', ds.card.base)}>
-      <div className="border-b border-border/60 bg-muted/50 px-3 py-2">
-        <div className={cn(ds.skeleton.line, 'w-48')} />
+    <>
+      {/* Mobile skeleton */}
+      <div className="sm:hidden space-y-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className={cn(ds.card.base, 'animate-pulse px-4 py-3')}>
+            <div className="flex items-center justify-between">
+              <div className={cn(ds.skeleton.line, 'w-20')} />
+              <div className="h-5 w-14 rounded-full bg-muted" />
+            </div>
+            <div className={cn(ds.skeleton.line, 'mt-1.5 h-3 w-40')} />
+            <div className="mt-1.5 flex items-center justify-between">
+              <div className={cn(ds.skeleton.line, 'h-3 w-24')} />
+              <div className="flex gap-1">
+                <div className={cn(ds.skeleton.line, 'h-7 w-7')} />
+                <div className={cn(ds.skeleton.line, 'h-7 w-7')} />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div
-          key={i}
-          className="flex animate-pulse items-center gap-4 border-b border-border/30 px-3 py-2 last:border-0"
-        >
-          <div className="space-y-1">
-            <div className={cn(ds.skeleton.line, 'w-24')} />
-            <div className={cn(ds.skeleton.line, 'h-3 w-20 sm:hidden')} />
-          </div>
-          <div className="space-y-1">
-            <div className={cn(ds.skeleton.line, 'w-32')} />
-            <div className={cn(ds.skeleton.line, 'h-3 w-28 sm:hidden')} />
-          </div>
-          <div className={cn(ds.skeleton.line, 'hidden w-28 sm:block')} />
-          <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
-          <div className={cn(ds.skeleton.line, 'ml-auto hidden w-20 sm:block')} />
-          <div className={cn(ds.skeleton.line, 'ml-auto w-8 sm:w-20')} />
+
+      {/* Desktop skeleton */}
+      <div className={cn('hidden overflow-hidden sm:block', ds.card.base)}>
+        <div className="border-b border-border/60 bg-muted/50 px-3 py-2">
+          <div className={cn(ds.skeleton.line, 'w-48')} />
         </div>
-      ))}
-    </div>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className="flex animate-pulse items-center gap-4 border-b border-border/30 px-3 py-2 last:border-0"
+          >
+            <div className={cn(ds.skeleton.line, 'w-24')} />
+            <div className={cn(ds.skeleton.line, 'w-32')} />
+            <div className={cn(ds.skeleton.line, 'w-28')} />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
+            <div className={cn(ds.skeleton.line, 'ml-auto w-20')} />
+            <div className={cn(ds.skeleton.line, 'w-20')} />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 

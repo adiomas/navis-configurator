@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, Users, Pencil, Trash2, ChevronDown } from 'lucide-react'
+import { Search, Plus, Users, Pencil, Trash2, ChevronDown, Building2, User } from 'lucide-react'
 import { QueryErrorState } from '@/components/ui/QueryErrorState'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
@@ -129,8 +129,8 @@ export default function ClientsListPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="-mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="min-w-0 -mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
             <div className="flex rounded-lg border border-border">
               {categoryTabs.map((tab) => (
                 <button
@@ -182,108 +182,170 @@ export default function ClientsListPage() {
           ctaLabel={t('clients.addCompany')}
         />
       ) : (
-        <div className={cn(ds.table.wrapper, ds.card.base)}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border/60 bg-muted/50">
-                <th className={cn(ds.table.headerCell, 'text-left')}>
-                  {t('clients.companyName')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left sm:table-cell')}>
-                  {t('clients.contactName')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left lg:table-cell')}>
-                  {t('clients.email')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'text-left')}>
-                  {t('clients.category')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-center sm:table-cell')}>
-                  {t('clients.quotesCount')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'hidden text-left lg:table-cell')}>
-                  {t('clients.createdDate')}
-                </th>
-                <th className={cn(ds.table.headerCell, 'text-right')}>
-                  {t('common.actions')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCompanies.map((company) => {
-                const primaryContact = company.contacts.find((c) => c.is_primary) ?? company.contacts[0]
-                const quotesCount = company.quotes[0]?.count ?? 0
+        <>
+          {/* Mobile cards */}
+          <div className="sm:hidden space-y-2">
+            {filteredCompanies.map((company) => {
+              const primaryContact = company.contacts.find((c) => c.is_primary) ?? company.contacts[0]
+              const quotesCount = company.quotes[0]?.count ?? 0
+              const canEdit = isAdmin || company.created_by === user?.id
 
-                return (
-                  <tr
-                    key={company.id}
-                    className={ds.table.rowClickable}
-                  >
-                    <td className={ds.table.cell}>
-                      <Link
-                        to={`/clients/${company.id}`}
-                        className="font-medium text-navy hover:text-primary transition-colors"
+              return (
+                <Link
+                  key={company.id}
+                  to={`/clients/${company.id}`}
+                  className={cn(ds.card.base, 'block px-4 py-3 hover:bg-muted/30 transition-colors')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {company.client_type === 'individual'
+                        ? <User className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        : <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      }
+                      <span className="text-xs font-medium text-navy truncate">{company.name}</span>
+                    </div>
+                    <ClientCategoryBadge category={company.client_category as ClientCategory} />
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                    {primaryContact?.full_name && (
+                      <span>{primaryContact.full_name}</span>
+                    )}
+                    {primaryContact?.full_name && (company.email || quotesCount > 0) && (
+                      <span>·</span>
+                    )}
+                    {company.email && (
+                      <span className="truncate">{company.email}</span>
+                    )}
+                    {company.email && quotesCount > 0 && (
+                      <span>·</span>
+                    )}
+                    {quotesCount > 0 && (
+                      <span>{quotesCount} {t('clients.quotesCount').toLowerCase()}</span>
+                    )}
+                  </div>
+                  {canEdit && (
+                    <div className="mt-2 flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingCompany(company) }}
+                        className={cn(ds.btn.base, ds.btn.icon)}
+                        title={t('clients.editCompany')}
                       >
-                        {company.name}
-                      </Link>
-                      {/* Mobile: show contact, email, quotes count below company name */}
-                      <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground sm:hidden">
-                        {primaryContact?.full_name && (
-                          <span>{primaryContact.full_name}</span>
-                        )}
-                        {company.email && (
-                          <span className="truncate">{company.email}</span>
-                        )}
-                        <span>{quotesCount} {t('clients.quotesCount').toLowerCase()}</span>
-                      </span>
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden sm:table-cell text-muted-foreground')}>
-                      {primaryContact?.full_name ?? '—'}
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden lg:table-cell text-muted-foreground')}>
-                      {company.email ?? '—'}
-                    </td>
-                    <td className={ds.table.cell}>
-                      <ClientCategoryBadge
-                        category={company.client_category as ClientCategory}
-                      />
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden text-center text-muted-foreground sm:table-cell')}>
-                      {quotesCount}
-                    </td>
-                    <td className={cn(ds.table.cell, 'hidden lg:table-cell text-muted-foreground')}>
-                      {formatDate(company.created_at)}
-                    </td>
-                    <td className={ds.table.cell}>
-                      <div className="flex items-center justify-end gap-1">
-                        {(isAdmin || company.created_by === user?.id) && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => setEditingCompany(company)}
-                              className={cn(ds.btn.base, ds.btn.icon)}
-                              title={t('clients.editCompany')}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setDeletingCompanyId(company.id)}
-                              className={cn(ds.btn.base, ds.btn.icon, 'hover:bg-red-50 hover:text-red-600')}
-                              title={t('clients.deleteCompany')}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeletingCompanyId(company.id) }}
+                        className={cn(ds.btn.base, ds.btn.icon, 'hover:bg-red-50 hover:text-red-600')}
+                        title={t('clients.deleteCompany')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </Link>
+              )
+            })}
+          </div>
+
+          {/* Desktop table */}
+          <div className={cn(ds.table.wrapper, ds.card.base, 'hidden sm:block')}>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/60 bg-muted/50">
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('clients.companyName')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('clients.contactName')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'hidden text-left lg:table-cell')}>
+                    {t('clients.email')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-left')}>
+                    {t('clients.category')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-center')}>
+                    {t('clients.quotesCount')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'hidden text-left lg:table-cell')}>
+                    {t('clients.createdDate')}
+                  </th>
+                  <th className={cn(ds.table.headerCell, 'text-right')}>
+                    {t('common.actions')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCompanies.map((company) => {
+                  const primaryContact = company.contacts.find((c) => c.is_primary) ?? company.contacts[0]
+                  const quotesCount = company.quotes[0]?.count ?? 0
+
+                  return (
+                    <tr
+                      key={company.id}
+                      className={ds.table.rowClickable}
+                    >
+                      <td className={ds.table.cell}>
+                        <Link
+                          to={`/clients/${company.id}`}
+                          className="inline-flex items-center gap-1.5 font-medium text-navy hover:text-primary transition-colors"
+                        >
+                          {company.client_type === 'individual'
+                            ? <User className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            : <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          }
+                          {company.name}
+                        </Link>
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-muted-foreground')}>
+                        {primaryContact?.full_name ?? '—'}
+                      </td>
+                      <td className={cn(ds.table.cell, 'hidden lg:table-cell text-muted-foreground')}>
+                        {company.email ?? '—'}
+                      </td>
+                      <td className={ds.table.cell}>
+                        <ClientCategoryBadge
+                          category={company.client_category as ClientCategory}
+                        />
+                      </td>
+                      <td className={cn(ds.table.cell, 'text-center text-muted-foreground')}>
+                        {quotesCount}
+                      </td>
+                      <td className={cn(ds.table.cell, 'hidden lg:table-cell text-muted-foreground')}>
+                        {formatDate(company.created_at)}
+                      </td>
+                      <td className={ds.table.cell}>
+                        <div className="flex items-center justify-end gap-1">
+                          {(isAdmin || company.created_by === user?.id) && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setEditingCompany(company)}
+                                className={cn(ds.btn.base, ds.btn.icon)}
+                                title={t('clients.editCompany')}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDeletingCompanyId(company.id)}
+                                className={cn(ds.btn.base, ds.btn.icon, 'hover:bg-red-50 hover:text-red-600')}
+                                title={t('clients.deleteCompany')}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* Create modal */}
@@ -336,6 +398,7 @@ function EditCompanyModal({
       isOpen
       onClose={onClose}
       defaultValues={{
+        client_type: (company.client_type as 'company' | 'individual') ?? 'company',
         name: company.name,
         registration_number: company.registration_number ?? undefined,
         address: company.address ?? undefined,
@@ -358,26 +421,42 @@ function EditCompanyModal({
 
 function TableSkeleton() {
   return (
-    <div className={cn('overflow-hidden', ds.card.base)}>
-      <div className="border-b border-border/60 bg-muted/50 px-3 py-2">
-        <div className={cn(ds.skeleton.line, 'w-48')} />
-      </div>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div
-          key={i}
-          className="flex animate-pulse items-center gap-4 border-b border-border/30 px-3 py-2 last:border-0"
-        >
-          <div className="space-y-1">
-            <div className={cn(ds.skeleton.line, 'w-40')} />
-            <div className={cn(ds.skeleton.line, 'h-3 w-32 sm:hidden')} />
+    <>
+      {/* Mobile skeleton */}
+      <div className="sm:hidden space-y-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className={cn(ds.card.base, 'animate-pulse px-4 py-3')}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className={cn(ds.skeleton.line, 'h-3.5 w-3.5')} />
+                <div className={cn(ds.skeleton.line, 'w-32')} />
+              </div>
+              <div className="h-5 w-16 rounded-full bg-muted" />
+            </div>
+            <div className={cn(ds.skeleton.line, 'mt-1.5 h-3 w-44')} />
           </div>
-          <div className={cn(ds.skeleton.line, 'hidden w-28 sm:block')} />
-          <div className={cn(ds.skeleton.line, 'hidden w-36 lg:block')} />
-          <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
-          <div className={cn(ds.skeleton.line, 'ml-auto w-8')} />
+        ))}
+      </div>
+
+      {/* Desktop skeleton */}
+      <div className={cn('hidden overflow-hidden sm:block', ds.card.base)}>
+        <div className="border-b border-border/60 bg-muted/50 px-3 py-2">
+          <div className={cn(ds.skeleton.line, 'w-48')} />
         </div>
-      ))}
-    </div>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={i}
+            className="flex animate-pulse items-center gap-4 border-b border-border/30 px-3 py-2 last:border-0"
+          >
+            <div className={cn(ds.skeleton.line, 'w-40')} />
+            <div className={cn(ds.skeleton.line, 'w-28')} />
+            <div className={cn(ds.skeleton.line, 'hidden w-36 lg:block')} />
+            <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
+            <div className={cn(ds.skeleton.line, 'ml-auto w-8')} />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 

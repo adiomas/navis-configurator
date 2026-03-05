@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { subDays, subMonths, format } from 'date-fns'
+import { subDays } from 'date-fns'
 import { supabase } from '@/lib/supabase'
 import type { QuoteStatus } from '@/types'
 
@@ -74,6 +74,17 @@ export interface MonthlyTrendItem {
   revenue: number
 }
 
+interface DashboardRPCResult {
+  stats: DashboardStats
+  statusCounts: StatusCounts
+  revenueByMonth: RevenueByMonth[]
+  topBoats: TopBoat[]
+  salespersonData: SalespersonData[]
+  campaignPerformance: CampaignData[]
+  conversionFunnel: FunnelStep[]
+  monthlyTrend: MonthlyTrendItem[]
+}
+
 function getDateFrom(timeRange: TimeRange): string | null {
   const now = new Date()
   switch (timeRange) {
@@ -94,20 +105,15 @@ function toNum(value: unknown): number {
 export function useDashboard(timeRange: TimeRange) {
   const dateFrom = getDateFrom(timeRange)
 
-  const quotesQuery = useQuery({
-    queryKey: ['dashboard', 'quotes', timeRange],
+  // Single RPC call replaces quotesQuery + ~160 lines of useMemo aggregation
+  const statsQuery = useQuery<DashboardRPCResult>({
+    queryKey: ['dashboard', 'stats', timeRange],
     queryFn: async () => {
-      let query = supabase
-        .from('quotes')
-        .select('id, status, total_price, created_at, boat_id, created_by, boat:boats(name), company:companies(name), created_by_profile:profiles(full_name), template_group_id, template_group:quote_template_groups(name)')
-
-      if (dateFrom) {
-        query = query.gte('created_at', dateFrom)
-      }
-
-      const { data, error } = await query
+      const { data, error } = await supabase.rpc('get_dashboard_stats', {
+        p_date_from: dateFrom,
+      })
       if (error) throw error
-      return data ?? []
+      return data as unknown as DashboardRPCResult
     },
     staleTime: 60 * 1000,
   })
@@ -157,169 +163,7 @@ export function useDashboard(timeRange: TimeRange) {
     staleTime: 60 * 1000,
   })
 
-  const aggregated = useMemo(() => {
-    const quotes = quotesQuery.data
-    if (!quotes) return null
-
-    const totalQuotes = quotes.length
-    const activeQuotes = quotes.filter(q => q.status === 'draft' || q.status === 'sent').length
-    const accepted = quotes.filter(q => q.status === 'accepted').length
-    const rejected = quotes.filter(q => q.status === 'rejected').length
-    const decided = accepted + rejected
-    const acceptanceRate = decided > 0 ? (accepted / decided) * 100 : 0
-
-    const totalRevenue = quotes
-      .filter(q => q.status === 'accepted')
-      .reduce((sum, q) => sum + toNum(q.total_price), 0)
-
-    const avgQuoteValue = totalQuotes > 0
-      ? quotes.reduce((sum, q) => sum + toNum(q.total_price), 0) / totalQuotes
-      : 0
-
-    const stats: DashboardStats = {
-      totalQuotes,
-      activeQuotes,
-      acceptanceRate,
-      totalRevenue,
-      avgQuoteValue,
-    }
-
-    const statusCounts: StatusCounts = {
-      draft: quotes.filter(q => q.status === 'draft').length,
-      sent: quotes.filter(q => q.status === 'sent').length,
-      accepted,
-      rejected,
-    }
-
-    // Revenue by month
-    const monthMap = new Map<string, number>()
-    for (const q of quotes) {
-      const price = toNum(q.total_price)
-      if (q.status === 'accepted' && price > 0) {
-        const key = format(new Date(q.created_at), 'yyyy-MM')
-        monthMap.set(key, (monthMap.get(key) ?? 0) + price)
-      }
-    }
-    const revenueByMonth: RevenueByMonth[] = Array.from(monthMap.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([month, revenue]) => ({
-        month: format(new Date(month + '-01'), 'MMM yyyy'),
-        revenue,
-      }))
-
-    // Top boats by accepted revenue
-    const boatMap = new Map<string, { name: string; revenue: number; count: number }>()
-    for (const q of quotes) {
-      const price = toNum(q.total_price)
-      if (q.status === 'accepted' && q.boat_id && price > 0) {
-        const name = (q.boat as { name: string } | null)?.name ?? 'Unknown'
-        const entry = boatMap.get(q.boat_id) ?? { name, revenue: 0, count: 0 }
-        entry.revenue += price
-        entry.count += 1
-        boatMap.set(q.boat_id, entry)
-      }
-    }
-    const topBoats: TopBoat[] = Array.from(boatMap.values())
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5)
-      .map(b => ({ boatName: b.name, revenue: b.revenue, quoteCount: b.count }))
-
-    // Salesperson performance
-    const personMap = new Map<string, { name: string; total: number; accepted: number; revenue: number }>()
-    for (const q of quotes) {
-      const profile = q.created_by_profile as { full_name: string | null } | null
-      const name = profile?.full_name ?? 'Unknown'
-      const key = q.created_by ?? 'unknown'
-      const entry = personMap.get(key) ?? { name, total: 0, accepted: 0, revenue: 0 }
-      entry.total += 1
-      if (q.status === 'accepted') {
-        entry.accepted += 1
-        entry.revenue += toNum(q.total_price)
-      }
-      personMap.set(key, entry)
-    }
-    const salespersonData: SalespersonData[] = Array.from(personMap.values())
-      .sort((a, b) => b.revenue - a.revenue)
-      .map(p => ({
-        name: p.name,
-        totalQuotes: p.total,
-        acceptedQuotes: p.accepted,
-        revenue: p.revenue,
-        acceptanceRate: p.total > 0 ? (p.accepted / p.total) * 100 : 0,
-      }))
-
-    // Campaign performance
-    const campaignMap = new Map<string, { name: string; revenue: number; count: number }>()
-    for (const q of quotes) {
-      if (q.template_group_id) {
-        const tg = q.template_group as { name: string | null } | null
-        const name = tg?.name ?? 'Unknown Campaign'
-        const entry = campaignMap.get(q.template_group_id) ?? { name, revenue: 0, count: 0 }
-        entry.count += 1
-        if (q.status === 'accepted') {
-          entry.revenue += toNum(q.total_price)
-        }
-        campaignMap.set(q.template_group_id, entry)
-      }
-    }
-    const campaignPerformance: CampaignData[] = Array.from(campaignMap.values())
-      .sort((a, b) => b.revenue - a.revenue)
-      .map(c => ({ name: c.name, revenue: c.revenue, quoteCount: c.count }))
-
-    // Conversion funnel
-    const totalCreated = totalQuotes
-    const totalSent = quotes.filter(q => q.status === 'sent' || q.status === 'accepted' || q.status === 'rejected').length
-    const totalAccepted = accepted
-
-    const conversionFunnel: FunnelStep[] = [
-      {
-        label: 'created',
-        count: totalCreated,
-        percentage: 100,
-        dropoff: 0,
-      },
-      {
-        label: 'sent',
-        count: totalSent,
-        percentage: totalCreated > 0 ? (totalSent / totalCreated) * 100 : 0,
-        dropoff: totalCreated > 0 ? ((totalCreated - totalSent) / totalCreated) * 100 : 0,
-      },
-      {
-        label: 'accepted',
-        count: totalAccepted,
-        percentage: totalSent > 0 ? (totalAccepted / totalSent) * 100 : 0,
-        dropoff: totalSent > 0 ? ((totalSent - totalAccepted) / totalSent) * 100 : 0,
-      },
-    ]
-
-    // Monthly trend (last 6 months, fill gaps with 0)
-    const now = new Date()
-    const trendMap = new Map<string, { count: number; revenue: number }>()
-    for (let i = 5; i >= 0; i--) {
-      const key = format(subMonths(now, i), 'yyyy-MM')
-      trendMap.set(key, { count: 0, revenue: 0 })
-    }
-    for (const q of quotes) {
-      const key = format(new Date(q.created_at), 'yyyy-MM')
-      const entry = trendMap.get(key)
-      if (entry) {
-        entry.count += 1
-        if (q.status === 'accepted') {
-          entry.revenue += toNum(q.total_price)
-        }
-      }
-    }
-    const monthlyTrend: MonthlyTrendItem[] = Array.from(trendMap.entries())
-      .map(([key, val]) => ({
-        month: format(new Date(key + '-01'), 'MMM'),
-        quoteCount: val.count,
-        revenue: val.revenue,
-      }))
-
-    return { stats, statusCounts, revenueByMonth, topBoats, salespersonData, campaignPerformance, conversionFunnel, monthlyTrend }
-  }, [quotesQuery.data])
-
-  // Equipment popularity
+  // Equipment popularity (kept as separate query — different data source)
   const equipmentPopularity = useMemo((): EquipmentPopularityItem[] => {
     const items = equipmentQuery.data
     if (!items) return []
@@ -335,21 +179,23 @@ export function useDashboard(timeRange: TimeRange) {
       .map(([name, count]) => ({ name, count }))
   }, [equipmentQuery.data])
 
+  const rpcData = statsQuery.data
+
   return {
-    stats: aggregated?.stats,
-    statusCounts: aggregated?.statusCounts,
-    revenueByMonth: aggregated?.revenueByMonth ?? [],
-    topBoats: aggregated?.topBoats ?? [],
+    stats: rpcData?.stats,
+    statusCounts: rpcData?.statusCounts,
+    revenueByMonth: rpcData?.revenueByMonth ?? [],
+    topBoats: rpcData?.topBoats ?? [],
     recentQuotes: recentQuery.data ?? [],
-    salespersonData: aggregated?.salespersonData ?? [],
+    salespersonData: rpcData?.salespersonData ?? [],
     equipmentPopularity,
-    campaignPerformance: aggregated?.campaignPerformance ?? [],
-    conversionFunnel: aggregated?.conversionFunnel ?? [],
-    monthlyTrend: aggregated?.monthlyTrend ?? [],
-    isLoading: quotesQuery.isLoading || recentQuery.isLoading || equipmentQuery.isLoading,
-    error: quotesQuery.error || recentQuery.error || equipmentQuery.error,
+    campaignPerformance: rpcData?.campaignPerformance ?? [],
+    conversionFunnel: rpcData?.conversionFunnel ?? [],
+    monthlyTrend: rpcData?.monthlyTrend ?? [],
+    isLoading: statsQuery.isLoading || recentQuery.isLoading || equipmentQuery.isLoading,
+    error: statsQuery.error || recentQuery.error || equipmentQuery.error,
     refetch: () => {
-      void quotesQuery.refetch()
+      void statsQuery.refetch()
       void recentQuery.refetch()
       void equipmentQuery.refetch()
     },

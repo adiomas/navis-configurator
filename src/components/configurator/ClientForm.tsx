@@ -5,17 +5,20 @@ import { useTranslation } from 'react-i18next'
 import { clientFormSchema } from '@/lib/validators'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
-import type { ClientFormData, CompanyWithContacts } from '@/types'
+import { ContactSelector } from '@/components/configurator/ContactSelector'
+import type { ClientFormData, CompanyWithContacts, Contact } from '@/types'
 
 interface ClientFormProps {
   defaultValues: ClientFormData
   selectedCompany: CompanyWithContacts | null
+  selectedContact?: Contact | null
+  onSelectContact?: (contact: Contact) => void
   onSubmit: (data: ClientFormData) => void
   onValuesChange?: (data: Partial<ClientFormData>) => void
   formRef?: React.RefObject<HTMLFormElement | null>
 }
 
-export function ClientForm({ defaultValues, selectedCompany, onSubmit, onValuesChange, formRef }: ClientFormProps) {
+export function ClientForm({ defaultValues, selectedCompany, selectedContact, onSelectContact, onSubmit, onValuesChange, formRef }: ClientFormProps) {
   const { t } = useTranslation()
 
   const {
@@ -29,24 +32,25 @@ export function ClientForm({ defaultValues, selectedCompany, onSubmit, onValuesC
     defaultValues,
   })
 
-  // Auto-fill when a company is selected
+  // Auto-fill when a company or contact is selected
   useEffect(() => {
     if (!selectedCompany) return
 
-    const primaryContact = selectedCompany.contacts.find((c) => c.is_primary)
+    const contact = selectedContact
+      ?? selectedCompany.contacts.find((c) => c.is_primary)
       ?? selectedCompany.contacts[0]
 
     reset({
       companyId: selectedCompany.id,
-      contactId: primaryContact?.id,
-      name: primaryContact?.full_name ?? '',
-      email: primaryContact?.email ?? '',
-      phone: primaryContact?.phone ?? '',
+      contactId: contact?.id,
+      name: contact?.full_name ?? '',
+      email: contact?.email ?? '',
+      phone: contact?.phone ?? '',
       companyName: selectedCompany.name,
       notes: '',
       language: (selectedCompany.preferred_language as 'hr' | 'en') ?? 'en',
     })
-  }, [selectedCompany, reset])
+  }, [selectedCompany, selectedContact, reset])
 
   // Sync form values to parent on every change
   useEffect(() => {
@@ -63,6 +67,15 @@ export function ClientForm({ defaultValues, selectedCompany, onSubmit, onValuesC
 
   return (
     <form ref={formRef} onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+      {/* Contact selector for companies with multiple contacts */}
+      {selectedCompany && selectedCompany.client_type === 'company' && selectedCompany.contacts.length >= 2 && onSelectContact && (
+        <ContactSelector
+          contacts={selectedCompany.contacts}
+          selectedContactId={selectedContact?.id}
+          onSelectContact={onSelectContact}
+        />
+      )}
+
       {/* Contact Name + Email row */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>

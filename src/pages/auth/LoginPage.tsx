@@ -55,7 +55,7 @@ export default function LoginPage() {
           {t('auth.loginSubtitle')}
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" autoComplete="on">
           {/* Email */}
           <div>
             <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-foreground">
@@ -66,7 +66,7 @@ export default function LoginPage() {
               <input
                 id="email"
                 type="email"
-                autoComplete="email"
+                autoComplete="username"
                 {...register('email')}
                 className={cn(
                   'w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-base md:text-sm outline-none transition-colors',

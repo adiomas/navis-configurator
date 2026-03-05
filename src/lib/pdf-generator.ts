@@ -76,6 +76,23 @@ interface PdfLabels {
   category: string
   type: string
   price: string
+  contactPerson: string
+  net: string
+  optional: string
+  vesselDiscount: string
+  vesselNet: string
+  equipmentDiscounts: string
+  equipmentNet: string
+  quoteDetails: string
+  paymentDetails: string
+  recipient: string
+  bankDetails: string
+  forSeller: string
+  forBuyer: string
+  equipmentAndAddons: string
+  callNumber: string
+  authorized: string
+  model: string
 }
 
 const labelsHr: PdfLabels = {
@@ -106,6 +123,23 @@ const labelsHr: PdfLabels = {
   category: 'Kategorija',
   type: 'Tip',
   price: 'Cijena',
+  contactPerson: 'Kontakt osoba',
+  net: 'Neto',
+  optional: 'Opcionalno',
+  vesselDiscount: 'Popust na plovilo',
+  vesselNet: 'Plovilo neto',
+  equipmentDiscounts: 'Popusti na opremu',
+  equipmentNet: 'Oprema neto',
+  quoteDetails: 'Detalji ponude',
+  paymentDetails: 'Podaci za plaćanje',
+  recipient: 'Primatelj',
+  bankDetails: 'Bankovni podaci',
+  forSeller: 'Za prodavatelja',
+  forBuyer: 'Za kupca',
+  equipmentAndAddons: 'Oprema i dodaci',
+  callNumber: 'Poziv na broj',
+  authorized: 'Ovlašteni Azimut Yachts zastupnik',
+  model: 'Model',
 }
 
 const labelsEn: PdfLabels = {
@@ -136,6 +170,23 @@ const labelsEn: PdfLabels = {
   category: 'Category',
   type: 'Type',
   price: 'Price',
+  contactPerson: 'Contact Person',
+  net: 'Net',
+  optional: 'Optional',
+  vesselDiscount: 'Vessel Discount',
+  vesselNet: 'Vessel Net',
+  equipmentDiscounts: 'Equipment Discounts',
+  equipmentNet: 'Equipment Net',
+  quoteDetails: 'Quote Details',
+  paymentDetails: 'Payment Details',
+  recipient: 'Recipient',
+  bankDetails: 'Bank Details',
+  forSeller: 'For Seller',
+  forBuyer: 'For Buyer',
+  equipmentAndAddons: 'Equipment & Accessories',
+  callNumber: 'Reference',
+  authorized: 'Authorized Azimut Yachts Dealer',
+  model: 'Model',
 }
 
 /**

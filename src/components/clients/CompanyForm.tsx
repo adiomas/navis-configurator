@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { Building2, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { companySchema, type CompanyFormData } from '@/lib/validators'
@@ -30,10 +31,13 @@ export const CompanyForm = ({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<CompanyFormData>({
     resolver: zodResolver(companySchema),
     defaultValues: {
+      client_type: 'company',
       client_category: 'prospect',
       preferred_language: 'hr',
       ...defaultValues,
@@ -43,13 +47,17 @@ export const CompanyForm = ({
   useEffect(() => {
     if (isOpen) {
       reset({
+        client_type: 'company',
         client_category: 'prospect',
         preferred_language: 'hr',
         ...defaultValues,
       })
     }
-  }, [isOpen, defaultValues, reset])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
+  const clientType = watch('client_type')
+  const isIndividual = clientType === 'individual'
   const isEdit = !!defaultValues?.name
 
   const footerContent = (
@@ -82,11 +90,46 @@ export const CompanyForm = ({
       footer={footerContent}
     >
       <form onSubmit={handleSubmit(onSubmit)} className={ds.form.spacing}>
-        {/* Row 1: Name + Registration */}
+        {/* Client type toggle */}
+        <div>
+          <label className={ds.input.label}>
+            {t('clients.clientType')}
+          </label>
+          <div className="flex overflow-hidden rounded-lg border border-input">
+            <button
+              type="button"
+              onClick={() => setValue('client_type', 'company')}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-2 py-2 text-xs font-medium transition-colors',
+                !isIndividual
+                  ? 'bg-navy text-white'
+                  : 'bg-background text-muted-foreground hover:bg-muted',
+              )}
+            >
+              <Building2 className="h-3.5 w-3.5" />
+              {t('clients.clientTypeCompany')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setValue('client_type', 'individual')}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-2 py-2 text-xs font-medium transition-colors',
+                isIndividual
+                  ? 'bg-navy text-white'
+                  : 'bg-background text-muted-foreground hover:bg-muted',
+              )}
+            >
+              <User className="h-3.5 w-3.5" />
+              {t('clients.clientTypeIndividual')}
+            </button>
+          </div>
+        </div>
+
+        {/* Row 1: Name + ID */}
         <div className={ds.form.grid}>
           <div>
             <label className={ds.input.label}>
-              {t('clients.companyName')} *
+              {isIndividual ? t('clients.fullName') : t('clients.companyName')} *
             </label>
             <input {...register('name')} className={ds.input.base} />
             {errors.name && (
@@ -95,7 +138,7 @@ export const CompanyForm = ({
           </div>
           <div>
             <label className={ds.input.label}>
-              {t('clients.registrationNumber')}
+              {isIndividual ? t('clients.personalId') : t('clients.registrationNumber')}
             </label>
             <input {...register('registration_number')} className={ds.input.base} />
           </div>
@@ -117,7 +160,7 @@ export const CompanyForm = ({
           </div>
         </div>
 
-        {/* Row 3: Postal + Country */}
+        {/* Row 4: Postal + Country */}
         <div className={ds.form.grid}>
           <div>
             <label className={ds.input.label}>
@@ -133,7 +176,7 @@ export const CompanyForm = ({
           </div>
         </div>
 
-        {/* Row 4: Phone + Email */}
+        {/* Row 5: Phone + Email */}
         <div className={ds.form.grid}>
           <div>
             <label className={ds.input.label}>
@@ -152,22 +195,24 @@ export const CompanyForm = ({
           </div>
         </div>
 
-        {/* Row 5: Website */}
-        <div>
-          <label className={ds.input.label}>
-            {t('clients.website')}
-          </label>
-          <input
-            {...register('website')}
-            placeholder="https://"
-            className={ds.input.base}
-          />
-          {errors.website && (
-            <p className={ds.input.error}>{errors.website.message}</p>
-          )}
-        </div>
+        {/* Row 6: Website (companies only) */}
+        {!isIndividual && (
+          <div>
+            <label className={ds.input.label}>
+              {t('clients.website')}
+            </label>
+            <input
+              {...register('website')}
+              placeholder="https://"
+              className={ds.input.base}
+            />
+            {errors.website && (
+              <p className={ds.input.error}>{errors.website.message}</p>
+            )}
+          </div>
+        )}
 
-        {/* Row 6: Category + Lead Source */}
+        {/* Row 7: Category + Lead Source */}
         <div className={ds.form.grid}>
           <div>
             <label className={ds.input.label}>
@@ -194,7 +239,7 @@ export const CompanyForm = ({
           </div>
         </div>
 
-        {/* Row 7: Preferred Language */}
+        {/* Row 8: Preferred Language */}
         <div>
           <label className={ds.input.label}>
             {t('clients.preferredLanguage')}
@@ -221,7 +266,7 @@ export const CompanyForm = ({
           </div>
         </div>
 
-        {/* Row 8: Notes */}
+        {/* Row 9: Notes */}
         <div>
           <label className={ds.input.label}>
             {t('clients.notes')}

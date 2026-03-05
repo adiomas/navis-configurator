@@ -1,17 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { X, Download, ChevronDown, Loader2, FileText } from 'lucide-react'
+import { X, Download, Loader2, FileText } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
-
-type PdfTemplateName = 'compact' | 'detailed' | 'luxury'
 
 interface PDFPreviewModalProps {
   isOpen: boolean
   pdfBlob: Blob | null
   isGenerating: boolean
   fileName: string
-  selectedTemplate: PdfTemplateName
-  onTemplateChange: (template: PdfTemplateName) => void
   onClose: () => void
   onDownload: () => void
 }
@@ -21,8 +17,6 @@ export function PDFPreviewModal({
   pdfBlob,
   isGenerating,
   fileName,
-  selectedTemplate,
-  onTemplateChange,
   onClose,
   onDownload,
 }: PDFPreviewModalProps) {
@@ -96,31 +90,10 @@ export function PDFPreviewModal({
 
       {/* Toolbar */}
       <div className="relative z-10 flex items-center justify-between gap-2 border-b border-white/10 bg-[#1a1a2e] px-3 py-2.5 md:px-5 md:py-3">
-        {/* Left: template switcher + filename */}
+        {/* Left: filename */}
         <div className="flex items-center gap-2 min-w-0 md:gap-3">
-          <div className="relative shrink-0">
-            <select
-              value={selectedTemplate}
-              onChange={(e) => onTemplateChange(e.target.value as PdfTemplateName)}
-              disabled={isGenerating}
-              className="h-8 cursor-pointer appearance-none rounded-lg border border-white/15 bg-white/10 px-2.5 pr-7 text-xs font-medium text-white transition-colors hover:bg-white/15 focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 md:px-3"
-            >
-              <option value="compact" className="bg-[#1a1a2e] text-white">
-                {t('quotes.templateCompact')}
-              </option>
-              <option value="detailed" className="bg-[#1a1a2e] text-white">
-                {t('quotes.templateDetailed')}
-              </option>
-              <option value="luxury" className="bg-[#1a1a2e] text-white">
-                {t('quotes.templateLuxury')}
-              </option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/50" />
-          </div>
-          <div className="hidden items-center gap-2 min-w-0 md:flex">
-            <FileText className="h-3.5 w-3.5 shrink-0 text-white/30" />
-            <span className="truncate text-xs text-white/50">{fileName}</span>
-          </div>
+          <FileText className="h-3.5 w-3.5 shrink-0 text-white/30" />
+          <span className="truncate text-xs text-white/50">{fileName}</span>
         </div>
 
         {/* Right: download + close */}

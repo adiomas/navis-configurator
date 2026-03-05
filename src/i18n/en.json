@@ -27,7 +27,13 @@
     "goHome": "Go to Dashboard",
     "unexpectedError": "An unexpected error occurred",
     "unexpectedErrorDesc": "Something went wrong. Please reload the page.",
-    "reloadPage": "Reload Page"
+    "reloadPage": "Reload Page",
+    "networkError": "Network error. Check your connection and try again.",
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "forbidden": "You don't have permission to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -90,7 +96,7 @@
     "title": "Boat Catalog",
     "addBoat": "Add Boat",
     "editBoat": "Edit Boat",
-    "deletBoat": "Delete Boat",
+    "deleteBoat": "Delete Boat",
     "name": "Name",
     "brand": "Brand",
     "model": "Model",
@@ -129,7 +135,11 @@
     "addSpec": "Add Specification",
     "addCategory": "Add Category",
     "descriptionHr": "Description (Croatian)",
-    "descriptionEn": "Description (English)"
+    "descriptionEn": "Description (English)",
+    "copySpecsFrom": "Copy specs from...",
+    "copySpecsTitle": "Copy Specifications",
+    "copySpecsConfirm": "Copy {{count}} specification(s) from {{name}}?",
+    "copySpecsSuccess": "Copied {{count}} specification(s)"
   },
   "equipment": {
     "title": "Equipment",
@@ -257,12 +267,19 @@
     "equipmentWideDiscountsLabel": "Equipment-Wide Discounts",
     "boatDiscountsLabel": "Boat Discounts",
     "apply": "Apply",
-    "discountOnItem": "Discount on {{name}}"
+    "discountOnItem": "Discount on {{name}}",
+    "selectContact": "Contact person",
+    "primary": "Primary"
   },
   "clients": {
     "title": "Clients",
     "addCompany": "Add Client",
+    "clientType": "Client Type",
+    "clientTypeCompany": "Company",
+    "clientTypeIndividual": "Individual",
     "companyName": "Company Name",
+    "fullName": "Full Name",
+    "personalId": "Personal ID (OIB)",
     "contactName": "Contact Name",
     "email": "Email",
     "phone": "Phone",
@@ -381,13 +398,21 @@
     "notes": "Notes",
     "pdfDownloading": "Generating PDF...",
     "pdfDownloadError": "Failed to generate PDF",
-    "templateCompact": "Compact",
     "templateDetailed": "Detailed",
-    "templateLuxury": "Luxury",
     "previewPDF": "Preview",
     "filteringByTemplate": "Template: ",
     "clearFilter": "Clear filter",
-    "noQuotesForTemplate": "No quotes created from this template yet."
+    "noQuotesForTemplate": "No quotes created from this template yet.",
+    "paymentBarcode": "Payment Barcode",
+    "depositPercentage": "Deposit Percentage",
+    "customPercentage": "Custom %",
+    "depositAmount": "Deposit Amount",
+    "labelPreview": "Barcode Label Preview",
+    "depositSaved": "Deposit configuration saved",
+    "depositRemoved": "Payment barcode removed",
+    "removeBarcode": "Remove Barcode",
+    "changeLanguage": "Change quote language",
+    "languageUpdated": "Quote language updated"
   },
   "settings": {
     "title": "Settings",
@@ -427,9 +452,7 @@
     "termsSaveError": "Failed to save terms",
     "setDefault": "Set as Default",
     "defaultTemplate": "Default",
-    "compactDesc": "Single-page minimal layout",
     "detailedDesc": "2 pages with full specifications",
-    "luxuryDesc": "Premium layout with hero image",
     "templateSetSuccess": "Default template updated",
     "templateSetError": "Failed to update default template",
     "dragOrClick": "Drag & drop or click to upload",
@@ -514,7 +537,19 @@
     "passwordNote": "Share this password with the user. They should change it on first login.",
     "confirmDeactivate": "Are you sure you want to deactivate this user? They will no longer be able to log in.",
     "accountDeactivated": "Your account has been deactivated. Contact an administrator.",
-    "noUsers": "No users found"
+    "noUsers": "No users found",
+    "deleteUser": "Delete User",
+    "confirmDelete": "Are you sure you want to permanently delete this user? This action cannot be undone.",
+    "deleteSuccess": "User deleted successfully",
+    "deleteError": "Failed to delete user",
+    "cannotDeleteSelf": "Cannot delete your own account",
+    "adminOnly": "Only admins can perform this action",
+    "password": "Password",
+    "newPassword": "New password",
+    "resetPassword": "Reset Password",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordResetSuccess": "Password reset successfully",
+    "passwordResetError": "Failed to reset password"
   },
   "pdf": {
     "quote": "QUOTE",

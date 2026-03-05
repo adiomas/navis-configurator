@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { useSettings } from '@/hooks/useSettings'
@@ -11,10 +11,23 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 type SettingsTab = 'company' | 'users'
 
+const VALID_TABS: SettingsTab[] = ['company', 'users']
+
 export default function SettingsPage() {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<SettingsTab>('company')
+  const [searchParams, setSearchParams] = useSearchParams()
   const { data: settings, isLoading } = useSettings()
+
+  const tabParam = searchParams.get('tab') as SettingsTab | null
+  const activeTab: SettingsTab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'company'
+
+  const setActiveTab = (tab: SettingsTab) => {
+    if (tab === 'company') {
+      setSearchParams({}, { replace: true })
+    } else {
+      setSearchParams({ tab }, { replace: true })
+    }
+  }
 
   const tabs: { key: SettingsTab; label: string }[] = [
     { key: 'company', label: t('settings.company') },

@@ -3,6 +3,14 @@ import { generateHUB3Barcode } from '@/lib/barcode'
 import type { CompanySettings } from '@/types'
 
 /**
+ * Validate BIC/SWIFT code format (8 or 11 alphanumeric characters).
+ * Format: BANKCCLL or BANKCCLLBBB
+ */
+function isValidBIC(bic: string): boolean {
+  return /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(bic.toUpperCase())
+}
+
+/**
  * Generate EPC QR code data string per EPC069-12 specification.
  * Used for SEPA payments in English-language quotes.
  */
@@ -37,16 +45,24 @@ async function generateEPCQRCode(
   quoteNumber: string,
   totalAmount: number,
   settings: CompanySettings,
+  depositPercentage?: number | null,
 ): Promise<string | null> {
   if (!settings.iban) return null
 
+  const bic = settings.bic ?? ''
+  if (!isValidBIC(bic)) return null
+
+  const remittanceText = depositPercentage && depositPercentage > 0 && depositPercentage < 100
+    ? `Advance ${depositPercentage}% - Quote ${quoteNumber}`
+    : `Quote ${quoteNumber}`
+
   const epcData = buildEPCData({
-    bic: settings.bic ?? '',
+    bic,
     recipientName: settings.name ?? 'Navis Marine d.o.o.',
     iban: settings.iban,
     amount: totalAmount,
     reference: quoteNumber,
-    text: `Quote ${quoteNumber}`,
+    text: remittanceText,
   })
 
   try {
@@ -74,12 +90,17 @@ export async function generatePaymentBarcode(
   companyName: string,
   settings: CompanySettings,
   language: string,
+  depositPercentage?: number | null,
 ): Promise<string | null> {
   if (!settings.iban) return null
 
+  const barcodeAmount = depositPercentage && depositPercentage > 0 && depositPercentage <= 100
+    ? totalAmount * (depositPercentage / 100)
+    : totalAmount
+
   if (language === 'hr') {
-    return generateHUB3Barcode(quoteNumber, totalAmount, companyName, settings, language)
+    return generateHUB3Barcode(quoteNumber, barcodeAmount, companyName, settings, language, depositPercentage)
   }
 
-  return generateEPCQRCode(quoteNumber, totalAmount, settings)
+  return generateEPCQRCode(quoteNumber, barcodeAmount, settings, depositPercentage)
 }

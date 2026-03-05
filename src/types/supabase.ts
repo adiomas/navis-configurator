@@ -157,6 +157,7 @@ export type Database = {
           address: string | null
           city: string | null
           client_category: string
+          client_type: string
           country: string | null
           created_at: string
           created_by: string | null
@@ -179,6 +180,7 @@ export type Database = {
           address?: string | null
           city?: string | null
           client_category?: string
+          client_type?: string
           country?: string | null
           created_at?: string
           created_by?: string | null
@@ -201,6 +203,7 @@ export type Database = {
           address?: string | null
           city?: string | null
           client_category?: string
+          client_type?: string
           country?: string | null
           created_at?: string
           created_by?: string | null
@@ -799,6 +802,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           currency: string
+          deposit_amount: number | null
+          deposit_percentage: number | null
           equipment_discount: number
           equipment_subtotal: number
           id: string
@@ -823,6 +828,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          deposit_amount?: number | null
+          deposit_percentage?: number | null
           equipment_discount?: number
           equipment_subtotal?: number
           id?: string
@@ -847,6 +854,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          deposit_amount?: number | null
+          deposit_percentage?: number | null
           equipment_discount?: number
           equipment_subtotal?: number
           id?: string
@@ -904,7 +913,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_quote_number: { Args: never; Returns: string }
+      get_dashboard_stats: {
+        Args: { p_date_from?: string | null }
+        Returns: Json
+      }
+      get_quote_status_counts: {
+        Args: { p_template_group_id?: string | null }
+        Returns: Json
+      }
+      get_template_group_quote_counts: {
+        Args: Record<string, never>
+        Returns: Json
+      }
       is_admin: { Args: never; Returns: boolean }
+      set_primary_boat_image: {
+        Args: { p_boat_id: string; p_image_id: string }
+        Returns: null
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

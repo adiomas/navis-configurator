@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import { generateQuoteNumber } from '@/lib/quote-number'
 import { calculatePriceBreakdown } from '@/lib/pricing'
 import type {
   ClientFormData,
@@ -71,51 +70,26 @@ export function useQuotes(filters?: QuoteFilters) {
 }
 
 export function useQuoteStatusCounts(templateGroupId?: string) {
-  return useQuery({
+  return useQuery<Record<string, number>>({
     queryKey: ['quotes', 'status-counts', templateGroupId ?? 'all'],
     queryFn: async () => {
-      let query = supabase
-        .from('quotes')
-        .select('status')
-
-      if (templateGroupId) {
-        query = query.eq('template_group_id', templateGroupId)
-      }
-
-      const { data, error } = await query
-
+      const { data, error } = await supabase.rpc('get_quote_status_counts', {
+        p_template_group_id: templateGroupId ?? null,
+      })
       if (error) throw error
-
-      const counts: Record<string, number> = { all: 0, draft: 0, sent: 0, accepted: 0, rejected: 0 }
-      for (const row of data ?? []) {
-        counts.all++
-        counts[row.status] = (counts[row.status] ?? 0) + 1
-      }
-      return counts
+      return data as unknown as Record<string, number>
     },
     staleTime: 30 * 1000,
   })
 }
 
 export function useTemplateGroupQuoteCounts() {
-  return useQuery({
+  return useQuery<Record<string, { total: number; accepted: number }>>({
     queryKey: ['template-groups', 'quote-counts'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('quotes')
-        .select('template_group_id, status')
-        .not('template_group_id', 'is', null)
-
+      const { data, error } = await supabase.rpc('get_template_group_quote_counts')
       if (error) throw error
-
-      const counts: Record<string, { total: number; accepted: number }> = {}
-      for (const row of data ?? []) {
-        const id = row.template_group_id as string
-        if (!counts[id]) counts[id] = { total: 0, accepted: 0 }
-        counts[id].total++
-        if (row.status === 'accepted') counts[id].accepted++
-      }
-      return counts
+      return data as unknown as Record<string, { total: number; accepted: number }>
     },
     staleTime: 60 * 1000,
   })
@@ -152,6 +126,53 @@ export function useQuote(quoteId?: string) {
     },
     enabled: !!quoteId,
     staleTime: 30 * 1000,
+  })
+}
+
+export function useUpdateQuoteDeposit() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ quoteId, depositPercentage }: { quoteId: string; depositPercentage: number | null }) => {
+      const { data: quote, error: fetchError } = await supabase
+        .from('quotes')
+        .select('total_price')
+        .eq('id', quoteId)
+        .single()
+      if (fetchError) throw fetchError
+
+      const depositAmount = depositPercentage != null && depositPercentage > 0
+        ? Number(quote.total_price) * (depositPercentage / 100)
+        : null
+
+      const { error: updateError } = await supabase
+        .from('quotes')
+        .update({ deposit_percentage: depositPercentage, deposit_amount: depositAmount })
+        .eq('id', quoteId)
+      if (updateError) throw updateError
+    },
+    onSuccess: (_data, { quoteId }) => {
+      queryClient.invalidateQueries({ queryKey: ['quote', quoteId] })
+      queryClient.invalidateQueries({ queryKey: ['quotes'] })
+    },
+  })
+}
+
+export function useUpdateQuoteLanguage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ quoteId, language }: { quoteId: string; language: 'hr' | 'en' }) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ language })
+        .eq('id', quoteId)
+      if (error) throw error
+    },
+    onSuccess: (_data, { quoteId }) => {
+      queryClient.invalidateQueries({ queryKey: ['quote', quoteId] })
+      queryClient.invalidateQueries({ queryKey: ['quotes'] })
+    },
   })
 }
 
@@ -219,15 +240,9 @@ export function useCopyQuote() {
       const { data: session } = await supabase.auth.getSession()
       const userId = session.session?.user.id ?? null
 
-      // 3. Generate new quote number
-      const { data: lastQuote } = await supabase
-        .from('quotes')
-        .select('quote_number')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-
-      const quoteNumber = generateQuoteNumber(lastQuote?.quote_number ?? null)
+      // 3. Generate new quote number (atomic RPC with row locking)
+      const { data: quoteNumber, error: rpcError } = await supabase.rpc('generate_quote_number')
+      if (rpcError) throw rpcError
 
       // 4. Insert new quote (draft, timestamps reset)
       const { data: newQuote, error: insertError } = await supabase
@@ -248,6 +263,8 @@ export function useCopyQuote() {
           total_price: source.total_price,
           currency: source.currency,
           template_group_id: source.template_group_id,
+          deposit_percentage: source.deposit_percentage,
+          deposit_amount: source.deposit_amount,
           created_by: userId,
           sent_at: null,
           accepted_at: null,
@@ -337,15 +354,9 @@ export function useCreateQuote() {
       const { data: session } = await supabase.auth.getSession()
       const userId = session.session?.user.id ?? null
 
-      // Get last quote number
-      const { data: lastQuote } = await supabase
-        .from('quotes')
-        .select('quote_number')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-
-      const quoteNumber = generateQuoteNumber(lastQuote?.quote_number ?? null)
+      // Generate quote number (atomic RPC with row locking)
+      const { data: quoteNumber, error: rpcError } = await supabase.rpc('generate_quote_number')
+      if (rpcError) throw rpcError
 
       // Calculate pricing
       const breakdown = calculatePriceBreakdown(boatBasePrice, selectedEquipment, discounts)

@@ -81,59 +81,41 @@ export const ResponsiveModal = ({
         onClick={() => onOpenChange(false)}
       />
 
-      {/* Desktop: centered modal */}
-      <div className="hidden md:flex absolute inset-0 items-center justify-center p-4">
-        <div
-          ref={contentRef}
-          className={cn(
-            'relative w-full rounded-xl bg-white shadow-xl transition-transform duration-200',
-            sizeClasses[size],
-            animating ? 'translate-y-0 scale-100' : 'translate-y-4 scale-95'
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <h3 className="font-display text-base font-semibold text-navy">
-              {title}
-            </h3>
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <div className={cn(
-            'overflow-y-auto p-5',
-            footer ? 'max-h-[calc(100vh-14rem)]' : 'max-h-[calc(100vh-10rem)]'
-          )}>
-            {children}
-          </div>
-          {footer && (
-            <div className="flex justify-end gap-2.5 border-t border-border px-5 py-3">
-              {footer}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile: bottom sheet */}
+      {/* Single panel: bottom sheet on mobile, centered modal on desktop */}
       <div
-        className="md:hidden absolute inset-x-0 bottom-0"
+        className={cn(
+          // Mobile: anchored to bottom
+          'absolute inset-x-0 bottom-0',
+          // Desktop: centered
+          'md:inset-0 md:flex md:items-center md:justify-center md:p-4',
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         <div
+          ref={contentRef}
           className={cn(
-            'rounded-t-2xl bg-white shadow-xl transition-transform duration-200',
-            animating ? 'translate-y-0' : 'translate-y-full'
+            'relative w-full bg-white shadow-xl transition-transform duration-200',
+            // Mobile: bottom sheet style
+            'rounded-t-2xl',
+            // Desktop: centered card style
+            'md:rounded-xl',
+            sizeClasses[size],
+            // Mobile animation
+            animating ? 'translate-y-0' : 'translate-y-full',
+            // Desktop animation (override mobile)
+            animating ? 'md:translate-y-0 md:scale-100' : 'md:translate-y-4 md:scale-95',
           )}
         >
-          {/* Handle bar */}
-          <div className="flex justify-center py-3">
+          {/* Handle bar (mobile only) */}
+          <div className="flex justify-center py-3 md:hidden">
             <div className="h-1 w-10 rounded-full bg-border" />
           </div>
-          <div className="flex items-center justify-between border-b border-border px-5 pb-4">
+
+          {/* Header */}
+          <div className={cn(
+            'flex items-center justify-between border-b border-border px-5',
+            'pb-4 md:py-4',
+          )}>
             <h3 className="font-display text-base font-semibold text-navy">
               {title}
             </h3>
@@ -145,12 +127,16 @@ export const ResponsiveModal = ({
               <X className="h-5 w-5" />
             </button>
           </div>
+
+          {/* Content — rendered ONCE */}
           <div className={cn(
             'overflow-y-auto p-5',
-            footer ? 'max-h-[60vh]' : 'max-h-[70vh]'
+            footer ? 'max-h-[60vh] md:max-h-[calc(100vh-14rem)]' : 'max-h-[70vh] md:max-h-[calc(100vh-10rem)]'
           )}>
             {children}
           </div>
+
+          {/* Footer */}
           {footer && (
             <div className="flex justify-end gap-2.5 border-t border-border px-5 py-3">
               {footer}

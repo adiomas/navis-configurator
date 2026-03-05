@@ -7,15 +7,15 @@ import { getLocalizedName } from '@/lib/i18n-helpers'
 import { calculatePriceBreakdown } from '@/lib/pricing'
 import type {
   Boat,
-  BoatWithDetails,
   ClientFormData,
   ConfiguratorDiscount,
+  EquipmentCategoryWithItems,
   EquipmentItem,
 } from '@/types'
 
 interface CompactReviewSummaryProps {
   boat: Boat
-  boatDetails: BoatWithDetails
+  boatEquipment: EquipmentCategoryWithItems[]
   selectedEquipment: Map<string, EquipmentItem>
   discounts: ConfiguratorDiscount[]
   clientData: ClientFormData
@@ -43,7 +43,7 @@ function Card({ icon: Icon, title, className, children }: CardProps) {
 
 export function CompactReviewSummary({
   boat,
-  boatDetails,
+  boatEquipment,
   selectedEquipment,
   discounts,
   clientData,
@@ -198,11 +198,11 @@ export function CompactReviewSummary({
 
       {/* Equipment Breakdown — full width */}
       <Card icon={Package} title={t('configurator.equipmentSummary')} className="lg:col-span-2">
-        {boatDetails.equipment_categories.length === 0 ? (
+        {boatEquipment.length === 0 ? (
           <p className="text-xs text-muted-foreground">{t('configurator.noOptionalSelected')}</p>
         ) : (
           <div className="space-y-3">
-            {boatDetails.equipment_categories.map((category) => {
+            {boatEquipment.map((category) => {
               const catSelectedItems = category.items.filter((item) =>
                 selectedEquipment.has(item.id),
               )

@@ -27,7 +27,13 @@
     "goHome": "Idi na nadzornu ploču",
     "unexpectedError": "Došlo je do neočekivane greške",
     "unexpectedErrorDesc": "Nešto je pošlo po krivu. Molimo osvježite stranicu.",
-    "reloadPage": "Osvježi stranicu"
+    "reloadPage": "Osvježi stranicu",
+    "networkError": "Greška mreže. Provjerite vezu i pokušajte ponovo.",
+    "sessionExpired": "Vaša sesija je istekla. Molimo prijavite se ponovo.",
+    "forbidden": "Nemate dozvolu za izvršavanje ove akcije.",
+    "notFound": "Traženi resurs nije pronađen.",
+    "today": "Danas",
+    "yesterday": "Jučer"
   },
   "nav": {
     "dashboard": "Nadzorna ploča",
@@ -90,7 +96,7 @@
     "title": "Katalog brodova",
     "addBoat": "Dodaj brod",
     "editBoat": "Uredi brod",
-    "deletBoat": "Obriši brod",
+    "deleteBoat": "Obriši brod",
     "name": "Naziv",
     "brand": "Marka",
     "model": "Model",
@@ -129,7 +135,11 @@
     "addSpec": "Dodaj specifikaciju",
     "addCategory": "Dodaj kategoriju",
     "descriptionHr": "Opis (Hrvatski)",
-    "descriptionEn": "Opis (Engleski)"
+    "descriptionEn": "Opis (Engleski)",
+    "copySpecsFrom": "Kopiraj specifikacije iz...",
+    "copySpecsTitle": "Kopiraj specifikacije",
+    "copySpecsConfirm": "Kopiraj {{count}} specifikacija iz {{name}}?",
+    "copySpecsSuccess": "Kopirano {{count}} specifikacija"
   },
   "equipment": {
     "title": "Oprema",
@@ -257,12 +267,19 @@
     "equipmentWideDiscountsLabel": "Popusti na ukupnu opremu",
     "boatDiscountsLabel": "Popusti na brod",
     "apply": "Primijeni",
-    "discountOnItem": "Popust na {{name}}"
+    "discountOnItem": "Popust na {{name}}",
+    "selectContact": "Kontakt osoba",
+    "primary": "Primarni"
   },
   "clients": {
     "title": "Klijenti",
     "addCompany": "Dodaj klijenta",
+    "clientType": "Tip klijenta",
+    "clientTypeCompany": "Tvrtka",
+    "clientTypeIndividual": "Fizička osoba",
     "companyName": "Naziv tvrtke",
+    "fullName": "Ime i prezime",
+    "personalId": "OIB",
     "contactName": "Ime kontakta",
     "email": "E-mail",
     "phone": "Telefon",
@@ -381,13 +398,21 @@
     "notes": "Bilješke",
     "pdfDownloading": "Generiranje PDF-a...",
     "pdfDownloadError": "Greška pri generiranju PDF-a",
-    "templateCompact": "Kompaktni",
     "templateDetailed": "Detaljni",
-    "templateLuxury": "Luksuzni",
     "previewPDF": "Pregled",
     "filteringByTemplate": "Predložak: ",
     "clearFilter": "Ukloni filter",
-    "noQuotesForTemplate": "Još nema ponuda kreiranih iz ovog predloška."
+    "noQuotesForTemplate": "Još nema ponuda kreiranih iz ovog predloška.",
+    "paymentBarcode": "Barkod za plaćanje",
+    "depositPercentage": "Postotak predujma",
+    "customPercentage": "Vlastiti %",
+    "depositAmount": "Iznos predujma",
+    "labelPreview": "Pregled barkod labele",
+    "depositSaved": "Konfiguracija predujma spremljena",
+    "depositRemoved": "Barkod za plaćanje uklonjen",
+    "removeBarcode": "Ukloni barkod",
+    "changeLanguage": "Promijeni jezik ponude",
+    "languageUpdated": "Jezik ponude ažuriran"
   },
   "settings": {
     "title": "Postavke",
@@ -427,9 +452,7 @@
     "termsSaveError": "Greška pri spremanju uvjeta",
     "setDefault": "Postavi kao zadani",
     "defaultTemplate": "Zadani",
-    "compactDesc": "Jednostranični minimalan prikaz",
     "detailedDesc": "2 stranice s punim specifikacijama",
-    "luxuryDesc": "Premium prikaz s hero slikom",
     "templateSetSuccess": "Zadani predložak ažuriran",
     "templateSetError": "Greška pri ažuriranju zadanog predloška",
     "dragOrClick": "Povucite ili kliknite za učitavanje",
@@ -514,7 +537,19 @@
     "passwordNote": "Podijelite ovu lozinku s korisnikom. Trebaju je promijeniti prilikom prve prijave.",
     "confirmDeactivate": "Jeste li sigurni da želite deaktivirati ovog korisnika? Više se neće moći prijaviti.",
     "accountDeactivated": "Vaš račun je deaktiviran. Kontaktirajte administratora.",
-    "noUsers": "Nema pronađenih korisnika"
+    "noUsers": "Nema pronađenih korisnika",
+    "deleteUser": "Obriši korisnika",
+    "confirmDelete": "Jeste li sigurni da želite trajno obrisati ovog korisnika? Ova radnja se ne može poništiti.",
+    "deleteSuccess": "Korisnik uspješno obrisan",
+    "deleteError": "Greška pri brisanju korisnika",
+    "cannotDeleteSelf": "Ne možete obrisati vlastiti račun",
+    "adminOnly": "Samo administratori mogu izvršiti ovu radnju",
+    "password": "Lozinka",
+    "newPassword": "Nova lozinka",
+    "resetPassword": "Resetiraj lozinku",
+    "passwordMinLength": "Lozinka mora imati najmanje 6 znakova",
+    "passwordResetSuccess": "Lozinka uspješno resetirana",
+    "passwordResetError": "Greška pri resetiranju lozinke"
   },
   "pdf": {
     "quote": "PONUDA",

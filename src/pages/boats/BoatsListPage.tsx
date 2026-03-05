@@ -135,23 +135,25 @@ export default function BoatsListPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-lg border border-border">
-            {categoryTabs.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setCategoryParam(tab.value)}
-                className={cn(
-                  'px-2.5 py-1 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
-                  categoryFilter === tab.value
-                    ? 'bg-navy text-white'
-                    : 'text-muted-foreground hover:bg-muted'
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="-mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
+            <div className="flex rounded-lg border border-border">
+              {categoryTabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setCategoryParam(tab.value)}
+                  className={cn(
+                    'whitespace-nowrap px-2.5 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
+                    categoryFilter === tab.value
+                      ? 'bg-navy text-white'
+                      : 'text-muted-foreground hover:bg-muted'
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="relative">

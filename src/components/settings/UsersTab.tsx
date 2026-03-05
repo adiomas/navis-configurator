@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Plus, Pencil, Users, Copy, Check } from 'lucide-react'
+import { Plus, Pencil, Trash2, Users, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
-import { useUsers, useInviteUser, useUpdateUser, useToggleUserActive } from '@/hooks/useUsers'
+import { useUsers, useInviteUser, useUpdateUser, useToggleUserActive, useDeleteUser, useResetPassword } from '@/hooks/useUsers'
 import { inviteUserSchema, updateUserSchema } from '@/lib/validators'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ResponsiveModal } from '@/components/ui/ResponsiveModal'
@@ -18,13 +18,15 @@ import type { InviteUserFormData, UpdateUserFormData } from '@/lib/validators'
 
 export function UsersTab() {
   const { t } = useTranslation()
-  const { user: currentUser } = useAuth()
+  const { user: currentUser, isAdmin } = useAuth()
   const queryClient = useQueryClient()
   const { data: users, isLoading } = useUsers()
+  const deleteUser = useDeleteUser()
 
   const [showInviteDialog, setShowInviteDialog] = useState(false)
   const [editingUser, setEditingUser] = useState<Profile | null>(null)
   const [deactivatingUser, setDeactivatingUser] = useState<Profile | null>(null)
+  const [deletingUser, setDeletingUser] = useState<Profile | null>(null)
 
   const formatRelativeTime = (dateStr: string) => {
     const now = new Date()
@@ -43,17 +45,19 @@ export function UsersTab() {
 
   return (
     <div className="space-y-3">
-      {/* Invite button */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setShowInviteDialog(true)}
-          className={cn(ds.btn.base, ds.btn.md, ds.btn.primary)}
-        >
-          <Plus className="h-4 w-4" />
-          {t('users.inviteUser')}
-        </button>
-      </div>
+      {/* Invite button — admin only */}
+      {isAdmin && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowInviteDialog(true)}
+            className={cn(ds.btn.base, ds.btn.md, ds.btn.primary)}
+          >
+            <Plus className="h-4 w-4" />
+            {t('users.inviteUser')}
+          </button>
+        </div>
+      )}
 
       {/* Content */}
       {!users || users.length === 0 ? (
@@ -135,6 +139,16 @@ export function UsersTab() {
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
+                        {isAdmin && !isSelf && (
+                          <button
+                            type="button"
+                            onClick={() => setDeletingUser(profile)}
+                            className={cn(ds.btn.base, ds.btn.icon, 'text-destructive hover:bg-destructive/10')}
+                            title={t('users.deleteUser')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -155,6 +169,7 @@ export function UsersTab() {
         <EditDialog
           profile={editingUser}
           isSelf={editingUser.id === currentUser?.id}
+          isAdmin={isAdmin}
           onClose={() => setEditingUser(null)}
         />
       )}
@@ -182,6 +197,30 @@ export function UsersTab() {
           setDeactivatingUser(null)
         }}
         onCancel={() => setDeactivatingUser(null)}
+      />
+
+      {/* Delete Confirm */}
+      <ConfirmDialog
+        isOpen={!!deletingUser}
+        title={t('users.deleteUser')}
+        description={t('users.confirmDelete')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        isDangerous
+        onConfirm={async () => {
+          if (!deletingUser) return
+          deleteUser.mutate(deletingUser.id, {
+            onSuccess: () => {
+              toast.success(t('users.deleteSuccess'))
+              setDeletingUser(null)
+            },
+            onError: () => {
+              toast.error(t('users.deleteError'))
+              setDeletingUser(null)
+            },
+          })
+        }}
+        onCancel={() => setDeletingUser(null)}
       />
     </div>
   )
@@ -254,8 +293,7 @@ function ActiveToggle({
 function InviteDialog({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation()
   const inviteUser = useInviteUser()
-  const [tempPassword, setTempPassword] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const {
     register,
@@ -268,22 +306,14 @@ function InviteDialog({ onClose }: { onClose: () => void }) {
 
   const onSubmit = (data: InviteUserFormData) => {
     inviteUser.mutate(data, {
-      onSuccess: (result) => {
-        setTempPassword(result.temporary_password)
+      onSuccess: () => {
         toast.success(t('users.inviteSuccess'))
+        onClose()
       },
       onError: () => {
         toast.error(t('users.inviteError'))
       },
     })
-  }
-
-  const handleCopyPassword = async () => {
-    if (!tempPassword) return
-    await navigator.clipboard.writeText(tempPassword)
-    setCopied(true)
-    toast.success(t('users.passwordCopied'))
-    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -293,76 +323,56 @@ function InviteDialog({ onClose }: { onClose: () => void }) {
       title={t('users.inviteUser')}
       size="sm"
     >
-      {tempPassword ? (
-        <div className="space-y-4">
-          <div>
-            <label className={ds.input.label}>
-              {t('users.temporaryPassword')}
-            </label>
-            <div className="mt-1.5 flex items-center gap-2">
-              <code className="flex-1 rounded-lg bg-muted px-3 py-2 font-mono text-xs">
-                {tempPassword}
-              </code>
-              <button
-                type="button"
-                onClick={handleCopyPassword}
-                className="rounded-lg border border-border p-2 transition-colors hover:bg-muted"
-                title={t('users.copyPassword')}
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-emerald-600" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-            <p className="mt-1.5 text-[11px] text-muted-foreground">
-              {t('users.passwordNote')}
-            </p>
-          </div>
-          <div className="flex justify-end">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <div className={ds.input.group}>
+          <label className={ds.input.label}>{t('users.email')}</label>
+          <input type="email" {...register('email')} className={ds.input.base} />
+          {errors.email && <p className={ds.input.error}>{errors.email.message}</p>}
+        </div>
+        <div className={ds.input.group}>
+          <label className={ds.input.label}>{t('users.fullName')}</label>
+          <input type="text" {...register('full_name')} className={ds.input.base} />
+          {errors.full_name && <p className={ds.input.error}>{errors.full_name.message}</p>}
+        </div>
+        <div className={ds.input.group}>
+          <label className={ds.input.label}>{t('users.password')}</label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              {...register('password')}
+              className={cn(ds.input.base, 'pr-10')}
+            />
             <button
               type="button"
-              onClick={onClose}
-              className={cn(ds.btn.base, ds.btn.sm, 'bg-navy text-white hover:bg-navy-light')}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              tabIndex={-1}
             >
-              {t('common.close')}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+          {errors.password && <p className={ds.input.error}>{errors.password.message}</p>}
         </div>
-      ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <div className={ds.input.group}>
-            <label className={ds.input.label}>{t('users.email')}</label>
-            <input type="email" {...register('email')} className={ds.input.base} />
-            {errors.email && <p className={ds.input.error}>{errors.email.message}</p>}
-          </div>
-          <div className={ds.input.group}>
-            <label className={ds.input.label}>{t('users.fullName')}</label>
-            <input type="text" {...register('full_name')} className={ds.input.base} />
-            {errors.full_name && <p className={ds.input.error}>{errors.full_name.message}</p>}
-          </div>
-          <div className={ds.input.group}>
-            <label className={ds.input.label}>{t('users.role')}</label>
-            <select {...register('role')} className={ds.input.select}>
-              <option value="sales">{t('users.sales')}</option>
-              <option value="admin">{t('users.admin')}</option>
-            </select>
-          </div>
-          <div className="flex justify-end gap-2 border-t border-border pt-3">
-            <button type="button" onClick={onClose} className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary)}>
-              {t('common.cancel')}
-            </button>
-            <button
-              type="submit"
-              disabled={inviteUser.isPending}
-              className={cn(ds.btn.base, ds.btn.sm, 'bg-navy text-white hover:bg-navy-light disabled:opacity-50')}
-            >
-              {inviteUser.isPending ? '...' : t('users.inviteUser')}
-            </button>
-          </div>
-        </form>
-      )}
+        <div className={ds.input.group}>
+          <label className={ds.input.label}>{t('users.role')}</label>
+          <select {...register('role')} className={ds.input.select}>
+            <option value="sales">{t('users.sales')}</option>
+            <option value="admin">{t('users.admin')}</option>
+          </select>
+        </div>
+        <div className="flex justify-end gap-2 border-t border-border pt-3">
+          <button type="button" onClick={onClose} className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary)}>
+            {t('common.cancel')}
+          </button>
+          <button
+            type="submit"
+            disabled={inviteUser.isPending}
+            className={cn(ds.btn.base, ds.btn.sm, 'bg-navy text-white hover:bg-navy-light disabled:opacity-50')}
+          >
+            {inviteUser.isPending ? '...' : t('users.inviteUser')}
+          </button>
+        </div>
+      </form>
     </ResponsiveModal>
   )
 }
@@ -370,14 +380,20 @@ function InviteDialog({ onClose }: { onClose: () => void }) {
 function EditDialog({
   profile,
   isSelf,
+  isAdmin,
   onClose,
 }: {
   profile: Profile
   isSelf: boolean
+  isAdmin: boolean
   onClose: () => void
 }) {
   const { t } = useTranslation()
   const updateUser = useUpdateUser(profile.id)
+  const resetPassword = useResetPassword()
+  const [newPassword, setNewPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [showResetPassword, setShowResetPassword] = useState(false)
 
   const {
     register,
@@ -406,6 +422,26 @@ function EditDialog({
         toast.error(t('users.updateError'))
       },
     })
+  }
+
+  const handleResetPassword = () => {
+    setPasswordError('')
+    if (newPassword.length < 6) {
+      setPasswordError(t('users.passwordMinLength'))
+      return
+    }
+    resetPassword.mutate(
+      { userId: profile.id, newPassword },
+      {
+        onSuccess: () => {
+          toast.success(t('users.passwordResetSuccess'))
+          setNewPassword('')
+        },
+        onError: () => {
+          toast.error(t('users.passwordResetError'))
+        },
+      }
+    )
   }
 
   return (
@@ -448,6 +484,43 @@ function EditDialog({
           </button>
         </div>
       </form>
+
+      {/* Reset password — admin only, not for self */}
+      {isAdmin && !isSelf && (
+        <div className="mt-4 space-y-2 border-t border-border pt-4">
+          <label className={ds.input.label}>{t('users.resetPassword')}</label>
+          <div className="flex items-start gap-2">
+            <div className="flex-1">
+              <div className="relative">
+                <input
+                  type={showResetPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => { setNewPassword(e.target.value); setPasswordError('') }}
+                  placeholder={t('users.newPassword')}
+                  className={cn(ds.input.base, 'pr-10')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowResetPassword((v) => !v)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  tabIndex={-1}
+                >
+                  {showResetPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {passwordError && <p className={ds.input.error}>{passwordError}</p>}
+            </div>
+            <button
+              type="button"
+              onClick={handleResetPassword}
+              disabled={resetPassword.isPending || !newPassword}
+              className={cn(ds.btn.base, ds.btn.sm, 'shrink-0 bg-warning text-white hover:bg-warning/90 disabled:opacity-50')}
+            >
+              {resetPassword.isPending ? '...' : t('users.resetPassword')}
+            </button>
+          </div>
+        </div>
+      )}
     </ResponsiveModal>
   )
 }

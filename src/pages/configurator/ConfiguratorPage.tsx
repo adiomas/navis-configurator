@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Save, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { useConfiguratorStore } from '@/stores/configurator-store'
-import { useBoat } from '@/hooks/useBoats'
+import { useBoat, useBoatEquipment } from '@/hooks/useBoats'
 import { calculatePriceBreakdown } from '@/lib/pricing'
 import { CompactPriceSidebar } from '@/components/configurator/CompactPriceSidebar'
 import { MobileBottomBar } from '@/components/configurator/MobileBottomBar'
@@ -32,6 +32,7 @@ export default function ConfiguratorPage() {
   } = useConfiguratorStore()
 
   const { data: boatDetails } = useBoat(selectedBoat?.id)
+  const { data: boatEquipment } = useBoatEquipment(selectedBoat?.id)
 
   const equipmentArray = useMemo(
     () => [...selectedEquipment.values()],
@@ -143,7 +144,7 @@ export default function ConfiguratorPage() {
           {currentStep === 2 && <EquipmentStep priceBreakdown={priceBreakdown} />}
           {currentStep === 3 && <ClientStep />}
           {currentStep === 4 && (
-            <ReviewStep boatDetails={boatDetails ?? null} />
+            <ReviewStep boatDetails={boatDetails ?? null} boatEquipment={boatEquipment ?? []} />
           )}
         </div>
 

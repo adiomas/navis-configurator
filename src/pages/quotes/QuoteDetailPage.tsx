@@ -18,14 +18,15 @@ import {
   Loader2,
   Eye,
   MoreHorizontal,
-  ChevronDown,
+  CreditCard,
+  Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice, formatDate } from '@/lib/formatters'
 import { useAuth } from '@/hooks/useAuth'
-import { useQuote, useCopyQuote, useUpdateQuoteStatus } from '@/hooks/useQuotes'
-import { useBoat } from '@/hooks/useBoats'
+import { useQuote, useCopyQuote, useUpdateQuoteStatus, useUpdateQuoteDeposit, useUpdateQuoteLanguage } from '@/hooks/useQuotes'
+import { useBoat, useBoatEquipment } from '@/hooks/useBoats'
 import { useSettings } from '@/hooks/useSettings'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge'
@@ -33,8 +34,6 @@ import { QuoteTimeline } from '@/components/quotes/QuoteTimeline'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { PDFPreviewModal } from '@/components/pdf/PDFPreviewModal'
 import type { QuoteStatus, QuoteWithDetails } from '@/types'
-
-type PdfTemplateName = 'compact' | 'detailed' | 'luxury'
 
 export default function QuoteDetailPage() {
   const { t, i18n } = useTranslation()
@@ -46,20 +45,25 @@ export default function QuoteDetailPage() {
   const { data: quote, isLoading, error } = useQuote(id)
   const boatId = quote?.boat_id ?? undefined
   const { data: boatData } = useBoat(boatId)
+  const { data: boatEquipment } = useBoatEquipment(boatId)
   const { data: settings } = useSettings()
   const copyQuote = useCopyQuote()
   const updateStatus = useUpdateQuoteStatus()
+  const updateDeposit = useUpdateQuoteDeposit()
+  const updateLanguage = useUpdateQuoteLanguage()
   const loadFromQuote = useConfiguratorStore((s) => s.loadFromQuote)
 
   const canEdit = isAdmin || quote?.created_by === currentUser?.id
 
   const [confirmingStatus, setConfirmingStatus] = useState<QuoteStatus | null>(null)
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<PdfTemplateName>('compact')
   const [previewBlob, setPreviewBlob] = useState<Blob | null>(null)
   const [showPreview, setShowPreview] = useState(false)
   const [isPreviewing, setIsPreviewing] = useState(false)
   const [showMoreActions, setShowMoreActions] = useState(false)
+  const [tempDepositPercentage, setTempDepositPercentage] = useState<number | null>(null)
+  const [isEditingDeposit, setIsEditingDeposit] = useState(false)
+  const [customDepositInput, setCustomDepositInput] = useState('')
 
   // Group equipment items by category
   const equipmentByCategory = useMemo(() => {
@@ -76,6 +80,56 @@ export default function QuoteDetailPage() {
     return map
   }, [quote?.items, lang])
 
+  // Sync deposit state when quote loads
+  const depositInitialized = useState(false)
+  if (quote && !depositInitialized[0]) {
+    setTempDepositPercentage(quote.deposit_percentage != null ? Number(quote.deposit_percentage) : null)
+    depositInitialized[1](true)
+  }
+
+  const handleDepositPreset = (pct: number) => {
+    setTempDepositPercentage(pct)
+    setCustomDepositInput('')
+    setIsEditingDeposit(true)
+  }
+
+  const handleCustomDepositChange = (value: string) => {
+    setCustomDepositInput(value)
+    const num = parseFloat(value)
+    if (!isNaN(num) && num >= 0 && num <= 100) {
+      setTempDepositPercentage(num)
+      setIsEditingDeposit(true)
+    }
+  }
+
+  const handleSaveDeposit = () => {
+    if (!id || tempDepositPercentage == null) return
+    updateDeposit.mutate(
+      { quoteId: id, depositPercentage: tempDepositPercentage },
+      {
+        onSuccess: () => {
+          setIsEditingDeposit(false)
+          toast.success(t('quotes.depositSaved'))
+        },
+      }
+    )
+  }
+
+  const handleRemoveDeposit = () => {
+    if (!id) return
+    updateDeposit.mutate(
+      { quoteId: id, depositPercentage: null },
+      {
+        onSuccess: () => {
+          setTempDepositPercentage(null)
+          setCustomDepositInput('')
+          setIsEditingDeposit(false)
+          toast.success(t('quotes.depositRemoved'))
+        },
+      }
+    )
+  }
+
   const handleCopy = async () => {
     if (!id) return
     try {
@@ -87,21 +141,17 @@ export default function QuoteDetailPage() {
   }
 
   const handleEdit = () => {
-    if (!quote || !boatData) return
-    loadFromQuote(quote, boatData.equipment_categories)
+    if (!quote || !boatEquipment) return
+    loadFromQuote(quote, boatEquipment)
     navigate('/configurator')
   }
 
-  const buildPdfDocument = async (q: QuoteWithDetails, tmpl: PdfTemplateName) => {
+  const buildPdfDocument = async (q: QuoteWithDetails) => {
     const [
-      { PDFCompactTemplate },
       { PDFDetailedTemplate },
-      { PDFLuxuryTemplate },
       { generatePaymentBarcode },
     ] = await Promise.all([
-      import('@/components/pdf/PDFCompactTemplate'),
       import('@/components/pdf/PDFDetailedTemplate'),
-      import('@/components/pdf/PDFLuxuryTemplate'),
       import('@/lib/barcode-unified'),
     ])
 
@@ -111,35 +161,15 @@ export default function QuoteDetailPage() {
       q.company?.name ?? '',
       settings!,
       q.language,
+      q.deposit_percentage,
     )
 
-    const specs = boatData?.specs
-
-    if (tmpl === 'detailed') {
-      return (
-        <PDFDetailedTemplate
-          quote={q}
-          settings={settings!}
-          barcodeDataUrl={barcodeDataUrl}
-          boatSpecs={specs}
-        />
-      )
-    }
-    if (tmpl === 'luxury') {
-      return (
-        <PDFLuxuryTemplate
-          quote={q}
-          settings={settings!}
-          barcodeDataUrl={barcodeDataUrl}
-          boatSpecs={specs}
-        />
-      )
-    }
     return (
-      <PDFCompactTemplate
+      <PDFDetailedTemplate
         quote={q}
         settings={settings!}
         barcodeDataUrl={barcodeDataUrl}
+        boatSpecs={boatData?.specs}
       />
     )
   }
@@ -149,9 +179,9 @@ export default function QuoteDetailPage() {
     setIsDownloadingPDF(true)
     try {
       const { generatePDF, downloadPDF } = await import('@/lib/pdf-generator')
-      const doc = await buildPdfDocument(quote, selectedTemplate)
+      const doc = await buildPdfDocument(quote)
       const blob = await generatePDF(doc)
-      downloadPDF(blob, `${quote.quote_number}_${selectedTemplate}.pdf`)
+      downloadPDF(blob, `${quote.quote_number}.pdf`)
     } catch (err) {
       console.error('PDF generation failed:', err)
       toast.error(t('quotes.pdfDownloadError'))
@@ -166,31 +196,13 @@ export default function QuoteDetailPage() {
     setShowPreview(true)
     try {
       const { generatePDF } = await import('@/lib/pdf-generator')
-      const doc = await buildPdfDocument(quote, selectedTemplate)
+      const doc = await buildPdfDocument(quote)
       const blob = await generatePDF(doc)
       setPreviewBlob(blob)
     } catch (err) {
       console.error('PDF preview failed:', err)
       toast.error(t('quotes.pdfDownloadError'))
       setShowPreview(false)
-    } finally {
-      setIsPreviewing(false)
-    }
-  }
-
-  const handleTemplateChangeInPreview = async (tmpl: PdfTemplateName) => {
-    setSelectedTemplate(tmpl)
-    if (!quote || !settings) return
-    setIsPreviewing(true)
-    setPreviewBlob(null)
-    try {
-      const { generatePDF } = await import('@/lib/pdf-generator')
-      const doc = await buildPdfDocument(quote, tmpl)
-      const blob = await generatePDF(doc)
-      setPreviewBlob(blob)
-    } catch (err) {
-      console.error('PDF preview failed:', err)
-      toast.error(t('quotes.pdfDownloadError'))
     } finally {
       setIsPreviewing(false)
     }
@@ -274,18 +286,6 @@ export default function QuoteDetailPage() {
       <div className="flex flex-wrap items-center gap-2">
         {/* PDF group */}
         <div className="flex items-center gap-1.5 rounded-lg border border-border/60 bg-white p-1">
-          <div className="relative">
-            <select
-              value={selectedTemplate}
-              onChange={(e) => setSelectedTemplate(e.target.value as PdfTemplateName)}
-              className="h-7 cursor-pointer appearance-none rounded-md border-0 bg-muted/50 px-2 pr-6 text-base md:text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="compact">{t('quotes.templateCompact')}</option>
-              <option value="detailed">{t('quotes.templateDetailed')}</option>
-              <option value="luxury">{t('quotes.templateLuxury')}</option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
-          </div>
           <button
             type="button"
             onClick={handlePreviewPDF}
@@ -323,7 +323,7 @@ export default function QuoteDetailPage() {
               <button
                 type="button"
                 onClick={handleEdit}
-                disabled={!boatData}
+                disabled={!boatEquipment}
                 className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'disabled:opacity-50')}
               >
                 <Pencil className="h-3.5 w-3.5" />
@@ -356,7 +356,7 @@ export default function QuoteDetailPage() {
                     <button
                       type="button"
                       onClick={() => { handleEdit(); setShowMoreActions(false) }}
-                      disabled={!boatData}
+                      disabled={!boatEquipment}
                       className="flex w-full items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-muted disabled:opacity-50"
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -470,9 +470,23 @@ export default function QuoteDetailPage() {
                       {contact.phone && <p>{contact.phone}</p>}
                     </div>
                   )}
-                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!id) return
+                      const newLang = quote.language === 'hr' ? 'en' : 'hr'
+                      updateLanguage.mutate(
+                        { quoteId: id, language: newLang },
+                        { onSuccess: () => toast.success(t('quotes.languageUpdated')) }
+                      )
+                    }}
+                    disabled={updateLanguage.isPending}
+                    className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary disabled:opacity-50"
+                    title={t('quotes.changeLanguage')}
+                  >
                     {quote.language === 'hr' ? '🇭🇷 HR' : '🇬🇧 EN'}
-                  </span>
+                    <svg className="h-2.5 w-2.5" viewBox="0 0 12 12" fill="none"><path d="M3 4.5h6L6 8.5 3 4.5Z" fill="currentColor"/></svg>
+                  </button>
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground">—</p>
@@ -559,6 +573,118 @@ export default function QuoteDetailPage() {
           )}
         </Card>
 
+        {/* Payment Barcode / Deposit config - full width */}
+        {canEdit && (
+          <Card icon={CreditCard} title={t('quotes.paymentBarcode')} className="lg:col-span-2">
+            <div className="space-y-3">
+              {/* Preset buttons */}
+              <div>
+                <p className={cn(ds.text.label, 'mb-1.5')}>{t('quotes.depositPercentage')}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {[10, 20, 30, 50, 100].map((pct) => (
+                    <button
+                      key={pct}
+                      type="button"
+                      onClick={() => handleDepositPreset(pct)}
+                      className={cn(
+                        'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
+                        tempDepositPercentage === pct
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border bg-white text-foreground hover:bg-muted'
+                      )}
+                    >
+                      {pct}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom input */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-muted-foreground">{t('quotes.customPercentage')}:</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={customDepositInput}
+                  onChange={(e) => handleCustomDepositChange(e.target.value)}
+                  placeholder="0-100"
+                  className="h-8 w-20 rounded-md border border-border bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <span className="text-xs text-muted-foreground">%</span>
+              </div>
+
+              {/* Calculated amount + label preview */}
+              {tempDepositPercentage != null && tempDepositPercentage > 0 && (
+                <div className="space-y-2 rounded-md bg-muted/50 p-2.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{t('quotes.depositAmount')}</span>
+                    <span className="font-medium">
+                      {formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}
+                      {tempDepositPercentage < 100 && (
+                        <span className="ml-1 text-muted-foreground">
+                          ({tempDepositPercentage}% {lang === 'hr' ? 'od' : 'of'} {formatPrice(Number(quote.total_price ?? 0))})
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  {tempDepositPercentage < 100 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">{t('quotes.labelPreview')}</span>
+                      <span className="font-medium text-navy">
+                        {lang === 'hr'
+                          ? `Predujam ${tempDepositPercentage}% — ${formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}`
+                          : `Advance payment ${tempDepositPercentage}% — ${formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Save / Cancel / Remove buttons */}
+              <div className="flex items-center gap-2">
+                {isEditingDeposit && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleSaveDeposit}
+                      disabled={updateDeposit.isPending || tempDepositPercentage == null}
+                      className={cn(ds.btn.base, ds.btn.sm, ds.btn.primary, 'disabled:opacity-50')}
+                    >
+                      {updateDeposit.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                      {t('common.save')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempDepositPercentage(quote.deposit_percentage != null ? Number(quote.deposit_percentage) : null)
+                        setCustomDepositInput('')
+                        setIsEditingDeposit(false)
+                      }}
+                      className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary)}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      {t('common.cancel')}
+                    </button>
+                  </>
+                )}
+                {quote.deposit_percentage != null && !isEditingDeposit && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveDeposit}
+                    disabled={updateDeposit.isPending}
+                    className={cn(ds.btn.base, ds.btn.sm, 'text-red-600 hover:bg-red-50 disabled:opacity-50')}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {t('quotes.removeBarcode')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Timeline + Notes - full width */}
         <Card icon={Clock} title={t('quotes.timeline')} className="lg:col-span-2">
           {quote.notes && (
@@ -594,9 +720,7 @@ export default function QuoteDetailPage() {
         isOpen={showPreview}
         pdfBlob={previewBlob}
         isGenerating={isPreviewing}
-        fileName={`${quote.quote_number}_${selectedTemplate}.pdf`}
-        selectedTemplate={selectedTemplate}
-        onTemplateChange={handleTemplateChangeInPreview}
+        fileName={`${quote.quote_number}.pdf`}
         onClose={() => {
           setShowPreview(false)
           setPreviewBlob(null)
@@ -604,7 +728,7 @@ export default function QuoteDetailPage() {
         onDownload={() => {
           if (previewBlob) {
             import('@/lib/pdf-generator').then(({ downloadPDF }) => {
-              downloadPDF(previewBlob, `${quote.quote_number}_${selectedTemplate}.pdf`)
+              downloadPDF(previewBlob, `${quote.quote_number}.pdf`)
             })
           }
         }}

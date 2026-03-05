@@ -1,13 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { FileText, FileSpreadsheet, Crown, Check } from 'lucide-react'
+import { FileText, FileSpreadsheet, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePDFTemplates, useSetDefaultPDFTemplate } from '@/hooks/useSettings'
 
 const STYLE_CONFIG: Record<string, { icon: typeof FileText; description: string }> = {
-  compact: { icon: FileText, description: 'settings.compactDesc' },
   detailed: { icon: FileSpreadsheet, description: 'settings.detailedDesc' },
-  luxury: { icon: Crown, description: 'settings.luxuryDesc' },
 }
 
 export const PDFTemplatesList = () => {
@@ -41,7 +39,7 @@ export const PDFTemplatesList = () => {
   return (
     <div className="grid grid-cols-3 gap-2">
       {templates.map((template) => {
-        const config = STYLE_CONFIG[template.style] ?? STYLE_CONFIG.compact
+        const config = STYLE_CONFIG[template.style] ?? STYLE_CONFIG.detailed
         const Icon = config.icon
 
         return (

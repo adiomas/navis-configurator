@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { BoatWithDetails, EquipmentCategory, EquipmentItem, EquipmentCategoryWithItems } from '@/types'
+import type { EquipmentCategory, EquipmentItem, EquipmentCategoryWithItems } from '@/types'
 import type { EquipmentCategoryFormData, EquipmentItemFormData } from '@/lib/validators'
 
 // --- Category Mutations ---
@@ -200,27 +200,26 @@ export function useReorderCategories(boatId: string) {
       }
     },
     onMutate: async (updates) => {
-      await queryClient.cancelQueries({ queryKey: ['boat', boatId] })
-      const previous = queryClient.getQueryData<BoatWithDetails>(['boat', boatId])
+      await queryClient.cancelQueries({ queryKey: ['boat', boatId, 'equipment'] })
+      const previous = queryClient.getQueryData<EquipmentCategoryWithItems[]>(['boat', boatId, 'equipment'])
       if (previous) {
         const orderMap = new Map(updates.map((u) => [u.id, u.sort_order]))
-        queryClient.setQueryData<BoatWithDetails>(['boat', boatId], {
-          ...previous,
-          equipment_categories: previous.equipment_categories.map((cat) => ({
+        queryClient.setQueryData<EquipmentCategoryWithItems[]>(['boat', boatId, 'equipment'],
+          previous.map((cat) => ({
             ...cat,
             sort_order: orderMap.get(cat.id) ?? cat.sort_order,
           })),
-        })
+        )
       }
       return { previous }
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(['boat', boatId], context.previous)
+        queryClient.setQueryData(['boat', boatId, 'equipment'], context.previous)
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['boat', boatId] })
+      queryClient.invalidateQueries({ queryKey: ['boat', boatId, 'equipment'] })
     },
   })
 }
@@ -239,30 +238,29 @@ export function useReorderItems(boatId: string) {
       }
     },
     onMutate: async (updates) => {
-      await queryClient.cancelQueries({ queryKey: ['boat', boatId] })
-      const previous = queryClient.getQueryData<BoatWithDetails>(['boat', boatId])
+      await queryClient.cancelQueries({ queryKey: ['boat', boatId, 'equipment'] })
+      const previous = queryClient.getQueryData<EquipmentCategoryWithItems[]>(['boat', boatId, 'equipment'])
       if (previous) {
         const orderMap = new Map(updates.map((u) => [u.id, u.sort_order]))
-        queryClient.setQueryData<BoatWithDetails>(['boat', boatId], {
-          ...previous,
-          equipment_categories: previous.equipment_categories.map((cat) => ({
+        queryClient.setQueryData<EquipmentCategoryWithItems[]>(['boat', boatId, 'equipment'],
+          previous.map((cat) => ({
             ...cat,
             items: cat.items.map((item) => ({
               ...item,
               sort_order: orderMap.get(item.id) ?? item.sort_order,
             })),
           })),
-        })
+        )
       }
       return { previous }
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(['boat', boatId], context.previous)
+        queryClient.setQueryData(['boat', boatId, 'equipment'], context.previous)
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['boat', boatId] })
+      queryClient.invalidateQueries({ queryKey: ['boat', boatId, 'equipment'] })
     },
   })
 }

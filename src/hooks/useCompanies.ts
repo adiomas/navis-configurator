@@ -14,7 +14,7 @@ export function useCompanies(filters?: CompanyFilters) {
     queryFn: async () => {
       let query = supabase
         .from('companies')
-        .select('*, contacts(*), quotes:quotes(count), created_by')
+        .select('id, name, client_type, email, phone, client_category, city, country, created_at, status, contacts(id, full_name, email, phone, position, is_primary), quotes:quotes(count)')
         .eq('status', 'active')
         .order('name')
 
@@ -82,6 +82,7 @@ export function useCreateCompany() {
       const { data: company, error } = await supabase
         .from('companies')
         .insert({
+          client_type: data.client_type,
           name: data.name,
           registration_number: data.registration_number ?? null,
           address: data.address ?? null,
@@ -100,6 +101,18 @@ export function useCreateCompany() {
         .select()
         .single()
       if (error) throw error
+
+      // Auto-create primary contact for individual clients
+      if (data.client_type === 'individual') {
+        await supabase.from('contacts').insert({
+          company_id: company.id,
+          full_name: data.name,
+          email: data.email || null,
+          phone: data.phone ?? null,
+          is_primary: true,
+        })
+      }
+
       return company as Company
     },
     onSuccess: () => {
@@ -116,6 +129,7 @@ export function useUpdateCompany(id: string) {
       const { data: company, error } = await supabase
         .from('companies')
         .update({
+          client_type: data.client_type,
           name: data.name,
           registration_number: data.registration_number ?? null,
           address: data.address ?? null,
@@ -134,6 +148,28 @@ export function useUpdateCompany(id: string) {
         .select()
         .single()
       if (error) throw error
+
+      // Sync primary contact for individual clients
+      if (data.client_type === 'individual') {
+        const { data: primaryContact } = await supabase
+          .from('contacts')
+          .select('id')
+          .eq('company_id', id)
+          .eq('is_primary', true)
+          .single()
+
+        if (primaryContact) {
+          await supabase
+            .from('contacts')
+            .update({
+              full_name: data.name,
+              email: data.email || null,
+              phone: data.phone ?? null,
+            })
+            .eq('id', primaryContact.id)
+        }
+      }
+
       return company as Company
     },
     onSuccess: () => {

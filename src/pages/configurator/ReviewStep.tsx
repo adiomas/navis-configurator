@@ -5,13 +5,14 @@ import { toast } from 'sonner'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import { useCreateQuote } from '@/hooks/useQuotes'
 import { CompactReviewSummary } from '@/components/configurator/CompactReviewSummary'
-import type { BoatWithDetails } from '@/types'
+import type { BoatWithSpecs, EquipmentCategoryWithItems } from '@/types'
 
 interface ReviewStepProps {
-  boatDetails: BoatWithDetails | null
+  boatDetails: BoatWithSpecs | null
+  boatEquipment: EquipmentCategoryWithItems[]
 }
 
-export default function ReviewStep({ boatDetails }: ReviewStepProps) {
+export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const {
@@ -42,7 +43,7 @@ export default function ReviewStep({ boatDetails }: ReviewStepProps) {
         discounts,
         templateGroupId,
         status,
-        categories: boatDetails.equipment_categories,
+        categories: boatEquipment,
       })
 
       toast.success(
@@ -56,7 +57,7 @@ export default function ReviewStep({ boatDetails }: ReviewStepProps) {
     } catch {
       toast.error(t('configurator.saveError'))
     }
-  }, [selectedBoat, boatDetails, createQuote, clientData, equipmentArray, discounts, templateGroupId, t, reset, navigate])
+  }, [selectedBoat, boatDetails, boatEquipment, createQuote, clientData, equipmentArray, discounts, templateGroupId, t, reset, navigate])
 
   // Listen for save events from MobileBottomBar / desktop bottom nav
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function ReviewStep({ boatDetails }: ReviewStepProps) {
   return (
     <CompactReviewSummary
       boat={selectedBoat}
-      boatDetails={boatDetails}
+      boatEquipment={boatEquipment}
       selectedEquipment={selectedEquipment}
       discounts={discounts}
       clientData={clientData}

@@ -6,7 +6,7 @@ import { ClientSelector } from '@/components/configurator/ClientSelector'
 import { ClientForm } from '@/components/configurator/ClientForm'
 import { CompanyForm } from '@/components/clients/CompanyForm'
 import { useCreateCompany } from '@/hooks/useCompanies'
-import type { ClientFormData, CompanyWithContacts } from '@/types'
+import type { ClientFormData, CompanyWithContacts, Contact } from '@/types'
 import type { CompanyFormData } from '@/lib/validators'
 
 export default function ClientStep() {
@@ -14,6 +14,7 @@ export default function ClientStep() {
   const { clientData, setClientData } = useConfiguratorStore()
 
   const [selectedCompany, setSelectedCompany] = useState<CompanyWithContacts | null>(null)
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [showAddClient, setShowAddClient] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
 
@@ -21,7 +22,9 @@ export default function ClientStep() {
 
   const handleSelectCompany = (company: CompanyWithContacts) => {
     setSelectedCompany(company)
+    setSelectedContact(null)
     const primaryContact = company.contacts.find((c) => c.is_primary) ?? company.contacts[0]
+    if (primaryContact) setSelectedContact(primaryContact)
     setClientData({
       companyId: company.id,
       contactId: primaryContact?.id,
@@ -30,6 +33,17 @@ export default function ClientStep() {
       phone: primaryContact?.phone ?? '',
       companyName: company.name,
       language: (company.preferred_language as 'hr' | 'en') ?? 'hr',
+    })
+  }
+
+  const handleSelectContact = (contact: Contact) => {
+    setSelectedContact(contact)
+    setClientData({
+      ...clientData,
+      contactId: contact.id,
+      name: contact.full_name ?? '',
+      email: contact.email ?? '',
+      phone: contact.phone ?? '',
     })
   }
 
@@ -78,6 +92,8 @@ export default function ClientStep() {
           <ClientForm
             defaultValues={clientData}
             selectedCompany={selectedCompany}
+            selectedContact={selectedContact}
+            onSelectContact={handleSelectContact}
             onSubmit={handleFormSubmit}
             onValuesChange={setClientData}
             formRef={formRef}
