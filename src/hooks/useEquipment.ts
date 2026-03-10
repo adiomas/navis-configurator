@@ -265,6 +265,25 @@ export function useReorderItems(boatId: string) {
   })
 }
 
+// --- Bulk Set Standard ---
+
+export function useSetItemsStandard(boatId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ ids, is_standard }: { ids: string[]; is_standard: boolean }) => {
+      const { error } = await supabase
+        .from('equipment_items')
+        .update({ is_standard })
+        .in('id', ids)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boat', boatId] })
+    },
+  })
+}
+
 // --- Bulk Delete ---
 
 export function useDeleteItems(boatId: string) {

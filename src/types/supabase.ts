@@ -372,7 +372,9 @@ export type Database = {
           description_en: string | null
           description_hr: string | null
           id: string
+          is_discountable: boolean | null
           is_standard: boolean
+          manufacturer_code: string | null
           name_en: string | null
           name_hr: string | null
           price: number
@@ -384,7 +386,9 @@ export type Database = {
           description_en?: string | null
           description_hr?: string | null
           id?: string
+          is_discountable?: boolean | null
           is_standard?: boolean
+          manufacturer_code?: string | null
           name_en?: string | null
           name_hr?: string | null
           price?: number
@@ -396,7 +400,9 @@ export type Database = {
           description_en?: string | null
           description_hr?: string | null
           id?: string
+          is_discountable?: boolean | null
           is_standard?: boolean
+          manufacturer_code?: string | null
           name_en?: string | null
           name_hr?: string | null
           price?: number
@@ -541,6 +547,8 @@ export type Database = {
           equipment_item_id: string | null
           id: string
           item_discount: number
+          item_discount_type: string | null
+          item_discount_value: number
           item_type: string
           name_en: string | null
           name_hr: string | null
@@ -554,6 +562,8 @@ export type Database = {
           equipment_item_id?: string | null
           id?: string
           item_discount?: number
+          item_discount_type?: string | null
+          item_discount_value?: number
           item_type: string
           name_en?: string | null
           name_hr?: string | null
@@ -567,6 +577,8 @@ export type Database = {
           equipment_item_id?: string | null
           id?: string
           item_discount?: number
+          item_discount_type?: string | null
+          item_discount_value?: number
           item_type?: string
           name_en?: string | null
           name_hr?: string | null
@@ -914,22 +926,20 @@ export type Database = {
     }
     Functions: {
       generate_quote_number: { Args: never; Returns: string }
-      get_dashboard_stats: {
-        Args: { p_date_from?: string | null }
+      import_boat_from_pricelist: {
+        Args: { payload: Json }
         Returns: Json
       }
+      get_dashboard_stats: { Args: { p_date_from?: string }; Returns: Json }
       get_quote_status_counts: {
-        Args: { p_template_group_id?: string | null }
+        Args: { p_template_group_id?: string }
         Returns: Json
       }
-      get_template_group_quote_counts: {
-        Args: Record<string, never>
-        Returns: Json
-      }
+      get_template_group_quote_counts: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       set_primary_boat_image: {
         Args: { p_boat_id: string; p_image_id: string }
-        Returns: null
+        Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }

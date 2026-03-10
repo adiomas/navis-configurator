@@ -28,6 +28,8 @@ export const equipmentItemSchema = z.object({
   description_en: z.string().optional(),
   price: z.number().min(0, 'Price cannot be negative'),
   is_standard: z.boolean().default(false),
+  manufacturer_code: z.string().optional(),
+  is_discountable: z.boolean().optional().default(true),
 })
 
 export const companySchema = z.object({

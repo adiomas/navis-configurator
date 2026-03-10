@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, Plus, Pencil, Trash2, Copy, Package } from 'lucide-react'
+import { ChevronDown, Plus, Pencil, Trash2, Copy, Package, Check, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
@@ -19,6 +19,7 @@ import {
   useReorderCategories,
   useReorderItems,
   useDeleteItems,
+  useSetItemsStandard,
 } from '@/hooks/useEquipment'
 import { EquipmentCategoryForm } from '@/components/equipment/EquipmentCategoryForm'
 import { EquipmentItemForm } from '@/components/equipment/EquipmentItemForm'
@@ -75,6 +76,7 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
   const reorderCategories = useReorderCategories(boatId)
   const reorderItems = useReorderItems(boatId)
   const deleteItems = useDeleteItems(boatId)
+  const setItemsStandard = useSetItemsStandard(boatId)
 
   const categories = equipmentCategories ?? []
 
@@ -233,6 +235,22 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
     })
   }
 
+  // Bulk set standard/optional
+  const handleBulkSetStandard = (isStandard: boolean) => {
+    const ids = [...selectedItemIds]
+    setItemsStandard.mutate(
+      { ids, is_standard: isStandard },
+      {
+        onSuccess: () => {
+          const key = isStandard ? 'equipment.markStandardSuccess' : 'equipment.markOptionalSuccess'
+          toast.success(t(key, { count: ids.length }))
+          setSelectedItemIds(new Set())
+        },
+        onError: () => toast.error(t('equipment.error')),
+      }
+    )
+  }
+
   // Copy equipment
   const handleCopySelect = (sourceId: string) => {
     setCopySourceBoatId(sourceId)
@@ -292,18 +310,38 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
 
       {/* Bulk action bar */}
       {selectedItemIds.size > 0 && (
-        <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-          <span className="text-xs font-medium text-red-800">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-muted/50 px-3 py-2">
+          <span className="text-xs font-medium text-foreground">
             {t('equipment.selectedCount', { count: selectedItemIds.size })}
           </span>
-          <button
-            type="button"
-            onClick={() => setShowBulkDeleteConfirm(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            {t('equipment.deleteSelected', { count: selectedItemIds.size })}
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => handleBulkSetStandard(true)}
+              disabled={setItemsStandard.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-50"
+            >
+              <Check className="h-3.5 w-3.5" />
+              {t('equipment.markStandard')}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleBulkSetStandard(false)}
+              disabled={setItemsStandard.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+            >
+              <X className="h-3.5 w-3.5" />
+              {t('equipment.markOptional')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowBulkDeleteConfirm(true)}
+              className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {t('equipment.deleteSelected', { count: selectedItemIds.size })}
+            </button>
+          </div>
         </div>
       )}
 

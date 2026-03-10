@@ -79,7 +79,7 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
           return (
             <div
               key={category.id}
-              className="relative rounded-lg border border-border bg-card"
+              className="relative overflow-hidden rounded-lg border border-border bg-card"
             >
               {/* Category header */}
               <button
@@ -160,11 +160,11 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
 
                           {/* Name + description + discount badge */}
                           <div className="min-w-0 flex-1">
-                            <span className="text-xs font-medium text-foreground">
+                            <span className="break-words text-xs font-medium text-foreground">
                               {getItemName(item)}
                             </span>
                             {(item.description_hr || item.description_en) && (
-                              <p className="truncate text-[11px] text-muted-foreground">
+                              <p className="line-clamp-2 text-[11px] text-muted-foreground">
                                 {lang === 'hr' ? item.description_hr : item.description_en}
                               </p>
                             )}
