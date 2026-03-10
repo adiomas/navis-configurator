@@ -14,9 +14,10 @@ import type { EquipmentItem, DiscountLevel, DiscountType, PriceBreakdown } from 
 
 interface EquipmentStepProps {
   priceBreakdown: PriceBreakdown
+  discountableEquipmentSubtotal: number
 }
 
-export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
+export default function EquipmentStep({ priceBreakdown, discountableEquipmentSubtotal }: EquipmentStepProps) {
   const { t } = useTranslation()
   const {
     selectedBoat,
@@ -154,6 +155,7 @@ export default function EquipmentStep({ priceBreakdown }: EquipmentStepProps) {
             <CompactDiscountEditor
               boatBasePrice={boatDetails.base_price}
               equipmentSubtotal={priceBreakdown.equipmentSubtotal}
+              discountableEquipmentSubtotal={discountableEquipmentSubtotal}
             />
           </div>
         </div>

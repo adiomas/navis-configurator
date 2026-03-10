@@ -120,7 +120,8 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                     const isSelected = selectedEquipment.has(item.id)
                     const isStandard = item.is_standard
                     const itemDiscount = getItemDiscount(item.id)
-                    const showDiscountTag = isSelected && !isStandard
+                    const isDiscountable = item.is_discountable ?? category.is_discountable ?? true
+                    const showDiscountTag = isSelected && !isStandard && isDiscountable
 
                     return (
                       <div key={item.id} className="relative">
@@ -190,6 +191,11 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                             {isStandard && (
                               <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-600">
                                 {t('configurator.standardIncluded')}
+                              </span>
+                            )}
+                            {!isStandard && !isDiscountable && (
+                              <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                                {t('equipment.noDiscount')}
                               </span>
                             )}
                             {showDiscountTag && (

@@ -417,7 +417,10 @@ export default function QuoteDetailPage() {
                 {quote.discounts.map((d) => (
                   <div key={d.id} className="flex justify-between text-xs">
                     <span className="text-muted-foreground">
-                      {d.description ?? d.discount_level}
+                      {d.description
+                        ?? (d.discount_level === 'boat_base' ? t('configurator.boatDiscount')
+                          : d.discount_level === 'equipment_all' ? t('configurator.equipmentWideDiscount')
+                          : t('configurator.perItemDiscounts'))}
                     </span>
                     <span className="font-medium text-red-600">
                       {d.discount_type === 'percentage'

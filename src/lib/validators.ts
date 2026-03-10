@@ -19,6 +19,7 @@ export const boatSchema = z.object({
 export const equipmentCategorySchema = z.object({
   name_hr: z.string().min(1, 'Croatian name is required'),
   name_en: z.string().min(1, 'English name is required'),
+  is_discountable: z.boolean().default(true),
 })
 
 export const equipmentItemSchema = z.object({
@@ -28,6 +29,7 @@ export const equipmentItemSchema = z.object({
   description_en: z.string().optional(),
   price: z.number().min(0, 'Price cannot be negative'),
   is_standard: z.boolean().default(false),
+  is_discountable: z.boolean().nullable().default(null),
 })
 
 export const companySchema = z.object({

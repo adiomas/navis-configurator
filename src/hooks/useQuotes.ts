@@ -74,7 +74,7 @@ export function useQuoteStatusCounts(templateGroupId?: string) {
     queryKey: ['quotes', 'status-counts', templateGroupId ?? 'all'],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_quote_status_counts', {
-        p_template_group_id: templateGroupId ?? null,
+        p_template_group_id: templateGroupId ?? undefined,
       })
       if (error) throw error
       return data as unknown as Record<string, number>
@@ -265,6 +265,8 @@ export function useCopyQuote() {
           template_group_id: source.template_group_id,
           deposit_percentage: source.deposit_percentage,
           deposit_amount: source.deposit_amount,
+          delivery_terms_hr: source.delivery_terms_hr,
+          delivery_terms_en: source.delivery_terms_en,
           created_by: userId,
           sent_at: null,
           accepted_at: null,
@@ -287,6 +289,7 @@ export function useCopyQuote() {
           sort_order: index,
           category_name_hr: item.category_name_hr as string | null,
           category_name_en: item.category_name_en as string | null,
+          is_discountable: (item.is_discountable as boolean) ?? true,
         }))
 
         const { error: itemsError } = await supabase
@@ -338,6 +341,7 @@ interface CreateQuoteParams {
   templateGroupId: string | null
   status: 'draft' | 'sent'
   categories: EquipmentCategoryWithItems[]
+  deliveryTerms: string
 }
 
 export function useCreateQuote() {
@@ -347,7 +351,7 @@ export function useCreateQuote() {
     mutationFn: async (params: CreateQuoteParams) => {
       const {
         boatId, boatBasePrice, clientData, selectedEquipment,
-        discounts, templateGroupId, status, categories,
+        discounts, templateGroupId, status, categories, deliveryTerms,
       } = params
 
       // Get current user
@@ -358,8 +362,16 @@ export function useCreateQuote() {
       const { data: quoteNumber, error: rpcError } = await supabase.rpc('generate_quote_number')
       if (rpcError) throw rpcError
 
+      // Resolve discountable flag for each item
+      const itemDiscountableMap = new Map<string, boolean>()
+      for (const item of selectedEquipment) {
+        const cat = categories.find(c => c.items.some(i => i.id === item.id))
+        const effective = item.is_discountable ?? cat?.is_discountable ?? true
+        itemDiscountableMap.set(item.id, effective)
+      }
+
       // Calculate pricing
-      const breakdown = calculatePriceBreakdown(boatBasePrice, selectedEquipment, discounts)
+      const breakdown = calculatePriceBreakdown(boatBasePrice, selectedEquipment, discounts, itemDiscountableMap)
 
       // Resolve company & contact — create new if needed
       let companyId = clientData.companyId ?? null
@@ -415,6 +427,8 @@ export function useCreateQuote() {
         template_group_id: templateGroupId,
         created_by: userId,
         sent_at: status === 'sent' ? new Date().toISOString() : null,
+        delivery_terms_hr: clientData.language === 'hr' ? deliveryTerms || null : null,
+        delivery_terms_en: clientData.language === 'en' ? deliveryTerms || null : null,
       }
 
       const { data: quote, error: quoteError } = await supabase
@@ -442,6 +456,7 @@ export function useCreateQuote() {
           sort_order: index,
           category_name_hr: categoryMap.get(item.id)?.name_hr ?? null,
           category_name_en: categoryMap.get(item.id)?.name_en ?? null,
+          is_discountable: itemDiscountableMap.get(item.id) ?? true,
         }))
 
         const { error: itemsError } = await supabase

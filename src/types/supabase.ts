@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
@@ -240,6 +238,8 @@ export type Database = {
           city: string | null
           default_currency: string
           default_language: string
+          delivery_terms_en: string | null
+          delivery_terms_hr: string | null
           email: string | null
           iban: string | null
           id: string
@@ -259,6 +259,8 @@ export type Database = {
           city?: string | null
           default_currency?: string
           default_language?: string
+          delivery_terms_en?: string | null
+          delivery_terms_hr?: string | null
           email?: string | null
           iban?: string | null
           id?: string
@@ -278,6 +280,8 @@ export type Database = {
           city?: string | null
           default_currency?: string
           default_language?: string
+          delivery_terms_en?: string | null
+          delivery_terms_hr?: string | null
           email?: string | null
           iban?: string | null
           id?: string
@@ -337,6 +341,7 @@ export type Database = {
         Row: {
           boat_id: string
           id: string
+          is_discountable: boolean
           name_en: string | null
           name_hr: string | null
           sort_order: number
@@ -344,6 +349,7 @@ export type Database = {
         Insert: {
           boat_id: string
           id?: string
+          is_discountable?: boolean
           name_en?: string | null
           name_hr?: string | null
           sort_order?: number
@@ -351,6 +357,7 @@ export type Database = {
         Update: {
           boat_id?: string
           id?: string
+          is_discountable?: boolean
           name_en?: string | null
           name_hr?: string | null
           sort_order?: number
@@ -372,7 +379,9 @@ export type Database = {
           description_en: string | null
           description_hr: string | null
           id: string
+          is_discountable: boolean | null
           is_standard: boolean
+          manufacturer_code: string | null
           name_en: string | null
           name_hr: string | null
           price: number
@@ -384,7 +393,9 @@ export type Database = {
           description_en?: string | null
           description_hr?: string | null
           id?: string
+          is_discountable?: boolean | null
           is_standard?: boolean
+          manufacturer_code?: string | null
           name_en?: string | null
           name_hr?: string | null
           price?: number
@@ -396,7 +407,9 @@ export type Database = {
           description_en?: string | null
           description_hr?: string | null
           id?: string
+          is_discountable?: boolean | null
           is_standard?: boolean
+          manufacturer_code?: string | null
           name_en?: string | null
           name_hr?: string | null
           price?: number
@@ -540,7 +553,10 @@ export type Database = {
           category_name_hr: string | null
           equipment_item_id: string | null
           id: string
+          is_discountable: boolean
           item_discount: number
+          item_discount_type: string | null
+          item_discount_value: number
           item_type: string
           name_en: string | null
           name_hr: string | null
@@ -553,7 +569,10 @@ export type Database = {
           category_name_hr?: string | null
           equipment_item_id?: string | null
           id?: string
+          is_discountable?: boolean
           item_discount?: number
+          item_discount_type?: string | null
+          item_discount_value?: number
           item_type: string
           name_en?: string | null
           name_hr?: string | null
@@ -566,7 +585,10 @@ export type Database = {
           category_name_hr?: string | null
           equipment_item_id?: string | null
           id?: string
+          is_discountable?: boolean
           item_discount?: number
+          item_discount_type?: string | null
+          item_discount_value?: number
           item_type?: string
           name_en?: string | null
           name_hr?: string | null
@@ -802,6 +824,8 @@ export type Database = {
           created_at: string
           created_by: string | null
           currency: string
+          delivery_terms_en: string | null
+          delivery_terms_hr: string | null
           deposit_amount: number | null
           deposit_percentage: number | null
           equipment_discount: number
@@ -828,6 +852,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          delivery_terms_en?: string | null
+          delivery_terms_hr?: string | null
           deposit_amount?: number | null
           deposit_percentage?: number | null
           equipment_discount?: number
@@ -854,6 +880,8 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          delivery_terms_en?: string | null
+          delivery_terms_hr?: string | null
           deposit_amount?: number | null
           deposit_percentage?: number | null
           equipment_discount?: number
@@ -914,22 +942,17 @@ export type Database = {
     }
     Functions: {
       generate_quote_number: { Args: never; Returns: string }
-      get_dashboard_stats: {
-        Args: { p_date_from?: string | null }
-        Returns: Json
-      }
+      get_dashboard_stats: { Args: { p_date_from?: string }; Returns: Json }
       get_quote_status_counts: {
-        Args: { p_template_group_id?: string | null }
+        Args: { p_template_group_id?: string }
         Returns: Json
       }
-      get_template_group_quote_counts: {
-        Args: Record<string, never>
-        Returns: Json
-      }
+      get_template_group_quote_counts: { Args: never; Returns: Json }
+      import_boat_from_pricelist: { Args: { payload: Json }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       set_primary_boat_image: {
         Args: { p_boat_id: string; p_image_id: string }
-        Returns: null
+        Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }

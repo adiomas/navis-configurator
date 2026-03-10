@@ -337,6 +337,11 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
                           )}
                         />
                         <span className="text-xs font-medium text-foreground">{categoryName}</span>
+                        {!category.is_discountable && (
+                          <span className={cn(ds.badge.base, 'bg-amber-50 text-amber-700 text-[10px]')}>
+                            {t('equipment.noDiscount')}
+                          </span>
+                        )}
                         <span className={cn(ds.badge.base, ds.badge.muted, 'text-[10px]')}>
                           {category.items.length}
                         </span>
@@ -405,6 +410,11 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
                                           {t('equipment.standard')}
                                         </span>
                                       )}
+                                      {(item.is_discountable === false || (item.is_discountable === null && !category.is_discountable)) && (
+                                        <span className={cn(ds.badge.base, 'shrink-0 bg-amber-50 text-amber-700 text-[10px]')}>
+                                          {t('equipment.noDiscount')}
+                                        </span>
+                                      )}
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                       <span className="text-xs font-medium text-foreground">
@@ -463,6 +473,7 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
             ? {
                 name_hr: editingCategory.name_hr ?? undefined,
                 name_en: editingCategory.name_en ?? undefined,
+                is_discountable: editingCategory.is_discountable,
               }
             : undefined
         }
@@ -494,6 +505,7 @@ export const BoatEquipmentTab = ({ boatId, equipmentCategories, isAdmin }: BoatE
                 description_en: editingItem.description_en ?? undefined,
                 price: editingItem.price,
                 is_standard: editingItem.is_standard,
+                is_discountable: editingItem.is_discountable,
               }
             : undefined
         }

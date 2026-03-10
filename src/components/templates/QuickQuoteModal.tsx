@@ -123,6 +123,7 @@ export const QuickQuoteModal = ({
           templateGroupId,
           status: 'draft',
           categories: boatEquipment,
+          deliveryTerms: '',
         })
       } catch {
         // Stop on first error — already created quotes remain as drafts

@@ -10,6 +10,7 @@ import type { DiscountLevel, DiscountType } from '@/types'
 interface CompactDiscountEditorProps {
   boatBasePrice: number
   equipmentSubtotal: number
+  discountableEquipmentSubtotal?: number
 }
 
 interface DiscountRow {
@@ -19,7 +20,7 @@ interface DiscountRow {
   description: string
 }
 
-export function CompactDiscountEditor({ boatBasePrice, equipmentSubtotal }: CompactDiscountEditorProps) {
+export function CompactDiscountEditor({ boatBasePrice, equipmentSubtotal, discountableEquipmentSubtotal }: CompactDiscountEditorProps) {
   const { t } = useTranslation()
   const { discounts, addDiscount, removeDiscount } = useConfiguratorStore()
 
@@ -40,9 +41,9 @@ export function CompactDiscountEditor({ boatBasePrice, equipmentSubtotal }: Comp
       />
       <DiscountSection
         title={t('configurator.equipmentWideDiscount')}
-        hint={t('configurator.equipmentDiscountHint')}
+        hint={t('configurator.equipmentDiscountNote')}
         level="equipment_all"
-        baseAmount={equipmentSubtotal}
+        baseAmount={discountableEquipmentSubtotal ?? equipmentSubtotal}
         activeDiscounts={equipmentDiscounts}
         addDiscount={addDiscount}
         removeDiscount={removeDiscount}

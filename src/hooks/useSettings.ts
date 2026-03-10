@@ -113,6 +113,34 @@ export function useUpdateTerms() {
   })
 }
 
+export function useUpdateDeliveryTerms() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: { delivery_terms_hr: string; delivery_terms_en: string }) => {
+      const { data: existing } = await supabase
+        .from('company_settings')
+        .select('id')
+        .limit(1)
+        .single()
+
+      if (!existing) throw new Error('Company settings not found. Save company details first.')
+
+      const { error } = await supabase
+        .from('company_settings')
+        .update({
+          delivery_terms_hr: data.delivery_terms_hr || null,
+          delivery_terms_en: data.delivery_terms_en || null,
+        })
+        .eq('id', existing.id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-settings'] })
+    },
+  })
+}
+
 export function useUploadLogo() {
   const queryClient = useQueryClient()
 

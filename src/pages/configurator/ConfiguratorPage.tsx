@@ -39,13 +39,34 @@ export default function ConfiguratorPage() {
     [selectedEquipment],
   )
 
+  const itemDiscountableMap = useMemo(() => {
+    if (!boatEquipment) return new Map<string, boolean>()
+    const map = new Map<string, boolean>()
+    for (const cat of boatEquipment) {
+      for (const item of cat.items) {
+        if (selectedEquipment.has(item.id)) {
+          map.set(item.id, item.is_discountable ?? cat.is_discountable ?? true)
+        }
+      }
+    }
+    return map
+  }, [boatEquipment, selectedEquipment])
+
   const priceBreakdown = useMemo(
     () => calculatePriceBreakdown(
       selectedBoat?.base_price ?? 0,
       equipmentArray,
       discounts,
+      itemDiscountableMap,
     ),
-    [selectedBoat?.base_price, equipmentArray, discounts],
+    [selectedBoat?.base_price, equipmentArray, discounts, itemDiscountableMap],
+  )
+
+  const discountableEquipmentSubtotal = useMemo(() =>
+    equipmentArray
+      .filter(item => !item.is_standard && (itemDiscountableMap.get(item.id) ?? true))
+      .reduce((sum, item) => sum + item.price, 0),
+    [equipmentArray, itemDiscountableMap],
   )
 
   const selectedOptionalItems = useMemo(
@@ -141,7 +162,7 @@ export default function ConfiguratorPage() {
         {/* Step content */}
         <div className="min-w-0 flex-1">
           {currentStep === 1 && <BoatStep />}
-          {currentStep === 2 && <EquipmentStep priceBreakdown={priceBreakdown} />}
+          {currentStep === 2 && <EquipmentStep priceBreakdown={priceBreakdown} discountableEquipmentSubtotal={discountableEquipmentSubtotal} />}
           {currentStep === 3 && <ClientStep />}
           {currentStep === 4 && (
             <ReviewStep boatDetails={boatDetails ?? null} boatEquipment={boatEquipment ?? []} />

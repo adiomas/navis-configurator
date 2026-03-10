@@ -17,6 +17,7 @@ interface ConfiguratorState {
   clientData: ClientFormData
   discounts: ConfiguratorDiscount[]
   templateGroupId: string | null
+  deliveryTerms: string
 
   // Actions
   setStep: (step: 1 | 2 | 3 | 4) => void
@@ -27,6 +28,7 @@ interface ConfiguratorState {
   addDiscount: (discount: ConfiguratorDiscount) => void
   removeDiscount: (id: string) => void
   setTemplateGroupId: (id: string | null) => void
+  setDeliveryTerms: (terms: string) => void
   loadFromQuote: (quote: QuoteWithDetails, boatEquipment: EquipmentCategoryWithItems[]) => void
   reset: () => void
 }
@@ -47,6 +49,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
   clientData: { ...initialClientData },
   discounts: [],
   templateGroupId: null,
+  deliveryTerms: '',
 
   setStep: (step) => set({ currentStep: step }),
 
@@ -87,6 +90,8 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
 
   setTemplateGroupId: (id) => set({ templateGroupId: id }),
 
+  setDeliveryTerms: (terms) => set({ deliveryTerms: terms }),
+
   loadFromQuote: (quote, boatEquipment) => {
     // Build equipment map by matching quote_items with actual equipment
     const allItems = boatEquipment.flatMap((cat) => cat.items)
@@ -126,6 +131,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
       },
       discounts,
       templateGroupId: quote.template_group_id ?? null,
+      deliveryTerms: quote.delivery_terms_hr ?? quote.delivery_terms_en ?? '',
     })
   },
 
@@ -137,5 +143,6 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
       clientData: { ...initialClientData },
       discounts: [],
       templateGroupId: null,
+      deliveryTerms: '',
     }),
 }))

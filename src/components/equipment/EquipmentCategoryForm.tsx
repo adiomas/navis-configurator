@@ -130,6 +130,20 @@ export const EquipmentCategoryForm = ({
             </p>
           )}
         </div>
+
+        {/* Discountable toggle */}
+        <div className="flex items-center gap-2">
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              {...register('is_discountable')}
+              className={ds.input.checkbox}
+            />
+            <span className="text-xs text-foreground">
+              {t('equipment.isDiscountable')}
+            </span>
+          </label>
+        </div>
       </form>
     </ResponsiveModal>
   )

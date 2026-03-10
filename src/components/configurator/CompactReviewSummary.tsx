@@ -56,7 +56,17 @@ export function CompactReviewSummary({
   const equipmentAllDiscounts = discounts.filter((d) => d.level === 'equipment_all')
 
   const selectedItems = Array.from(selectedEquipment.values())
-  const priceBreakdown = calculatePriceBreakdown(boat.base_price, selectedItems, discounts)
+
+  const itemDiscountableMap = new Map<string, boolean>()
+  for (const cat of boatEquipment) {
+    for (const item of cat.items) {
+      if (selectedEquipment.has(item.id)) {
+        itemDiscountableMap.set(item.id, item.is_discountable ?? cat.is_discountable ?? true)
+      }
+    }
+  }
+
+  const priceBreakdown = calculatePriceBreakdown(boat.base_price, selectedItems, discounts, itemDiscountableMap)
 
   const getEquipmentItemName = (itemId: string): string => {
     const item = selectedEquipment.get(itemId)

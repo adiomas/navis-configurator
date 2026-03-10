@@ -5,6 +5,7 @@ import { ds } from '@/lib/styles'
 import { useSettings } from '@/hooks/useSettings'
 import { CompanySettingsForm } from '@/components/settings/CompanySettingsForm'
 import { TermsEditor } from '@/components/settings/TermsEditor'
+import { DeliveryTermsEditor } from '@/components/settings/DeliveryTermsEditor'
 import { PDFTemplatesList } from '@/components/settings/PDFTemplatesList'
 import { UsersTab } from '@/components/settings/UsersTab'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
@@ -71,6 +72,15 @@ export default function SettingsPage() {
                 {t('settings.terms')}
               </h3>
               <TermsEditor initialData={settings ?? null} />
+            </section>
+            <section className="border-t border-border/30 pt-5 md:border-0 md:pt-0 md:rounded-lg md:border md:border-border/60 md:bg-white md:p-4">
+              <h3 className={cn(ds.card.title, ds.card.titleMargin)}>
+                {t('settings.deliveryTerms')}
+              </h3>
+              <p className="mb-3 text-xs text-muted-foreground">
+                {t('settings.deliveryTermsHint')}
+              </p>
+              <DeliveryTermsEditor initialData={settings ?? null} />
             </section>
             <section className="border-t border-border/30 pt-5 md:border-0 md:pt-0 md:rounded-lg md:border md:border-border/60 md:bg-white md:p-4">
               <h3 className={cn(ds.card.title, ds.card.titleMargin)}>

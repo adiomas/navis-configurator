@@ -110,7 +110,7 @@ export function useDashboard(timeRange: TimeRange) {
     queryKey: ['dashboard', 'stats', timeRange],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_dashboard_stats', {
-        p_date_from: dateFrom,
+        p_date_from: dateFrom ?? undefined,
       })
       if (error) throw error
       return data as unknown as DashboardRPCResult

@@ -121,6 +121,7 @@ export interface ClientFormData {
   companyName?: string
   notes?: string
   language: 'hr' | 'en'
+  deliveryTerms?: string
 }
 
 // Quote status

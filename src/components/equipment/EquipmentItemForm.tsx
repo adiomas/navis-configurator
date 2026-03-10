@@ -207,7 +207,7 @@ export const EquipmentItemForm = ({
               <p className={ds.input.error}>{errors.price.message}</p>
             )}
           </div>
-          <div className="flex items-end pb-1">
+          <div className="flex flex-col gap-2 pb-1">
             <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
@@ -219,6 +219,31 @@ export const EquipmentItemForm = ({
               </span>
             </label>
           </div>
+        </div>
+
+        {/* Discountable override */}
+        <div>
+          <label className={ds.input.label}>
+            {t('equipment.discountableOverride')}
+          </label>
+          <Controller
+            name="is_discountable"
+            control={control}
+            render={({ field }) => (
+              <select
+                value={field.value === null || field.value === undefined ? 'inherit' : field.value ? 'yes' : 'no'}
+                onChange={(e) => {
+                  const v = e.target.value
+                  field.onChange(v === 'inherit' ? null : v === 'yes')
+                }}
+                className={ds.input.base}
+              >
+                <option value="inherit">{t('equipment.inheritFromCategory')}</option>
+                <option value="yes">{t('equipment.alwaysDiscountable')}</option>
+                <option value="no">{t('equipment.neverDiscountable')}</option>
+              </select>
+            )}
+          />
         </div>
       </form>
     </ResponsiveModal>

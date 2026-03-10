@@ -93,6 +93,7 @@ interface PdfLabels {
   callNumber: string
   authorized: string
   model: string
+  deliveryTerms: string
 }
 
 const labelsHr: PdfLabels = {
@@ -140,6 +141,7 @@ const labelsHr: PdfLabels = {
   callNumber: 'Poziv na broj',
   authorized: 'Ovlašteni Azimut Yachts zastupnik',
   model: 'Model',
+  deliveryTerms: 'Uvjeti isporuke',
 }
 
 const labelsEn: PdfLabels = {
@@ -187,6 +189,7 @@ const labelsEn: PdfLabels = {
   callNumber: 'Reference',
   authorized: 'Authorized Azimut Yachts Dealer',
   model: 'Model',
+  deliveryTerms: 'Terms of Delivery',
 }
 
 /**

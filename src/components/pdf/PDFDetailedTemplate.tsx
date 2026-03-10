@@ -622,10 +622,23 @@ export function PDFDetailedTemplate({
   const stdCol1 = stdEntries.slice(0, stdMid)
   const stdCol2 = stdEntries.slice(stdMid)
 
-  // Top 5 specs
+  // Top 5 specs — filter out price list region and prices note
+  const excludedLabels = ['price list region', 'prices note', 'regija cjenika', 'napomena o cijenama']
   const topSpecs = boatSpecs
-    ? [...boatSpecs].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).slice(0, 5)
+    ? [...boatSpecs]
+        .filter(spec => {
+          const lbl = (spec.label_hr ?? spec.label_en ?? '').toLowerCase()
+          const lblEn = (spec.label_en ?? spec.label_hr ?? '').toLowerCase()
+          return !excludedLabels.some(ex => lbl.includes(ex) || lblEn.includes(ex))
+        })
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .slice(0, 5)
     : []
+
+  // Delivery terms
+  const deliveryTermsText = lang === 'hr'
+    ? (quote.delivery_terms_hr ?? quote.delivery_terms_en ?? '')
+    : (quote.delivery_terms_en ?? quote.delivery_terms_hr ?? '')
 
   // Pricing
   const boatBasePrice = Number(quote.boat_base_price ?? 0)
@@ -776,6 +789,17 @@ export function PDFDetailedTemplate({
               )
             })}
           </View>
+        )}
+
+        {/* Delivery Terms */}
+        {deliveryTermsText && (
+          <>
+            <View style={s.secRow}>
+              <Text style={s.secText}>{labels.deliveryTerms}</Text>
+              <View style={s.secLine} />
+            </View>
+            <Text style={s.noteText}>{deliveryTermsText}</Text>
+          </>
         )}
 
         {/* Standard Equipment */}

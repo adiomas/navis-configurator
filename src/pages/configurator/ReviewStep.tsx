@@ -2,8 +2,11 @@ import { useMemo, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
+import { ds } from '@/lib/styles'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import { useCreateQuote } from '@/hooks/useQuotes'
+import { useSettings } from '@/hooks/useSettings'
 import { CompactReviewSummary } from '@/components/configurator/CompactReviewSummary'
 import type { BoatWithSpecs, EquipmentCategoryWithItems } from '@/types'
 
@@ -13,18 +16,32 @@ interface ReviewStepProps {
 }
 
 export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const lang = i18n.language as 'hr' | 'en'
+  const { data: settings } = useSettings()
   const {
     selectedBoat,
     selectedEquipment,
     clientData,
     discounts,
     templateGroupId,
+    deliveryTerms,
+    setDeliveryTerms,
     reset,
   } = useConfiguratorStore()
 
   const createQuote = useCreateQuote()
+
+  // Prefill delivery terms from company settings if store value is empty
+  useEffect(() => {
+    if (!deliveryTerms && settings) {
+      const defaultTerms = lang === 'hr'
+        ? settings.delivery_terms_hr ?? settings.delivery_terms_en ?? ''
+        : settings.delivery_terms_en ?? settings.delivery_terms_hr ?? ''
+      if (defaultTerms) setDeliveryTerms(defaultTerms)
+    }
+  }, [settings, lang, deliveryTerms, setDeliveryTerms])
 
   const equipmentArray = useMemo(
     () => [...selectedEquipment.values()],
@@ -44,6 +61,7 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
         templateGroupId,
         status,
         categories: boatEquipment,
+        deliveryTerms,
       })
 
       toast.success(
@@ -78,12 +96,28 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
   }
 
   return (
-    <CompactReviewSummary
-      boat={selectedBoat}
-      boatEquipment={boatEquipment}
-      selectedEquipment={selectedEquipment}
-      discounts={discounts}
-      clientData={clientData}
-    />
+    <div className="space-y-4">
+      <CompactReviewSummary
+        boat={selectedBoat}
+        boatEquipment={boatEquipment}
+        selectedEquipment={selectedEquipment}
+        discounts={discounts}
+        clientData={clientData}
+      />
+
+      {/* Delivery Terms */}
+      <div className="rounded-lg border border-border bg-card p-4">
+        <label className={cn(ds.input.label, 'mb-1.5')}>
+          {t('configurator.deliveryTerms')}
+        </label>
+        <textarea
+          value={deliveryTerms}
+          onChange={(e) => setDeliveryTerms(e.target.value)}
+          rows={3}
+          placeholder={t('configurator.deliveryTermsPlaceholder')}
+          className={ds.input.textarea}
+        />
+      </div>
+    </div>
   )
 }
