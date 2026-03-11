@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { X, Pencil, Trash2, Camera, Plus, Check, Copy } from 'lucide-react'
+import { X, Pencil, Trash2, Camera, Plus, Check, Copy, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice } from '@/lib/formatters'
@@ -550,7 +550,10 @@ function SpecificationsTab({
                 ) : (
                   <div
                     key={spec.id}
-                    className="group flex items-center justify-between border-b border-border/50 py-1.5"
+                    className={cn(
+                      'group flex items-center justify-between border-b border-border/50 py-1.5',
+                      spec.show_in_pdf === false && 'opacity-50',
+                    )}
                   >
                     <span className="text-xs text-muted-foreground">
                       {lang === 'hr' ? spec.label_hr : spec.label_en}
@@ -559,6 +562,23 @@ function SpecificationsTab({
                       <span className="text-xs font-medium text-foreground">{spec.value}</span>
                       {isAdmin && (
                         <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateSpec.mutate({
+                                specId: spec.id,
+                                data: { show_in_pdf: spec.show_in_pdf === false },
+                              })
+                            }
+                            className="opacity-0 transition-opacity group-hover:opacity-100"
+                            title={spec.show_in_pdf === false ? t('boats.showInPdf') : t('boats.hideFromPdf')}
+                          >
+                            {spec.show_in_pdf === false ? (
+                              <EyeOff className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                            ) : (
+                              <Eye className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                            )}
+                          </button>
                           <button
                             type="button"
                             onClick={() => startEdit(spec)}

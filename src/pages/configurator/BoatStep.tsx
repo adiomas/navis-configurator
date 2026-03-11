@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice } from '@/lib/formatters'
 import { useDebounce } from '@/hooks/useDebounce'
-import { useBoats, useBoat } from '@/hooks/useBoats'
+import { useBoats, useBoat, useBoatBrands } from '@/hooks/useBoats'
 import { useActiveTemplateGroupIds } from '@/hooks/useTemplateGroups'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import type { Boat, BoatCategory } from '@/types'
@@ -30,6 +30,8 @@ export default function BoatStep() {
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebounce(searchInput, 300)
   const [categoryFilter, setCategoryFilter] = useState<BoatCategory | 'all'>('all')
+  const [brandFilter, setBrandFilter] = useState<string | 'all'>('all')
+  const { data: allBrands } = useBoatBrands()
 
   const lang = i18n.language as 'hr' | 'en'
 
@@ -47,9 +49,20 @@ export default function BoatStep() {
     if (categoryFilter !== 'all') {
       result = result.filter((b) => b.category === categoryFilter)
     }
+    if (brandFilter !== 'all') {
+      result = result.filter((b) => b.brand === brandFilter)
+    }
 
     return result.sort((a, b) => b.base_price - a.base_price)
-  }, [boats, debouncedSearch, categoryFilter, templateBoatIds])
+  }, [boats, debouncedSearch, categoryFilter, brandFilter, templateBoatIds])
+
+  // Brand tabs — filter to brands present in current filtered set when template is active
+  const brandTabs = useMemo(() => {
+    const brandsSource = templateBoatIds
+      ? (boats ?? []).filter((b) => templateBoatIds.has(b.id)).map((b) => b.brand)
+      : allBrands ?? []
+    return [...new Set(brandsSource)].filter(Boolean).sort()
+  }, [allBrands, boats, templateBoatIds])
 
   const categoryTabs: { value: BoatCategory | 'all'; label: string }[] = [
     { value: 'all', label: t('common.all') },
@@ -122,7 +135,7 @@ export default function BoatStep() {
             className={cn(ds.input.base, 'pl-8')}
           />
         </div>
-        <div className="-mx-1 flex overflow-x-auto px-1 sm:mx-0 sm:px-0">
+        <div className="-mx-1 flex flex-wrap gap-2 overflow-x-auto px-1 sm:mx-0 sm:px-0">
           <div className="flex rounded-lg border border-border">
             {categoryTabs.map((tab) => (
               <button
@@ -140,6 +153,18 @@ export default function BoatStep() {
               </button>
             ))}
           </div>
+          {brandTabs.length > 1 && (
+            <select
+              value={brandFilter}
+              onChange={(e) => setBrandFilter(e.target.value)}
+              className={ds.input.select}
+            >
+              <option value="all">{t('configurator.allBrands')}</option>
+              {brandTabs.map((brand) => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 

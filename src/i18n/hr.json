@@ -139,7 +139,11 @@
     "copySpecsFrom": "Kopiraj specifikacije iz...",
     "copySpecsTitle": "Kopiraj specifikacije",
     "copySpecsConfirm": "Kopiraj {{count}} specifikacija iz {{name}}?",
-    "copySpecsSuccess": "Kopirano {{count}} specifikacija"
+    "copySpecsSuccess": "Kopirano {{count}} specifikacija",
+    "showInPdf": "Prikaži u PDF-u",
+    "hideFromPdf": "Sakrij iz PDF-a",
+    "addNewBrand": "Dodaj novu marku...",
+    "selectBrand": "Odaberi marku"
   },
   "equipment": {
     "title": "Oprema",
@@ -193,6 +197,10 @@
     "optionalValue": "Vrijednost opcionalne opreme",
     "manageEquipment": "Upravljaj opremom",
     "noItemsInCategory": "Nema stavki u ovoj kategoriji.",
+    "markStandard": "Označi standardno",
+    "markOptional": "Označi opcionalno",
+    "markStandardSuccess": "{{count}} stavki označeno kao standardno",
+    "markOptionalSuccess": "{{count}} stavki označeno kao opcionalno",
     "isDiscountable": "Stavke u ovoj kategoriji imaju pravo na popust",
     "discountableOverride": "Pravo na popust",
     "inheritFromCategory": "Naslijedi od kategorije",
@@ -219,6 +227,7 @@
     "grandTotal": "Ukupno",
     "saveDraft": "Spremi kao nacrt",
     "saveAndSend": "Spremi i pošalji",
+    "createOffer": "Kreiraj ponudu",
     "selectBoatFirst": "Prvo odaberite jahtu",
     "specifications": "Specifikacije",
     "selectedEquipment": "Odabrana oprema",
@@ -254,6 +263,7 @@
     "standardItem": "Uključeno",
     "quoteSaved": "Ponuda {{number}} spremljena",
     "quoteSent": "Ponuda {{number}} spremljena i poslana",
+    "offerCreated": "Ponuda {{number}} kreirana",
     "saveError": "Greška pri spremanju ponude",
     "addDiscount": "Dodaj popust",
     "removeDiscount": "Ukloni",
@@ -269,7 +279,7 @@
     "equipmentFinalPrice": "Oprema ukupno",
     "boatDiscountHint": "Popust se primjenjuje na osnovnu cijenu broda",
     "equipmentDiscountHint": "Popust se primjenjuje na ukupnu cijenu opreme",
-    "equipmentDiscountNote": "Primjenjuje se samo na stavke s pravom na popust",
+    "templateDiscountsApplied": "Popusti iz predloška su primijenjeni. Možete ih prilagoditi za ovog klijenta.",
     "deliveryTerms": "Uvjeti isporuke",
     "deliveryTermsPlaceholder": "Cijene bez PDV-a, Ex-factory...",
     "perItemDiscounts": "Popusti po stavkama",
@@ -278,7 +288,8 @@
     "apply": "Primijeni",
     "discountOnItem": "Popust na {{name}}",
     "selectContact": "Kontakt osoba",
-    "primary": "Primarni"
+    "primary": "Primarni",
+    "allBrands": "Sve marke"
   },
   "clients": {
     "title": "Klijenti",
@@ -353,7 +364,7 @@
     "amount": "Iznos",
     "date": "Datum",
     "draft": "Nacrt",
-    "sent": "Poslano",
+    "sent": "Ponuda",
     "accepted": "Prihvaćeno",
     "rejected": "Odbijeno",
     "downloadPDF": "Preuzmi PDF",
@@ -426,7 +437,7 @@
   "settings": {
     "title": "Postavke",
     "company": "Tvrtka",
-    "terms": "Uvjeti poslovanja",
+    "terms": "Uvjeti plaćanja",
     "pdfTemplates": "PDF predlošci",
     "companyName": "Naziv tvrtke",
     "oib": "OIB",
@@ -455,8 +466,8 @@
     "website": "Web stranica",
     "city": "Grad",
     "postalCode": "Poštanski broj",
-    "termsHr": "Uvjeti (Hrvatski)",
-    "termsEn": "Uvjeti (Engleski)",
+    "termsHr": "Uvjeti plaćanja (Hrvatski)",
+    "termsEn": "Uvjeti plaćanja (Engleski)",
     "termsSaveSuccess": "Uvjeti uspješno spremljeni",
     "termsSaveError": "Greška pri spremanju uvjeta",
     "deliveryTerms": "Zadani uvjeti isporuke",
@@ -521,7 +532,8 @@
     "createQuotes": "Kreiraj {{count}} ponuda",
     "creatingQuotes": "Kreiranje {{current}} od {{total}}...",
     "quotesCreated": "{{count}} ponuda kreirano",
-    "selectedClients": "{{count}} klijenata odabrano"
+    "selectedClients": "{{count}} klijenata odabrano",
+    "adjustDiscounts": "Prilagodi popuste"
   },
   "users": {
     "title": "Korisnici",
@@ -576,7 +588,7 @@
     "subtotal": "Međuzbroj",
     "discount": "Popust",
     "total": "Ukupno",
-    "termsAndConditions": "Uvjeti poslovanja",
+    "termsAndConditions": "Uvjeti plaćanja",
     "signature": "Potpis",
     "seller": "Prodavatelj",
     "buyer": "Kupac",

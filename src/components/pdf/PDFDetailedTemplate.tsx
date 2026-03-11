@@ -211,34 +211,40 @@ const s = StyleSheet.create({
     color: NAVY,
   },
 
-  // ── Specs ──
-  specsRow: {
-    flexDirection: 'row',
+  // ── Specs (compact 2-col key-value) ──
+  specsContainer: {
+    borderTopWidth: 1.5,
+    borderTopColor: GOLD,
+    backgroundColor: BG_LIGHT,
+    borderRadius: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     marginBottom: 12,
+    flexDirection: 'row',
+    gap: 20,
   },
-  specCell: {
+  specsCol: {
     flex: 1,
-    paddingVertical: 5,
-    alignItems: 'center',
   },
-  specCellBorder: {
-    flex: 1,
-    paddingVertical: 5,
-    alignItems: 'center',
-    borderRightWidth: 0.75,
-    borderRightColor: BORDER_LIGHT,
+  specRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    paddingVertical: 2,
+    borderBottomWidth: 0.5,
+    borderBottomColor: BORDER_LIGHT,
   },
   specLbl: {
-    fontSize: 5.5,
+    fontSize: 6,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
+    letterSpacing: 0.6,
     color: TEXT_LIGHT,
-    marginBottom: 1.5,
   },
   specVal: {
-    fontSize: 9,
+    fontSize: 7.5,
     fontWeight: 700,
     color: NAVY,
+    textAlign: 'right',
   },
 
   // ── Section divider ──
@@ -573,6 +579,11 @@ const s = StyleSheet.create({
   },
 })
 
+function splitHalf<T>(items: T[]): [T[], T[]] {
+  const mid = Math.ceil(items.length / 2)
+  return [items.slice(0, mid), items.slice(mid)]
+}
+
 export function PDFDetailedTemplate({
   quote,
   settings,
@@ -629,10 +640,10 @@ export function PDFDetailedTemplate({
         .filter(spec => {
           const lbl = (spec.label_hr ?? spec.label_en ?? '').toLowerCase()
           const lblEn = (spec.label_en ?? spec.label_hr ?? '').toLowerCase()
-          return !excludedLabels.some(ex => lbl.includes(ex) || lblEn.includes(ex))
+          if (excludedLabels.some(ex => lbl.includes(ex) || lblEn.includes(ex))) return false
+          return spec.show_in_pdf !== false
         })
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-        .slice(0, 5)
     : []
 
   // Delivery terms
@@ -773,23 +784,31 @@ export function PDFDetailedTemplate({
           </View>
         )}
 
-        {/* Specs row */}
-        {topSpecs.length > 0 && (
-          <View style={s.specsRow}>
-            {topSpecs.map((spec, idx) => {
-              const specLabel = lang === 'hr'
-                ? (spec.label_hr ?? spec.label_en ?? '')
-                : (spec.label_en ?? spec.label_hr ?? '')
-              const isLast = idx === topSpecs.length - 1
-              return (
-                <View key={spec.id} style={isLast ? s.specCell : s.specCellBorder}>
-                  <Text style={s.specLbl}>{specLabel}</Text>
-                  <Text style={s.specVal}>{spec.value ?? '—'}</Text>
-                </View>
-              )
-            })}
-          </View>
-        )}
+        {/* Specs — compact 2-column key-value */}
+        {topSpecs.length > 0 && (() => {
+          const [specsCol1, specsCol2] = splitHalf(topSpecs)
+          const renderSpecCol = (specs: typeof topSpecs) => (
+            <View style={s.specsCol}>
+              {specs.map((spec) => {
+                const specLabel = lang === 'hr'
+                  ? (spec.label_hr ?? spec.label_en ?? '')
+                  : (spec.label_en ?? spec.label_hr ?? '')
+                return (
+                  <View key={spec.id} style={s.specRow}>
+                    <Text style={s.specLbl}>{specLabel}</Text>
+                    <Text style={s.specVal}>{spec.value ?? '—'}</Text>
+                  </View>
+                )
+              })}
+            </View>
+          )
+          return (
+            <View style={s.specsContainer}>
+              {renderSpecCol(specsCol1)}
+              {specsCol2.length > 0 && renderSpecCol(specsCol2)}
+            </View>
+          )
+        })()}
 
         {/* Delivery Terms */}
         {deliveryTermsText && (
@@ -971,7 +990,7 @@ export function PDFDetailedTemplate({
 
           {terms && (
             <View style={s.termsWrap}>
-              <Text style={s.termsTitle}>{labels.termsAndConditions}</Text>
+              <Text style={s.termsTitle}>{labels.termsOfPayment}</Text>
               <Text style={s.termsBody}>{terms}</Text>
             </View>
           )}

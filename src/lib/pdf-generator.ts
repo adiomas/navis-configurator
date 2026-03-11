@@ -59,7 +59,7 @@ interface PdfLabels {
   subtotal: string
   discount: string
   total: string
-  termsAndConditions: string
+  termsOfPayment: string
   scanToPay: string
   basePrice: string
   equipmentTotal: string
@@ -107,7 +107,7 @@ const labelsHr: PdfLabels = {
   subtotal: 'Međuzbroj',
   discount: 'Popust',
   total: 'Ukupno',
-  termsAndConditions: 'Uvjeti poslovanja',
+  termsOfPayment: 'Uvjeti plaćanja',
   scanToPay: 'Skenirajte za uplatu',
   basePrice: 'Osnovna cijena',
   equipmentTotal: 'Ukupno oprema',
@@ -155,7 +155,7 @@ const labelsEn: PdfLabels = {
   subtotal: 'Subtotal',
   discount: 'Discount',
   total: 'Total',
-  termsAndConditions: 'Terms & Conditions',
+  termsOfPayment: 'Terms of Payment',
   scanToPay: 'Scan to pay',
   basePrice: 'Base Price',
   equipmentTotal: 'Equipment Total',

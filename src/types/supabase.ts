@@ -57,6 +57,7 @@ export type Database = {
           id: string
           label_en: string | null
           label_hr: string | null
+          show_in_pdf: boolean
           sort_order: number
           value: string | null
         }
@@ -66,6 +67,7 @@ export type Database = {
           id?: string
           label_en?: string | null
           label_hr?: string | null
+          show_in_pdf?: boolean
           sort_order?: number
           value?: string | null
         }
@@ -75,6 +77,7 @@ export type Database = {
           id?: string
           label_en?: string | null
           label_hr?: string | null
+          show_in_pdf?: boolean
           sort_order?: number
           value?: string | null
         }

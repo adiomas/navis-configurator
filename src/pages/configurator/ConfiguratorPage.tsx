@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, Check, Save, Send } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Save, FileCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { useConfiguratorStore } from '@/stores/configurator-store'
@@ -233,8 +233,8 @@ export default function ConfiguratorPage() {
                   onClick={() => document.dispatchEvent(new CustomEvent('configurator:save', { detail: 'sent' }))}
                   className={cn(ds.btn.base, ds.btn.md, ds.btn.primary)}
                 >
-                  <Send className="h-3.5 w-3.5" />
-                  {t('configurator.saveAndSend')}
+                  <FileCheck className="h-3.5 w-3.5" />
+                  {t('configurator.createOffer')}
                 </button>
               </>
             ) : (

@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Ship, Check, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { ResponsiveModal } from '@/components/ui/ResponsiveModal'
 import { ClientSelector } from '@/components/configurator/ClientSelector'
+import { DiscountSection } from '@/components/configurator/CompactDiscountEditor'
 import { CompanyForm } from '@/components/clients/CompanyForm'
 import { useTemplateGroup } from '@/hooks/useTemplateGroups'
 import { useCreateQuote } from '@/hooks/useQuotes'
@@ -54,23 +55,49 @@ export const QuickQuoteModal = ({
       .map((e) => e.item)
   }, [group, effectiveBoatId])
 
-  // Map template discounts to ConfiguratorDiscount format
-  const discounts = useMemo((): ConfiguratorDiscount[] => {
-    if (!group) return []
-    return group.discounts.map((d, i) => ({
-      id: `tpl-${i}`,
-      level: d.discount_level as ConfiguratorDiscount['level'],
-      type: d.discount_type as ConfiguratorDiscount['type'],
-      value: d.value,
-      description: d.description ?? undefined,
-    }))
+  // Local editable discounts — initialized from template, user can adjust
+  const [localDiscounts, setLocalDiscounts] = useState<ConfiguratorDiscount[]>([])
+
+  useEffect(() => {
+    if (!group) return
+    setLocalDiscounts(
+      group.discounts.map((d, i) => ({
+        id: `tpl-${i}`,
+        level: d.discount_level as ConfiguratorDiscount['level'],
+        type: d.discount_type as ConfiguratorDiscount['type'],
+        value: d.value,
+        description: d.description ?? undefined,
+      }))
+    )
   }, [group])
+
+  const addLocalDiscount = useCallback((d: ConfiguratorDiscount) => {
+    setLocalDiscounts((prev) => [...prev, d])
+  }, [])
+
+  const removeLocalDiscount = useCallback((id: string) => {
+    setLocalDiscounts((prev) => prev.filter((d) => d.id !== id))
+  }, [])
 
   // Get boat base price (special price from template or original)
   const selectedTemplateBoat = boats.find((b) => b.boat_id === effectiveBoatId)
   const selectedBoatData = boats.find((b) => b.boat_id === effectiveBoatId)?.boat
   const boatBasePrice =
     selectedTemplateBoat?.special_price ?? selectedBoatData?.base_price ?? 0
+
+  const equipmentSubtotal = useMemo(
+    () => templateEquipment.reduce((sum, item) => sum + Number(item.price ?? 0), 0),
+    [templateEquipment],
+  )
+
+  const boatDiscounts = useMemo(
+    () => localDiscounts.filter((d) => d.level === 'boat_base'),
+    [localDiscounts],
+  )
+  const equipmentDiscounts = useMemo(
+    () => localDiscounts.filter((d) => d.level === 'equipment_all'),
+    [localDiscounts],
+  )
 
   const canCreate = !!effectiveBoatId && selectedCompanies.length > 0
 
@@ -119,7 +146,7 @@ export const QuickQuoteModal = ({
             language: (company.preferred_language as 'hr' | 'en') ?? 'hr',
           },
           selectedEquipment: templateEquipment,
-          discounts,
+          discounts: localDiscounts,
           templateGroupId,
           status: 'draft',
           categories: boatEquipment,
@@ -143,6 +170,7 @@ export const QuickQuoteModal = ({
     onOpenChange(false)
     setSelectedBoatId(null)
     setSelectedCompanies([])
+    setLocalDiscounts([])
   }
 
   return (
@@ -274,6 +302,37 @@ export const QuickQuoteModal = ({
                 onToggleCompany={handleToggleCompany}
               />
             </div>
+
+            {/* Discounts (optional adjustments) */}
+            {effectiveBoatId && (
+              <div>
+                <h4 className="mb-3 text-sm font-medium text-foreground">
+                  {t('templateGroups.adjustDiscounts')}
+                </h4>
+                <div className="space-y-1.5">
+                  <DiscountSection
+                    title={t('configurator.boatDiscount')}
+                    hint={t('configurator.boatDiscountHint')}
+                    level="boat_base"
+                    baseAmount={boatBasePrice}
+                    activeDiscounts={boatDiscounts}
+                    addDiscount={addLocalDiscount}
+                    removeDiscount={removeLocalDiscount}
+                    t={t}
+                  />
+                  <DiscountSection
+                    title={t('configurator.equipmentWideDiscount')}
+                    hint={t('configurator.equipmentDiscountHint')}
+                    level="equipment_all"
+                    baseAmount={equipmentSubtotal}
+                    activeDiscounts={equipmentDiscounts}
+                    addDiscount={addLocalDiscount}
+                    removeDiscount={removeLocalDiscount}
+                    t={t}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Create button */}
             <div className="flex items-center justify-end gap-3 border-t border-border pt-4">

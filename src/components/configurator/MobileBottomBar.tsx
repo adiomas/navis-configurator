@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, ChevronUp, Save, Send, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronUp, Save, FileCheck, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice } from '@/lib/formatters'
@@ -113,8 +113,8 @@ export function MobileBottomBar({
                 onClick={() => document.dispatchEvent(new CustomEvent('configurator:save', { detail: 'sent' }))}
                 className={cn(ds.btn.base, 'h-10 shrink-0 rounded-lg bg-primary px-3.5 text-xs font-medium text-white hover:bg-primary/90')}
               >
-                <Send className="h-4 w-4" />
-                {t('configurator.saveAndSend')}
+                <FileCheck className="h-4 w-4" />
+                {t('configurator.createOffer')}
               </button>
             </>
           ) : (

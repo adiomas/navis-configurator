@@ -22,13 +22,20 @@ interface DiscountRow {
 
 export function CompactDiscountEditor({ boatBasePrice, equipmentSubtotal, discountableEquipmentSubtotal }: CompactDiscountEditorProps) {
   const { t } = useTranslation()
-  const { discounts, addDiscount, removeDiscount } = useConfiguratorStore()
+  const { discounts, addDiscount, removeDiscount, templateGroupId } = useConfiguratorStore()
 
   const boatDiscounts = discounts.filter((d) => d.level === 'boat_base')
   const equipmentDiscounts = discounts.filter((d) => d.level === 'equipment_all')
 
   return (
     <div className="space-y-1.5">
+      {templateGroupId && (
+        <div className="flex items-start gap-2 rounded-lg border-l-2 border-l-gold bg-gold/5 px-3 py-2">
+          <span className="text-[11px] leading-relaxed text-muted-foreground">
+            {t('configurator.templateDiscountsApplied')}
+          </span>
+        </div>
+      )}
       <DiscountSection
         title={t('configurator.boatDiscount')}
         hint={t('configurator.boatDiscountHint')}
@@ -41,7 +48,7 @@ export function CompactDiscountEditor({ boatBasePrice, equipmentSubtotal, discou
       />
       <DiscountSection
         title={t('configurator.equipmentWideDiscount')}
-        hint={t('configurator.equipmentDiscountNote')}
+        hint={t('configurator.equipmentDiscountHint')}
         level="equipment_all"
         baseAmount={discountableEquipmentSubtotal ?? equipmentSubtotal}
         activeDiscounts={equipmentDiscounts}
@@ -64,7 +71,7 @@ interface DiscountSectionProps {
   t: (key: string) => string
 }
 
-function DiscountSection({
+export function DiscountSection({
   title,
   hint,
   level,

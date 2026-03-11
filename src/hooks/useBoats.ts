@@ -86,6 +86,22 @@ export function useBoatEquipment(boatId: string | undefined) {
   })
 }
 
+// --- Boat Brands ---
+
+export function useBoatBrands() {
+  return useQuery<string[]>({
+    queryKey: ['boat-brands'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('boats')
+        .select('brand')
+        .eq('status', 'active')
+      return [...new Set(data?.map((b) => b.brand).filter(Boolean) ?? [])].sort()
+    },
+    staleTime: 10 * 60 * 1000,
+  })
+}
+
 // --- Boat Mutations ---
 
 export function useCreateBoat() {
@@ -275,7 +291,7 @@ export function useUpdateBoatSpec(boatId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ specId, data }: { specId: string; data: { label_hr?: string; label_en?: string; value?: string } }) => {
+    mutationFn: async ({ specId, data }: { specId: string; data: { label_hr?: string; label_en?: string; value?: string; show_in_pdf?: boolean } }) => {
       const { error } = await supabase
         .from('boat_specs')
         .update(data)

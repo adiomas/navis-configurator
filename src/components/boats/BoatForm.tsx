@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { boatSchema, type BoatFormData } from '@/lib/validators'
+import { useBoatBrands } from '@/hooks/useBoats'
 
 interface BoatFormProps {
   defaultValues?: Partial<BoatFormData>
@@ -23,10 +24,14 @@ export const BoatForm = ({
 }: BoatFormProps) => {
   const { t } = useTranslation()
   const [descLang, setDescLang] = useState<'hr' | 'en'>('hr')
+  const [showNewBrand, setShowNewBrand] = useState(false)
+  const { data: existingBrands } = useBoatBrands()
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<BoatFormData>({
     resolver: zodResolver(boatSchema),
@@ -57,10 +62,42 @@ export const BoatForm = ({
           <label className={ds.input.label}>
             {t('boats.brand')}
           </label>
-          <input
-            {...register('brand')}
-            className={ds.input.base}
-          />
+          {showNewBrand ? (
+            <div className="flex gap-1.5">
+              <input
+                {...register('brand')}
+                className={cn(ds.input.base, 'flex-1')}
+                autoFocus
+                placeholder={t('boats.addNewBrand')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewBrand(false)}
+                className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'shrink-0')}
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          ) : (
+            <select
+              value={watch('brand') ?? ''}
+              onChange={(e) => {
+                if (e.target.value === '__new__') {
+                  setValue('brand', '')
+                  setShowNewBrand(true)
+                } else {
+                  setValue('brand', e.target.value)
+                }
+              }}
+              className={ds.input.select}
+            >
+              <option value="">{t('boats.selectBrand')}</option>
+              {(existingBrands ?? []).map((brand) => (
+                <option key={brand} value={brand}>{brand}</option>
+              ))}
+              <option value="__new__">{t('boats.addNewBrand')}</option>
+            </select>
+          )}
         </div>
       </div>
 

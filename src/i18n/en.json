@@ -139,7 +139,11 @@
     "copySpecsFrom": "Copy specs from...",
     "copySpecsTitle": "Copy Specifications",
     "copySpecsConfirm": "Copy {{count}} specification(s) from {{name}}?",
-    "copySpecsSuccess": "Copied {{count}} specification(s)"
+    "copySpecsSuccess": "Copied {{count}} specification(s)",
+    "showInPdf": "Show in PDF",
+    "hideFromPdf": "Hide from PDF",
+    "addNewBrand": "Add new brand...",
+    "selectBrand": "Select brand"
   },
   "equipment": {
     "title": "Equipment",
@@ -193,6 +197,10 @@
     "optionalValue": "Optional Equipment Value",
     "manageEquipment": "Manage Equipment",
     "noItemsInCategory": "No items in this category.",
+    "markStandard": "Mark standard",
+    "markOptional": "Mark optional",
+    "markStandardSuccess": "{{count}} items marked as standard",
+    "markOptionalSuccess": "{{count}} items marked as optional",
     "isDiscountable": "Items in this category are discountable",
     "discountableOverride": "Discount eligibility",
     "inheritFromCategory": "Inherit from category",
@@ -219,6 +227,7 @@
     "grandTotal": "Grand Total",
     "saveDraft": "Save as Draft",
     "saveAndSend": "Save & Send",
+    "createOffer": "Create Offer",
     "selectBoatFirst": "Select a boat first",
     "specifications": "Specifications",
     "selectedEquipment": "Selected Equipment",
@@ -254,6 +263,7 @@
     "standardItem": "Included",
     "quoteSaved": "Quote {{number}} saved",
     "quoteSent": "Quote {{number}} saved & sent",
+    "offerCreated": "Offer {{number}} created",
     "saveError": "Failed to save quote",
     "addDiscount": "Add Discount",
     "removeDiscount": "Remove",
@@ -269,7 +279,7 @@
     "equipmentFinalPrice": "Equipment Final",
     "boatDiscountHint": "Discount applied to boat base price",
     "equipmentDiscountHint": "Discount applied to total equipment price",
-    "equipmentDiscountNote": "Applies only to discountable items",
+    "templateDiscountsApplied": "Template discounts applied. You can adjust them for this client.",
     "deliveryTerms": "Terms of Delivery",
     "deliveryTermsPlaceholder": "Prices exclusive of VAT, Ex-factory...",
     "perItemDiscounts": "Per-Item Discounts",
@@ -278,7 +288,8 @@
     "apply": "Apply",
     "discountOnItem": "Discount on {{name}}",
     "selectContact": "Contact person",
-    "primary": "Primary"
+    "primary": "Primary",
+    "allBrands": "All Brands"
   },
   "clients": {
     "title": "Clients",
@@ -353,7 +364,7 @@
     "amount": "Amount",
     "date": "Date",
     "draft": "Draft",
-    "sent": "Sent",
+    "sent": "Offer",
     "accepted": "Accepted",
     "rejected": "Rejected",
     "downloadPDF": "Download PDF",
@@ -426,7 +437,7 @@
   "settings": {
     "title": "Settings",
     "company": "Company",
-    "terms": "Terms & Conditions",
+    "terms": "Terms of Payment",
     "pdfTemplates": "PDF Templates",
     "companyName": "Company Name",
     "oib": "OIB (Tax ID)",
@@ -455,8 +466,8 @@
     "website": "Website",
     "city": "City",
     "postalCode": "Postal Code",
-    "termsHr": "Terms (Croatian)",
-    "termsEn": "Terms (English)",
+    "termsHr": "Payment Terms (Croatian)",
+    "termsEn": "Payment Terms (English)",
     "termsSaveSuccess": "Terms saved successfully",
     "termsSaveError": "Failed to save terms",
     "deliveryTerms": "Default Delivery Terms",
@@ -521,7 +532,8 @@
     "createQuotes": "Create {{count}} Quotes",
     "creatingQuotes": "Creating {{current}} of {{total}}...",
     "quotesCreated": "{{count}} quotes created",
-    "selectedClients": "{{count}} clients selected"
+    "selectedClients": "{{count}} clients selected",
+    "adjustDiscounts": "Adjust Discounts"
   },
   "users": {
     "title": "Users",
@@ -576,7 +588,7 @@
     "subtotal": "Subtotal",
     "discount": "Discount",
     "total": "Total",
-    "termsAndConditions": "Terms & Conditions",
+    "termsAndConditions": "Terms of Payment",
     "signature": "Signature",
     "seller": "Seller",
     "buyer": "Buyer",

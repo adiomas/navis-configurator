@@ -67,7 +67,7 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
       toast.success(
         status === 'draft'
           ? t('configurator.quoteSaved', { number: quote.quote_number })
-          : t('configurator.quoteSent', { number: quote.quote_number }),
+          : t('configurator.offerCreated', { number: quote.quote_number }),
       )
 
       reset()
