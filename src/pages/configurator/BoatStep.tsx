@@ -124,8 +124,8 @@ export default function BoatStep() {
       )}
 
       {/* Search + filters */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-xs flex-1">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative w-full sm:w-auto sm:min-w-[200px] sm:flex-1 sm:max-w-xs">
           <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
@@ -135,37 +135,35 @@ export default function BoatStep() {
             className={cn(ds.input.base, 'pl-8')}
           />
         </div>
-        <div className="-mx-1 flex flex-wrap gap-2 overflow-x-auto px-1 sm:mx-0 sm:px-0">
-          <div className="flex rounded-lg border border-border">
-            {categoryTabs.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setCategoryFilter(tab.value)}
-                className={cn(
-                  'whitespace-nowrap px-2.5 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
-                  categoryFilter === tab.value
-                    ? 'bg-navy text-white'
-                    : 'text-muted-foreground hover:bg-muted',
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-          {brandTabs.length > 1 && (
-            <select
-              value={brandFilter}
-              onChange={(e) => setBrandFilter(e.target.value)}
-              className={ds.input.select}
+        <div className="flex rounded-lg border border-border">
+          {categoryTabs.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => setCategoryFilter(tab.value)}
+              className={cn(
+                'whitespace-nowrap px-2.5 py-1.5 text-xs font-medium transition-colors first:rounded-l-lg last:rounded-r-lg',
+                categoryFilter === tab.value
+                  ? 'bg-navy text-white'
+                  : 'text-muted-foreground hover:bg-muted',
+              )}
             >
-              <option value="all">{t('configurator.allBrands')}</option>
-              {brandTabs.map((brand) => (
-                <option key={brand} value={brand}>{brand}</option>
-              ))}
-            </select>
-          )}
+              {tab.label}
+            </button>
+          ))}
         </div>
+        {brandTabs.length > 1 && (
+          <select
+            value={brandFilter}
+            onChange={(e) => setBrandFilter(e.target.value)}
+            className={cn(ds.input.select, 'w-auto')}
+          >
+            <option value="all">{t('configurator.allBrands')}</option>
+            {brandTabs.map((brand) => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Boat grid — responsive cards */}
