@@ -380,7 +380,7 @@ export default function ClientDetailPage() {
                       <td className={ds.table.cell}>
                         <span className="font-medium text-navy">{quote.quote_number}</span>
                       </td>
-                      <td className={cn(ds.table.cell, 'text-muted-foreground')}>
+                      <td className={cn(ds.table.cell, 'max-w-[200px] truncate text-muted-foreground')}>
                         {quote.boat ? `${quote.boat.brand} ${quote.boat.name}` : '—'}
                       </td>
                       <td className={ds.table.cell}>
@@ -500,7 +500,7 @@ function InfoItem({
             {value}
           </a>
         ) : (
-          <p className="mt-0.5 text-xs text-foreground">{value}</p>
+          <p className="mt-0.5 break-words text-xs text-foreground">{value}</p>
         )}
       </div>
     </div>

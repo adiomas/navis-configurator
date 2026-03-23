@@ -59,7 +59,7 @@ export default function DashboardLayout() {
       {/* Main area — offset for desktop sidebar */}
       <div
         className={cn(
-          'flex flex-1 flex-col transition-[margin] duration-200',
+          'flex min-w-0 flex-1 flex-col transition-[margin] duration-200',
           isCollapsed ? 'md:ml-14' : 'md:ml-56'
         )}
       >

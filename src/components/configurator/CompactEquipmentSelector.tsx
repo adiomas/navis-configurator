@@ -160,12 +160,12 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                           </div>
 
                           {/* Name + description + discount badge */}
-                          <div className="min-w-0 flex-1">
-                            <span className="text-xs font-medium text-foreground">
+                          <div className="min-w-0 flex-1 overflow-hidden">
+                            <span className="break-words text-xs font-medium text-foreground">
                               {getItemName(item)}
                             </span>
                             {(item.description_hr || item.description_en) && (
-                              <p className="truncate text-[11px] text-muted-foreground">
+                              <p className="truncate break-words text-[11px] text-muted-foreground">
                                 {lang === 'hr' ? item.description_hr : item.description_en}
                               </p>
                             )}

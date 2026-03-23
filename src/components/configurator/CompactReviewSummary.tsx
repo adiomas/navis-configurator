@@ -109,8 +109,8 @@ export function CompactReviewSummary({
               {equipmentItemDiscounts.map((d) => {
                 const itemName = d.equipmentItemId ? getEquipmentItemName(d.equipmentItemId) : ''
                 return (
-                  <div key={d.id} className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">
+                  <div key={d.id} className="flex justify-between gap-2 text-xs">
+                    <span className="min-w-0 truncate text-muted-foreground">
                       {itemName}{d.description ? ` — ${d.description}` : ''}
                     </span>
                     <span className="font-medium text-red-600">
@@ -238,9 +238,9 @@ export function CompactReviewSummary({
                     {catSelectedItems.map((item) => (
                       <li
                         key={item.id}
-                        className="flex items-center justify-between py-0.5 text-xs"
+                        className="flex items-center justify-between gap-2 py-0.5 text-xs"
                       >
-                        <span className="text-foreground">
+                        <span className="min-w-0 truncate text-foreground">
                           {getLocalizedName(item, lang)}
                         </span>
                         {item.is_standard ? (

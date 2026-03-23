@@ -415,8 +415,8 @@ export default function QuoteDetailPage() {
             {quote.discounts.length > 0 && (
               <div className="space-y-1 border-t border-gold/20 pt-2">
                 {quote.discounts.map((d) => (
-                  <div key={d.id} className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">
+                  <div key={d.id} className="flex justify-between gap-2 text-xs">
+                    <span className="min-w-0 truncate text-muted-foreground">
                       {d.description
                         ?? (d.discount_level === 'boat_base' ? t('configurator.boatDiscount')
                           : d.discount_level === 'equipment_all' ? t('configurator.equipmentWideDiscount')
