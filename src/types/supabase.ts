@@ -945,13 +945,16 @@ export type Database = {
     }
     Functions: {
       generate_quote_number: { Args: never; Returns: string }
+      import_boat_from_pricelist: {
+        Args: { payload: Json }
+        Returns: Json
+      }
       get_dashboard_stats: { Args: { p_date_from?: string }; Returns: Json }
       get_quote_status_counts: {
         Args: { p_template_group_id?: string }
         Returns: Json
       }
       get_template_group_quote_counts: { Args: never; Returns: Json }
-      import_boat_from_pricelist: { Args: { payload: Json }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       set_primary_boat_image: {
         Args: { p_boat_id: string; p_image_id: string }

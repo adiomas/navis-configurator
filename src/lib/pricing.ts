@@ -22,7 +22,7 @@ function applyDiscounts(amount: number, discounts: ConfiguratorDiscount[]): numb
 /**
  * Calculate total discount amount from a list of discounts on a base amount.
  */
-function calculateDiscountAmount(amount: number, discounts: ConfiguratorDiscount[]): number {
+export function calculateDiscountAmount(amount: number, discounts: ConfiguratorDiscount[]): number {
   return amount - applyDiscounts(amount, discounts)
 }
 

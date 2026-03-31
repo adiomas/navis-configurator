@@ -79,7 +79,7 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
           return (
             <div
               key={category.id}
-              className="relative rounded-lg border border-border bg-card"
+              className="relative overflow-hidden rounded-lg border border-border bg-card"
             >
               {/* Category header */}
               <button

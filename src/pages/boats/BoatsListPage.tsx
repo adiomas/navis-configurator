@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, ArrowUpDown } from 'lucide-react'
+import { Search, Plus, ArrowUpDown, FileUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { useBoats } from '@/hooks/useBoats'
@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useQueryParam } from '@/hooks/useQueryParams'
 import { BoatGrid } from '@/components/boats/BoatGrid'
 import { BoatDetailPanel } from '@/components/boats/BoatDetailPanel'
+import { PriceImportModal } from '@/components/boats/PriceImportModal'
 import type { BoatCategory } from '@/types'
 
 type SortOption = 'price_desc' | 'price_asc' | 'name' | 'year'
@@ -27,6 +28,7 @@ export default function BoatsListPage() {
 
   const [searchInput, setSearchInput] = useState(search)
   const [panelMode, setPanelMode] = useState<'view' | 'edit' | 'create'>('view')
+  const [importModalOpen, setImportModalOpen] = useState(false)
 
   const selectedBoatId = boatParam || null
   const isPanelOpen = !!selectedBoatId || panelMode === 'create'
@@ -90,6 +92,11 @@ export default function BoatsListPage() {
     setPanelMode('view')
   }, [setBoatParam])
 
+  const handleImportSuccess = useCallback((boatId: string) => {
+    setBoatParam(boatId)
+    setPanelMode('view')
+  }, [setBoatParam])
+
   const categoryTabs: { value: BoatCategory | 'all'; label: string }[] = [
     { value: 'all', label: t('common.all') },
     { value: 'new', label: t('boats.new') },
@@ -111,14 +118,24 @@ export default function BoatsListPage() {
           {t('boats.title')}
         </h1>
         {isAdmin && (
-          <button
-            type="button"
-            onClick={handleAddBoat}
-            className={cn(ds.btn.base, ds.btn.md, ds.btn.primary)}
-          >
-            <Plus className="h-4 w-4" />
-            {t('boats.addBoat')}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setImportModalOpen(true)}
+              className={cn(ds.btn.base, ds.btn.md, ds.btn.secondary)}
+            >
+              <FileUp className="h-4 w-4" />
+              {t('boats.importFromPriceList')}
+            </button>
+            <button
+              type="button"
+              onClick={handleAddBoat}
+              className={cn(ds.btn.base, ds.btn.md, ds.btn.primary)}
+            >
+              <Plus className="h-4 w-4" />
+              {t('boats.addBoat')}
+            </button>
+          </div>
         )}
       </div>
 
@@ -227,6 +244,13 @@ export default function BoatsListPage() {
           </div>
         </div>
       )}
+
+      {/* Price Import Modal */}
+      <PriceImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        onSuccess={handleImportSuccess}
+      />
     </div>
   )
 }

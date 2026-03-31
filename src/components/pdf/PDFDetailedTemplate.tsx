@@ -862,6 +862,13 @@ export function PDFDetailedTemplate({
                   const itemPrice = Number(item.price ?? 0)
                   const itemDiscount = Number(item.item_discount ?? 0)
                   const netPrice = itemPrice - itemDiscount
+                  const discountType = item.item_discount_type as string | null
+                  const discountValue = Number(item.item_discount_value ?? 0)
+                  const discountDisplay = itemDiscount > 0
+                    ? discountType === 'percentage'
+                      ? `-${discountValue}%`
+                      : `-${formatPrice(itemDiscount)}`
+                    : null
                   return (
                     <View key={item.id} style={s.row}>
                       <View style={s.colName}>
@@ -871,8 +878,8 @@ export function PDFDetailedTemplate({
                         <Text style={s.cellPrice}>{formatPrice(itemPrice)}</Text>
                       </View>
                       <View style={s.colDisc}>
-                        {itemDiscount > 0 && (
-                          <Text style={s.cellDisc}>-{formatPrice(itemDiscount)}</Text>
+                        {discountDisplay && (
+                          <Text style={s.cellDisc}>{discountDisplay}</Text>
                         )}
                       </View>
                       <View style={s.colNet}>

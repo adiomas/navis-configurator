@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import { calculatePriceBreakdown } from '@/lib/pricing'
+import { calculatePriceBreakdown, calculateDiscountAmount } from '@/lib/pricing'
 import type {
   ClientFormData,
   ConfiguratorDiscount,
@@ -285,6 +285,9 @@ export function useCopyQuote() {
           name_hr: item.name_hr as string,
           name_en: item.name_en as string,
           price: item.price as number,
+          item_discount: (item.item_discount as number) ?? 0,
+          item_discount_type: (item.item_discount_type as string | null) ?? null,
+          item_discount_value: (item.item_discount_value as number) ?? 0,
           item_type: item.item_type as string,
           sort_order: index,
           category_name_hr: item.category_name_hr as string | null,
@@ -446,18 +449,33 @@ export function useCreateQuote() {
 
       // Insert quote items (snapshot of equipment)
       if (selectedEquipment.length > 0) {
-        const quoteItems: QuoteItemInsert[] = selectedEquipment.map((item, index) => ({
-          quote_id: quote.id,
-          equipment_item_id: item.id,
-          name_hr: item.name_hr,
-          name_en: item.name_en,
-          price: item.price,
-          item_type: item.is_standard ? 'equipment_standard' : 'equipment_optional',
-          sort_order: index,
-          category_name_hr: categoryMap.get(item.id)?.name_hr ?? null,
-          category_name_en: categoryMap.get(item.id)?.name_en ?? null,
-          is_discountable: itemDiscountableMap.get(item.id) ?? true,
-        }))
+        const quoteItems: QuoteItemInsert[] = selectedEquipment.map((item, index) => {
+          const itemDiscounts = discounts.filter(
+            d => d.level === 'equipment_item' && d.equipmentItemId === item.id,
+          )
+          const itemDiscountAmount = itemDiscounts.length > 0
+            ? calculateDiscountAmount(item.price, itemDiscounts)
+            : 0
+
+          // Store discount type & raw value for PDF display (single discount case)
+          const singleDiscount = itemDiscounts.length === 1 ? itemDiscounts[0] : null
+
+          return {
+            quote_id: quote.id,
+            equipment_item_id: item.id,
+            name_hr: item.name_hr,
+            name_en: item.name_en,
+            price: item.price,
+            item_discount: itemDiscountAmount,
+            item_discount_type: singleDiscount?.type ?? (itemDiscounts.length > 1 ? 'fixed' : null),
+            item_discount_value: singleDiscount?.value ?? itemDiscountAmount,
+            item_type: item.is_standard ? 'equipment_standard' : 'equipment_optional',
+            sort_order: index,
+            category_name_hr: categoryMap.get(item.id)?.name_hr ?? null,
+            category_name_en: categoryMap.get(item.id)?.name_en ?? null,
+            is_discountable: itemDiscountableMap.get(item.id) ?? true,
+          }
+        })
 
         const { error: itemsError } = await supabase
           .from('quote_items')
