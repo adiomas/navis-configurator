@@ -10,25 +10,32 @@ import type {
   DiscountType,
 } from '@/types'
 
+export type EquipmentEntry = EquipmentItem & { quantity: number }
+
 interface ConfiguratorState {
   currentStep: 1 | 2 | 3 | 4
   selectedBoat: Boat | null
-  selectedEquipment: Map<string, EquipmentItem>
+  selectedEquipment: Map<string, EquipmentEntry>
   clientData: ClientFormData
   discounts: ConfiguratorDiscount[]
   templateGroupId: string | null
   deliveryTerms: string
+  modelYear: number | null
+  paymentTerms: string
 
   // Actions
   setStep: (step: 1 | 2 | 3 | 4) => void
   setBoat: (boat: Boat | null) => void
   toggleEquipment: (item: EquipmentItem) => void
-  setSelectedEquipment: (items: Map<string, EquipmentItem>) => void
+  setSelectedEquipment: (items: Map<string, EquipmentEntry>) => void
+  setEquipmentQuantity: (itemId: string, quantity: number) => void
   setClientData: (data: Partial<ClientFormData>) => void
   addDiscount: (discount: ConfiguratorDiscount) => void
   removeDiscount: (id: string) => void
   setTemplateGroupId: (id: string | null) => void
   setDeliveryTerms: (terms: string) => void
+  setModelYear: (year: number | null) => void
+  setPaymentTerms: (terms: string) => void
   loadFromQuote: (quote: QuoteWithDetails, boatEquipment: EquipmentCategoryWithItems[]) => void
   reset: () => void
 }
@@ -50,6 +57,8 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
   discounts: [],
   templateGroupId: null,
   deliveryTerms: '',
+  modelYear: null,
+  paymentTerms: '',
 
   setStep: (step) => set({ currentStep: step }),
 
@@ -58,6 +67,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
     selectedEquipment: new Map(),
     discounts: [],
     templateGroupId: null,
+    modelYear: null,
   }),
 
   toggleEquipment: (item) =>
@@ -66,12 +76,22 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
       if (next.has(item.id)) {
         next.delete(item.id)
       } else {
-        next.set(item.id, item)
+        next.set(item.id, { ...item, quantity: 1 })
       }
       return { selectedEquipment: next }
     }),
 
   setSelectedEquipment: (items) => set({ selectedEquipment: items }),
+
+  setEquipmentQuantity: (itemId, quantity) =>
+    set((state) => {
+      const next = new Map(state.selectedEquipment)
+      const entry = next.get(itemId)
+      if (entry) {
+        next.set(itemId, { ...entry, quantity: Math.max(1, quantity) })
+      }
+      return { selectedEquipment: next }
+    }),
 
   setClientData: (data) =>
     set((state) => ({
@@ -92,15 +112,19 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
 
   setDeliveryTerms: (terms) => set({ deliveryTerms: terms }),
 
+  setModelYear: (year) => set({ modelYear: year }),
+
+  setPaymentTerms: (terms) => set({ paymentTerms: terms }),
+
   loadFromQuote: (quote, boatEquipment) => {
     // Build equipment map by matching quote_items with actual equipment
     const allItems = boatEquipment.flatMap((cat) => cat.items)
-    const equipmentMap = new Map<string, EquipmentItem>()
+    const equipmentMap = new Map<string, EquipmentEntry>()
     for (const qi of quote.items) {
       if (qi.equipment_item_id) {
         const match = allItems.find((item) => item.id === qi.equipment_item_id)
         if (match) {
-          equipmentMap.set(match.id, match)
+          equipmentMap.set(match.id, { ...match, quantity: qi.quantity ?? 1 })
         }
       }
     }
@@ -132,6 +156,8 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
       discounts,
       templateGroupId: quote.template_group_id ?? null,
       deliveryTerms: quote.delivery_terms_hr ?? quote.delivery_terms_en ?? '',
+      modelYear: quote.model_year ?? null,
+      paymentTerms: quote.payment_terms_hr ?? quote.payment_terms_en ?? '',
     })
   },
 
@@ -144,5 +170,7 @@ export const useConfiguratorStore = create<ConfiguratorState>((set) => ({
       discounts: [],
       templateGroupId: null,
       deliveryTerms: '',
+      modelYear: null,
+      paymentTerms: '',
     }),
 }))

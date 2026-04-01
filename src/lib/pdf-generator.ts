@@ -94,6 +94,8 @@ interface PdfLabels {
   authorized: string
   model: string
   deliveryTerms: string
+  quantity: string
+  unitPrice: string
 }
 
 const labelsHr: PdfLabels = {
@@ -142,6 +144,8 @@ const labelsHr: PdfLabels = {
   authorized: 'Ovlašteni Azimut Yachts zastupnik',
   model: 'Model',
   deliveryTerms: 'Uvjeti isporuke',
+  quantity: 'Kol.',
+  unitPrice: 'Cijena',
 }
 
 const labelsEn: PdfLabels = {
@@ -190,6 +194,8 @@ const labelsEn: PdfLabels = {
   authorized: 'Authorized Azimut Yachts Dealer',
   model: 'Model',
   deliveryTerms: 'Terms of Delivery',
+  quantity: 'Qty',
+  unitPrice: 'Price',
 }
 
 /**

@@ -315,7 +315,12 @@
     "discountOnItem": "Discount on {{name}}",
     "selectContact": "Contact person",
     "primary": "Primary",
-    "allBrands": "All Brands"
+    "allBrands": "All Brands",
+    "modelYear": "Model Year",
+    "modelYearPlaceholder": "e.g. 2026",
+    "paymentTerms": "Terms of Payment",
+    "paymentTermsPlaceholder": "Enter payment terms...",
+    "quantity": "Qty"
   },
   "clients": {
     "title": "Clients",
@@ -458,7 +463,20 @@
     "depositRemoved": "Payment barcode removed",
     "removeBarcode": "Remove Barcode",
     "changeLanguage": "Change quote language",
-    "languageUpdated": "Quote language updated"
+    "languageUpdated": "Quote language updated",
+    "modelYear": "Model Year",
+    "year": "Year",
+    "paymentTerms": "Terms of Payment",
+    "includeStandardEquipment": "Include standard equipment in PDF",
+    "includeVAT": "Include VAT in price",
+    "vatPercentage": "VAT %",
+    "vatAmount": "VAT",
+    "grandTotalWithVAT": "Grand Total (incl. VAT)",
+    "quoteOptions": "Quote Options",
+    "deliveryTermsSaved": "Delivery terms saved",
+    "paymentTermsSaved": "Payment terms saved",
+    "vatSaved": "VAT settings saved",
+    "standardEquipmentToggled": "Standard equipment visibility updated"
   },
   "settings": {
     "title": "Settings",
@@ -618,6 +636,11 @@
     "signature": "Signature",
     "seller": "Seller",
     "buyer": "Buyer",
-    "scanToPay": "Scan to pay"
+    "scanToPay": "Scan to pay",
+    "quantity": "Qty",
+    "unitPrice": "Price",
+    "paymentTerms": "Terms of Payment",
+    "netPrice": "Net Price",
+    "item": "Item"
   }
 }

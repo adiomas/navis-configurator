@@ -5,7 +5,7 @@ import type {
   ClientFormData,
   ConfiguratorDiscount,
   EquipmentCategoryWithItems,
-  EquipmentItem,
+  EquipmentItemWithQuantity,
   QuoteInsert,
   QuoteItemInsert,
   QuoteDiscountInsert,
@@ -267,6 +267,12 @@ export function useCopyQuote() {
           deposit_amount: source.deposit_amount,
           delivery_terms_hr: source.delivery_terms_hr,
           delivery_terms_en: source.delivery_terms_en,
+          model_year: source.model_year,
+          payment_terms_hr: source.payment_terms_hr,
+          payment_terms_en: source.payment_terms_en,
+          include_standard_in_pdf: source.include_standard_in_pdf,
+          vat_included: source.vat_included,
+          vat_percentage: source.vat_percentage,
           created_by: userId,
           sent_at: null,
           accepted_at: null,
@@ -285,6 +291,7 @@ export function useCopyQuote() {
           name_hr: item.name_hr as string,
           name_en: item.name_en as string,
           price: item.price as number,
+          quantity: (item.quantity as number | null) ?? 1,
           item_discount: (item.item_discount as number) ?? 0,
           item_discount_type: (item.item_discount_type as string | null) ?? null,
           item_discount_value: (item.item_discount_value as number) ?? 0,
@@ -339,12 +346,14 @@ interface CreateQuoteParams {
   boatId: string
   boatBasePrice: number
   clientData: ClientFormData
-  selectedEquipment: EquipmentItem[]
+  selectedEquipment: EquipmentItemWithQuantity[]
   discounts: ConfiguratorDiscount[]
   templateGroupId: string | null
   status: 'draft' | 'sent'
   categories: EquipmentCategoryWithItems[]
   deliveryTerms: string
+  modelYear?: number | null
+  paymentTerms?: string
 }
 
 export function useCreateQuote() {
@@ -355,6 +364,7 @@ export function useCreateQuote() {
       const {
         boatId, boatBasePrice, clientData, selectedEquipment,
         discounts, templateGroupId, status, categories, deliveryTerms,
+        modelYear, paymentTerms,
       } = params
 
       // Get current user
@@ -432,6 +442,9 @@ export function useCreateQuote() {
         sent_at: status === 'sent' ? new Date().toISOString() : null,
         delivery_terms_hr: clientData.language === 'hr' ? deliveryTerms || null : null,
         delivery_terms_en: clientData.language === 'en' ? deliveryTerms || null : null,
+        model_year: modelYear ?? null,
+        payment_terms_hr: clientData.language === 'hr' ? (paymentTerms || null) : null,
+        payment_terms_en: clientData.language === 'en' ? (paymentTerms || null) : null,
       }
 
       const { data: quote, error: quoteError } = await supabase
@@ -450,11 +463,13 @@ export function useCreateQuote() {
       // Insert quote items (snapshot of equipment)
       if (selectedEquipment.length > 0) {
         const quoteItems: QuoteItemInsert[] = selectedEquipment.map((item, index) => {
+          const qty = item.quantity ?? 1
+          const lineTotal = item.price * qty
           const itemDiscounts = discounts.filter(
             d => d.level === 'equipment_item' && d.equipmentItemId === item.id,
           )
           const itemDiscountAmount = itemDiscounts.length > 0
-            ? calculateDiscountAmount(item.price, itemDiscounts)
+            ? calculateDiscountAmount(lineTotal, itemDiscounts)
             : 0
 
           // Store discount type & raw value for PDF display (single discount case)
@@ -466,6 +481,7 @@ export function useCreateQuote() {
             name_hr: item.name_hr,
             name_en: item.name_en,
             price: item.price,
+            quantity: qty,
             item_discount: itemDiscountAmount,
             item_discount_type: singleDiscount?.type ?? (itemDiscounts.length > 1 ? 'fixed' : null),
             item_discount_value: singleDiscount?.value ?? itemDiscountAmount,
@@ -517,6 +533,72 @@ export function useCreateQuote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quotes'] })
       queryClient.invalidateQueries({ queryKey: ['template-groups', 'quote-counts'] })
+    },
+  })
+}
+
+// --- Quote detail mutation hooks ---
+
+export function useUpdateQuoteDeliveryTerms() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ quoteId, termsHr, termsEn }: { quoteId: string; termsHr?: string | null; termsEn?: string | null }) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ delivery_terms_hr: termsHr ?? null, delivery_terms_en: termsEn ?? null })
+        .eq('id', quoteId)
+      if (error) throw error
+    },
+    onSuccess: (_data, { quoteId }) => {
+      queryClient.invalidateQueries({ queryKey: ['quote', quoteId] })
+    },
+  })
+}
+
+export function useUpdateQuotePaymentTerms() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ quoteId, termsHr, termsEn }: { quoteId: string; termsHr?: string | null; termsEn?: string | null }) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ payment_terms_hr: termsHr ?? null, payment_terms_en: termsEn ?? null })
+        .eq('id', quoteId)
+      if (error) throw error
+    },
+    onSuccess: (_data, { quoteId }) => {
+      queryClient.invalidateQueries({ queryKey: ['quote', quoteId] })
+    },
+  })
+}
+
+export function useUpdateQuoteIncludeStandard() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ quoteId, include }: { quoteId: string; include: boolean }) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ include_standard_in_pdf: include })
+        .eq('id', quoteId)
+      if (error) throw error
+    },
+    onSuccess: (_data, { quoteId }) => {
+      queryClient.invalidateQueries({ queryKey: ['quote', quoteId] })
+    },
+  })
+}
+
+export function useUpdateQuoteVAT() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ quoteId, vatIncluded, vatPercentage }: { quoteId: string; vatIncluded: boolean; vatPercentage: number }) => {
+      const { error } = await supabase
+        .from('quotes')
+        .update({ vat_included: vatIncluded, vat_percentage: vatPercentage })
+        .eq('id', quoteId)
+      if (error) throw error
+    },
+    onSuccess: (_data, { quoteId }) => {
+      queryClient.invalidateQueries({ queryKey: ['quote', quoteId] })
     },
   })
 }

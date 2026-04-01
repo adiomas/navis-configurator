@@ -20,12 +20,17 @@ import {
   MoreHorizontal,
   CreditCard,
   Trash2,
+  Settings2,
+  ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ds } from '@/lib/styles'
 import { formatPrice, formatDate } from '@/lib/formatters'
 import { useAuth } from '@/hooks/useAuth'
-import { useQuote, useCopyQuote, useUpdateQuoteStatus, useUpdateQuoteDeposit, useUpdateQuoteLanguage } from '@/hooks/useQuotes'
+import {
+  useQuote, useCopyQuote, useUpdateQuoteStatus, useUpdateQuoteDeposit, useUpdateQuoteLanguage,
+  useUpdateQuoteDeliveryTerms, useUpdateQuotePaymentTerms, useUpdateQuoteIncludeStandard, useUpdateQuoteVAT,
+} from '@/hooks/useQuotes'
 import { useBoat, useBoatEquipment } from '@/hooks/useBoats'
 import { useSettings } from '@/hooks/useSettings'
 import { useConfiguratorStore } from '@/stores/configurator-store'
@@ -51,6 +56,10 @@ export default function QuoteDetailPage() {
   const updateStatus = useUpdateQuoteStatus()
   const updateDeposit = useUpdateQuoteDeposit()
   const updateLanguage = useUpdateQuoteLanguage()
+  const updateDeliveryTerms = useUpdateQuoteDeliveryTerms()
+  const updatePaymentTerms = useUpdateQuotePaymentTerms()
+  const updateIncludeStandard = useUpdateQuoteIncludeStandard()
+  const updateVAT = useUpdateQuoteVAT()
   const loadFromQuote = useConfiguratorStore((s) => s.loadFromQuote)
 
   const canEdit = isAdmin || quote?.created_by === currentUser?.id
@@ -64,6 +73,11 @@ export default function QuoteDetailPage() {
   const [tempDepositPercentage, setTempDepositPercentage] = useState<number | null>(null)
   const [isEditingDeposit, setIsEditingDeposit] = useState(false)
   const [customDepositInput, setCustomDepositInput] = useState('')
+  const [editingDeliveryTerms, setEditingDeliveryTerms] = useState(false)
+  const [editingPaymentTerms, setEditingPaymentTerms] = useState(false)
+  const [tempDeliveryTerms, setTempDeliveryTerms] = useState('')
+  const [tempPaymentTerms, setTempPaymentTerms] = useState('')
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
 
   // Group equipment items by category
   const equipmentByCategory = useMemo(() => {
@@ -395,7 +409,7 @@ export default function QuoteDetailPage() {
       </div>
 
       {/* Detail cards — Pricing first (most important for sales), then context */}
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-3 lg:grid-cols-3">
         {/* Pricing - prominent, top-left on desktop */}
         <Card
           icon={Calculator}
@@ -448,12 +462,32 @@ export default function QuoteDetailPage() {
                   {formatPrice(Number(quote.total_price ?? 0))}
                 </span>
               </div>
+              {quote.vat_included && (
+                <div className="mt-2 space-y-1 border-t border-gold/20 pt-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      {t('quotes.vatAmount')} ({Number(quote.vat_percentage ?? 25)}%)
+                    </span>
+                    <span className="font-medium">
+                      {formatPrice(Number(quote.total_price ?? 0) * Number(quote.vat_percentage ?? 25) / 100)}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="font-display text-sm font-semibold text-navy">
+                      {t('quotes.grandTotalWithVAT')}
+                    </span>
+                    <span className="font-display text-lg font-bold text-navy">
+                      {formatPrice(Number(quote.total_price ?? 0) * (1 + Number(quote.vat_percentage ?? 25) / 100))}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </Card>
 
         {/* Client & Boat - top-right on desktop */}
-        <Card icon={Building2} title={`${t('quotes.clientInfo')} & ${t('quotes.boatInfo')}`}>
+        <Card icon={Building2} title={`${t('quotes.clientInfo')} & ${t('quotes.boatInfo')}`} className="lg:col-span-2">
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Client side */}
             <div>
@@ -511,8 +545,13 @@ export default function QuoteDetailPage() {
                     <p className="text-sm font-medium text-navy">{boatName}</p>
                     <p className="text-xs text-muted-foreground">
                       {boat.brand}
-                      {boat.year && <> · {boat.year}</>}
+                      {boat.category === 'used' && boat.year && <> · {boat.year}</>}
                     </p>
+                    {boat.category === 'new' && quote.model_year && (
+                      <p className="text-xs text-muted-foreground">
+                        {t('quotes.modelYear')}: {quote.model_year}
+                      </p>
+                    )}
                   </div>
                   <p className="font-display text-base font-semibold text-gold">
                     {formatPrice(Number(quote.boat_base_price ?? 0))}
@@ -525,48 +564,66 @@ export default function QuoteDetailPage() {
           </div>
         </Card>
 
-        {/* Equipment Breakdown - full width */}
-        <Card icon={Package} title={t('quotes.equipmentBreakdown')} className="lg:col-span-2">
+        {/* Equipment Breakdown - full width, collapsible categories */}
+        <Card icon={Package} title={t('quotes.equipmentBreakdown')} className="lg:col-span-3">
           {quote.items.length > 0 ? (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
               {Array.from(equipmentByCategory.entries()).map(([category, items]) => {
+                const isAllStandard = items.every((i) => i.item_type === 'equipment_standard')
                 const categoryTotal = items
                   .filter((i) => i.item_type !== 'equipment_standard')
-                  .reduce((sum, i) => sum + Number(i.price ?? 0), 0)
+                  .reduce((sum, i) => sum + Number(i.price ?? 0) * (i.quantity ?? 1), 0)
+                const isExpanded = expandedCategories.has(category)
 
                 return (
-                  <div key={category}>
-                    <div className="flex items-center justify-between border-b border-border pb-1.5">
-                      <h4 className="text-xs font-medium text-navy">{category}</h4>
-                      {categoryTotal > 0 && (
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {formatPrice(categoryTotal)}
+                  <div key={category} className={cn(isExpanded && 'sm:col-span-2')}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = new Set(expandedCategories)
+                        if (next.has(category)) next.delete(category); else next.add(category)
+                        setExpandedCategories(next)
+                      }}
+                      className="flex w-full items-center justify-between rounded-md bg-muted/50 px-2.5 py-1.5 text-left transition-colors hover:bg-muted"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <ChevronRight className={cn('h-3 w-3 text-muted-foreground transition-transform', isExpanded && 'rotate-90')} />
+                        <span className="text-xs font-medium text-navy">{category}</span>
+                        <span className="text-[10px] text-muted-foreground">({items.length})</span>
+                      </div>
+                      {isAllStandard ? (
+                        <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                          {t('quotes.standard')}
                         </span>
-                      )}
-                    </div>
-                    <ul className="mt-1 space-y-0.5">
-                      {items.map((item) => {
-                        const itemName = lang === 'hr' ? item.name_hr : item.name_en
-                        const isStandard = item.item_type === 'equipment_standard'
-                        return (
-                          <li
-                            key={item.id}
-                            className="flex items-center justify-between py-0.5 text-xs"
-                          >
-                            <span className="min-w-0 truncate text-foreground">{itemName}</span>
-                            {isStandard ? (
-                              <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-                                {t('quotes.standard')}
+                      ) : categoryTotal > 0 ? (
+                        <span className="text-xs font-medium text-foreground">{formatPrice(categoryTotal)}</span>
+                      ) : null}
+                    </button>
+                    {isExpanded && (
+                      <ul className="mb-1 mt-0.5 space-y-0 pl-5">
+                        {items.map((item) => {
+                          const itemName = lang === 'hr' ? item.name_hr : item.name_en
+                          const isStandard = item.item_type === 'equipment_standard'
+                          return (
+                            <li key={item.id} className="flex items-center justify-between py-0.5 text-xs">
+                              <span className="min-w-0 truncate text-foreground">
+                                {itemName}
+                                {!isStandard && (item.quantity ?? 1) > 1 && (
+                                  <span className="ml-1 text-muted-foreground">× {item.quantity}</span>
+                                )}
                               </span>
-                            ) : (
-                              <span className="shrink-0 font-medium text-foreground">
-                                {formatPrice(Number(item.price ?? 0))}
-                              </span>
-                            )}
-                          </li>
-                        )
-                      })}
-                    </ul>
+                              {isStandard ? (
+                                <span className="shrink-0 text-[10px] text-emerald-600">{t('quotes.standard')}</span>
+                              ) : (
+                                <span className="shrink-0 font-medium text-foreground">
+                                  {formatPrice(Number(item.price ?? 0) * (item.quantity ?? 1))}
+                                </span>
+                              )}
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
                   </div>
                 )
               })}
@@ -576,111 +633,191 @@ export default function QuoteDetailPage() {
           )}
         </Card>
 
-        {/* Payment Barcode / Deposit config - full width */}
+        {/* Bottom row: Quote Options + Payment Barcode + Timeline — 3 columns on desktop */}
         {canEdit && (
-          <Card icon={CreditCard} title={t('quotes.paymentBarcode')} className="lg:col-span-2">
-            <div className="space-y-3">
-              {/* Preset buttons */}
-              <div>
-                <p className={cn(ds.text.label, 'mb-1.5')}>{t('quotes.depositPercentage')}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {[10, 20, 30, 50, 100].map((pct) => (
-                    <button
-                      key={pct}
-                      type="button"
-                      onClick={() => handleDepositPreset(pct)}
-                      className={cn(
-                        'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
-                        tempDepositPercentage === pct
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-border bg-white text-foreground hover:bg-muted'
-                      )}
-                    >
-                      {pct}%
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom input */}
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground">{t('quotes.customPercentage')}:</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={customDepositInput}
-                  onChange={(e) => handleCustomDepositChange(e.target.value)}
-                  placeholder="0-100"
-                  className="h-8 w-20 rounded-md border border-border bg-white px-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <span className="text-xs text-muted-foreground">%</span>
-              </div>
-
-              {/* Calculated amount + label preview */}
-              {tempDepositPercentage != null && tempDepositPercentage > 0 && (
-                <div className="space-y-2 rounded-md bg-muted/50 p-2.5">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">{t('quotes.depositAmount')}</span>
-                    <span className="font-medium">
-                      {formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}
-                      {tempDepositPercentage < 100 && (
-                        <span className="ml-1 text-muted-foreground">
-                          ({tempDepositPercentage}% {lang === 'hr' ? 'od' : 'of'} {formatPrice(Number(quote.total_price ?? 0))})
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  {tempDepositPercentage < 100 && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">{t('quotes.labelPreview')}</span>
-                      <span className="font-medium text-navy">
-                        {lang === 'hr'
-                          ? `Predujam ${tempDepositPercentage}% — ${formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}`
-                          : `Advance payment ${tempDepositPercentage}% — ${formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}`}
-                      </span>
-                    </div>
+          <Card icon={Settings2} title={t('quotes.quoteOptions')}>
+            <div className="space-y-2.5">
+              {/* Toggles */}
+              <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md px-1 py-1 text-xs transition-colors hover:bg-muted/50">
+                <span className="text-foreground">{t('quotes.includeStandardEquipment')}</span>
+                <button
+                  type="button"
+                  onClick={() => updateIncludeStandard.mutate(
+                    { quoteId: id!, include: !(quote.include_standard_in_pdf !== false) },
+                    { onSuccess: () => toast.success(t('quotes.standardEquipmentToggled')) },
                   )}
+                  className={cn(
+                    'relative inline-flex h-[20px] w-[36px] shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200',
+                    quote.include_standard_in_pdf !== false ? 'bg-primary' : 'bg-muted-foreground/25',
+                  )}
+                >
+                  <span className={cn(
+                    'pointer-events-none inline-block h-[16px] w-[16px] rounded-full bg-white shadow-sm transition-transform duration-200',
+                    quote.include_standard_in_pdf !== false ? 'translate-x-[16px]' : 'translate-x-0',
+                  )} />
+                </button>
+              </label>
+              <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md px-1 py-1 text-xs transition-colors hover:bg-muted/50">
+                <span className="text-foreground">{t('quotes.includeVAT')}</span>
+                <button
+                  type="button"
+                  onClick={() => updateVAT.mutate(
+                    { quoteId: id!, vatIncluded: !quote.vat_included, vatPercentage: Number(quote.vat_percentage ?? 25) },
+                    { onSuccess: () => toast.success(t('quotes.vatSaved')) },
+                  )}
+                  className={cn(
+                    'relative inline-flex h-[20px] w-[36px] shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-200',
+                    quote.vat_included ? 'bg-primary' : 'bg-muted-foreground/25',
+                  )}
+                >
+                  <span className={cn(
+                    'pointer-events-none inline-block h-[16px] w-[16px] rounded-full bg-white shadow-sm transition-transform duration-200',
+                    quote.vat_included ? 'translate-x-[16px]' : 'translate-x-0',
+                  )} />
+                </button>
+              </label>
+              {quote.vat_included && (
+                <div className="flex items-center gap-2 pl-1">
+                  <label className="text-xs text-muted-foreground">{t('quotes.vatPercentage')}:</label>
+                  <input
+                    type="number" min={0} max={100} step={0.5}
+                    defaultValue={Number(quote.vat_percentage ?? 25)}
+                    onBlur={(e) => {
+                      const val = parseFloat(e.target.value)
+                      if (!isNaN(val) && val >= 0 && val <= 100) {
+                        updateVAT.mutate({ quoteId: id!, vatIncluded: true, vatPercentage: val },
+                          { onSuccess: () => toast.success(t('quotes.vatSaved')) })
+                      }
+                    }}
+                    className="h-6 w-14 rounded border border-border bg-white px-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <span className="text-xs text-muted-foreground">%</span>
                 </div>
               )}
 
-              {/* Save / Cancel / Remove buttons */}
-              <div className="flex items-center gap-2">
+              {/* Terms — compact inline */}
+              <div className="space-y-1.5 border-t border-border pt-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('configurator.deliveryTerms')}</p>
+                    {editingDeliveryTerms ? (
+                      <div className="mt-1 space-y-1.5">
+                        <textarea value={tempDeliveryTerms} onChange={(e) => setTempDeliveryTerms(e.target.value)} rows={2} className={cn(ds.input.textarea, 'text-xs')} />
+                        <div className="flex gap-1.5">
+                          <button type="button" onClick={() => {
+                            const payload = quote.language === 'hr'
+                              ? { quoteId: id!, termsHr: tempDeliveryTerms || null, termsEn: quote.delivery_terms_en }
+                              : { quoteId: id!, termsHr: quote.delivery_terms_hr, termsEn: tempDeliveryTerms || null }
+                            updateDeliveryTerms.mutate(payload, { onSuccess: () => { setEditingDeliveryTerms(false); toast.success(t('quotes.deliveryTermsSaved')) } })
+                          }} disabled={updateDeliveryTerms.isPending} className={cn(ds.btn.base, ds.btn.sm, ds.btn.primary, 'disabled:opacity-50 text-[11px] h-6 px-2')}>{t('common.save')}</button>
+                          <button type="button" onClick={() => setEditingDeliveryTerms(false)} className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'text-[11px] h-6 px-2')}>{t('common.cancel')}</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        {(lang === 'hr' ? (quote.delivery_terms_hr ?? quote.delivery_terms_en) : (quote.delivery_terms_en ?? quote.delivery_terms_hr)) || '—'}
+                      </p>
+                    )}
+                  </div>
+                  {!editingDeliveryTerms && (
+                    <button type="button" onClick={() => {
+                      setTempDeliveryTerms(lang === 'hr' ? (quote.delivery_terms_hr ?? quote.delivery_terms_en ?? '') : (quote.delivery_terms_en ?? quote.delivery_terms_hr ?? ''))
+                      setEditingDeliveryTerms(true)
+                    }} className="shrink-0 text-[11px] text-primary hover:underline">{t('common.edit')}</button>
+                  )}
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('quotes.paymentTerms')}</p>
+                    {editingPaymentTerms ? (
+                      <div className="mt-1 space-y-1.5">
+                        <textarea value={tempPaymentTerms} onChange={(e) => setTempPaymentTerms(e.target.value)} rows={2} className={cn(ds.input.textarea, 'text-xs')} />
+                        <div className="flex gap-1.5">
+                          <button type="button" onClick={() => {
+                            const payload = quote.language === 'hr'
+                              ? { quoteId: id!, termsHr: tempPaymentTerms || null, termsEn: quote.payment_terms_en }
+                              : { quoteId: id!, termsHr: quote.payment_terms_hr, termsEn: tempPaymentTerms || null }
+                            updatePaymentTerms.mutate(payload, { onSuccess: () => { setEditingPaymentTerms(false); toast.success(t('quotes.paymentTermsSaved')) } })
+                          }} disabled={updatePaymentTerms.isPending} className={cn(ds.btn.base, ds.btn.sm, ds.btn.primary, 'disabled:opacity-50 text-[11px] h-6 px-2')}>{t('common.save')}</button>
+                          <button type="button" onClick={() => setEditingPaymentTerms(false)} className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'text-[11px] h-6 px-2')}>{t('common.cancel')}</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        {(lang === 'hr' ? (quote.payment_terms_hr ?? quote.payment_terms_en) : (quote.payment_terms_en ?? quote.payment_terms_hr)) || '—'}
+                      </p>
+                    )}
+                  </div>
+                  {!editingPaymentTerms && (
+                    <button type="button" onClick={() => {
+                      setTempPaymentTerms(lang === 'hr' ? (quote.payment_terms_hr ?? quote.payment_terms_en ?? '') : (quote.payment_terms_en ?? quote.payment_terms_hr ?? ''))
+                      setEditingPaymentTerms(true)
+                    }} className="shrink-0 text-[11px] text-primary hover:underline">{t('common.edit')}</button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Payment Barcode / Deposit — compact */}
+        {canEdit && (
+          <Card icon={CreditCard} title={t('quotes.paymentBarcode')}>
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-1">
+                {[10, 20, 30, 50, 100].map((pct) => (
+                  <button
+                    key={pct}
+                    type="button"
+                    onClick={() => handleDepositPreset(pct)}
+                    className={cn(
+                      'rounded border px-2 py-1 text-[11px] font-medium transition-colors',
+                      tempDepositPercentage === pct
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border bg-white text-foreground hover:bg-muted'
+                    )}
+                  >
+                    {pct}%
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <label className="text-[11px] text-muted-foreground">{t('quotes.customPercentage')}:</label>
+                <input
+                  type="number" min={0} max={100} step={1}
+                  value={customDepositInput}
+                  onChange={(e) => handleCustomDepositChange(e.target.value)}
+                  placeholder="0-100"
+                  className="h-6 w-14 rounded border border-border bg-white px-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <span className="text-[11px] text-muted-foreground">%</span>
+              </div>
+              {tempDepositPercentage != null && tempDepositPercentage > 0 && (
+                <div className="rounded-md bg-muted/50 p-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('quotes.depositAmount')}</span>
+                    <span className="font-medium">{formatPrice(Number(quote.total_price ?? 0) * (tempDepositPercentage / 100))}</span>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5">
                 {isEditingDeposit && (
                   <>
-                    <button
-                      type="button"
-                      onClick={handleSaveDeposit}
-                      disabled={updateDeposit.isPending || tempDepositPercentage == null}
-                      className={cn(ds.btn.base, ds.btn.sm, ds.btn.primary, 'disabled:opacity-50')}
-                    >
-                      {updateDeposit.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                    <button type="button" onClick={handleSaveDeposit} disabled={updateDeposit.isPending || tempDepositPercentage == null}
+                      className={cn(ds.btn.base, ds.btn.sm, ds.btn.primary, 'disabled:opacity-50 text-[11px] h-6 px-2')}>
+                      {updateDeposit.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
                       {t('common.save')}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTempDepositPercentage(quote.deposit_percentage != null ? Number(quote.deposit_percentage) : null)
-                        setCustomDepositInput('')
-                        setIsEditingDeposit(false)
-                      }}
-                      className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary)}
-                    >
-                      <X className="h-3.5 w-3.5" />
+                    <button type="button" onClick={() => { setTempDepositPercentage(quote.deposit_percentage != null ? Number(quote.deposit_percentage) : null); setCustomDepositInput(''); setIsEditingDeposit(false) }}
+                      className={cn(ds.btn.base, ds.btn.sm, ds.btn.secondary, 'text-[11px] h-6 px-2')}>
                       {t('common.cancel')}
                     </button>
                   </>
                 )}
                 {quote.deposit_percentage != null && !isEditingDeposit && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveDeposit}
-                    disabled={updateDeposit.isPending}
-                    className={cn(ds.btn.base, ds.btn.sm, 'text-red-600 hover:bg-red-50 disabled:opacity-50')}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    {t('quotes.removeBarcode')}
+                  <button type="button" onClick={handleRemoveDeposit} disabled={updateDeposit.isPending}
+                    className={cn(ds.btn.base, ds.btn.sm, 'text-red-600 hover:bg-red-50 disabled:opacity-50 text-[11px] h-6 px-2')}>
+                    <Trash2 className="h-3 w-3" /> {t('quotes.removeBarcode')}
                   </button>
                 )}
               </div>
@@ -688,15 +825,15 @@ export default function QuoteDetailPage() {
           </Card>
         )}
 
-        {/* Timeline + Notes - full width */}
-        <Card icon={Clock} title={t('quotes.timeline')} className="lg:col-span-2">
+        {/* Timeline + Notes — compact */}
+        <Card icon={Clock} title={t('quotes.timeline')}>
           {quote.notes && (
-            <div className="mb-3 rounded-md bg-muted/50 p-2.5">
-              <p className={cn(ds.text.label, 'mb-1')}>
+            <div className="mb-2 rounded-md bg-muted/50 p-2">
+              <p className={cn(ds.text.label, 'mb-0.5')}>
                 <FileText className="mr-1 inline h-3 w-3" />
                 {t('quotes.notes')}
               </p>
-              <p className="whitespace-pre-wrap text-xs text-muted-foreground">
+              <p className="whitespace-pre-wrap text-xs text-muted-foreground line-clamp-3">
                 {quote.notes}
               </p>
             </div>

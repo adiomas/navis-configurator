@@ -10,13 +10,13 @@ import type {
   ClientFormData,
   ConfiguratorDiscount,
   EquipmentCategoryWithItems,
-  EquipmentItem,
 } from '@/types'
+import type { EquipmentEntry } from '@/stores/configurator-store'
 
 interface CompactReviewSummaryProps {
   boat: Boat
   boatEquipment: EquipmentCategoryWithItems[]
-  selectedEquipment: Map<string, EquipmentItem>
+  selectedEquipment: Map<string, EquipmentEntry>
   discounts: ConfiguratorDiscount[]
   clientData: ClientFormData
 }
@@ -220,7 +220,10 @@ export function CompactReviewSummary({
 
               const categoryTotal = catSelectedItems
                 .filter((i) => !i.is_standard)
-                .reduce((sum, i) => sum + i.price, 0)
+                .reduce((sum, i) => {
+                  const qty = selectedEquipment.get(i.id)?.quantity ?? 1
+                  return sum + i.price * qty
+                }, 0)
 
               return (
                 <div key={category.id}>
@@ -235,25 +238,31 @@ export function CompactReviewSummary({
                     )}
                   </div>
                   <ul className="mt-1 space-y-0.5">
-                    {catSelectedItems.map((item) => (
-                      <li
-                        key={item.id}
-                        className="flex items-center justify-between gap-2 py-0.5 text-xs"
-                      >
-                        <span className="min-w-0 truncate text-foreground">
-                          {getLocalizedName(item, lang)}
-                        </span>
-                        {item.is_standard ? (
-                          <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-                            {t('configurator.standardIncluded')}
+                    {catSelectedItems.map((item) => {
+                      const qty = selectedEquipment.get(item.id)?.quantity ?? 1
+                      return (
+                        <li
+                          key={item.id}
+                          className="flex items-center justify-between gap-2 py-0.5 text-xs"
+                        >
+                          <span className="min-w-0 truncate text-foreground">
+                            {getLocalizedName(item, lang)}
+                            {!item.is_standard && qty > 1 && (
+                              <span className="ml-1 text-muted-foreground">× {qty}</span>
+                            )}
                           </span>
-                        ) : (
-                          <span className="font-medium text-foreground">
-                            {formatPrice(item.price)}
-                          </span>
-                        )}
-                      </li>
-                    ))}
+                          {item.is_standard ? (
+                            <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                              {t('configurator.standardIncluded')}
+                            </span>
+                          ) : (
+                            <span className="font-medium text-foreground">
+                              {formatPrice(item.price * qty)}
+                            </span>
+                          )}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </div>
               )

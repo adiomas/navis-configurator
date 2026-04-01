@@ -651,6 +651,11 @@ export function PDFDetailedTemplate({
     ? (quote.delivery_terms_hr ?? quote.delivery_terms_en ?? '')
     : (quote.delivery_terms_en ?? quote.delivery_terms_hr ?? '')
 
+  // Payment terms (quote-level override, falls back to settings)
+  const paymentTermsText = lang === 'hr'
+    ? (quote.payment_terms_hr ?? quote.payment_terms_en ?? '')
+    : (quote.payment_terms_en ?? quote.payment_terms_hr ?? '')
+
   // Pricing
   const boatBasePrice = Number(quote.boat_base_price ?? 0)
   const boatDiscountAmount = Number(quote.boat_discount ?? 0)
@@ -773,9 +778,12 @@ export function PDFDetailedTemplate({
           <View style={s.vessel}>
             <View style={s.vesselLeft}>
               <Text style={s.vesselName}>{boat.name}</Text>
-              {boat.year && (
-                <Text style={s.vesselYear}>{labels.model} {boat.year}</Text>
-              )}
+              {(() => {
+                const displayYear = boat.category === 'used' ? boat.year : quote.model_year
+                return displayYear ? (
+                  <Text style={s.vesselYear}>{labels.model} {displayYear}</Text>
+                ) : null
+              })()}
             </View>
             <View style={s.vesselRight}>
               <Text style={s.priceTag}>{labels.basePrice}</Text>
@@ -821,8 +829,8 @@ export function PDFDetailedTemplate({
           </>
         )}
 
-        {/* Standard Equipment */}
-        {hasStandard && (
+        {/* Standard Equipment (conditional based on quote setting) */}
+        {hasStandard && quote.include_standard_in_pdf !== false && (
           <>
             <View style={s.secRow}>
               <Text style={s.secText}>{labels.standardEquipment}</Text>
@@ -846,10 +854,11 @@ export function PDFDetailedTemplate({
             </View>
 
             <View style={s.tHead}>
-              <Text style={[s.tHeadText, { width: '50%' }]}>{labels.item}</Text>
-              <Text style={[s.tHeadText, { width: '18%', textAlign: 'right' }]}>{labels.price}</Text>
+              <Text style={[s.tHeadText, { width: '38%' }]}>{labels.item}</Text>
+              <Text style={[s.tHeadText, { width: '8%', textAlign: 'center' }]}>{labels.quantity}</Text>
+              <Text style={[s.tHeadText, { width: '16%', textAlign: 'right' }]}>{labels.unitPrice}</Text>
               <Text style={[s.tHeadText, { width: '14%', textAlign: 'right' }]}>{labels.discount}</Text>
-              <Text style={[s.tHeadText, { width: '18%', textAlign: 'right' }]}>{labels.net}</Text>
+              <Text style={[s.tHeadText, { width: '24%', textAlign: 'right' }]}>{labels.net}</Text>
             </View>
 
             {Array.from(optionalByCategory.entries()).map(([category, items]) => (
@@ -859,9 +868,11 @@ export function PDFDetailedTemplate({
                 </View>
                 {items.map((item) => {
                   const itemName = lang === 'hr' ? item.name_hr : item.name_en
-                  const itemPrice = Number(item.price ?? 0)
+                  const qty = Number(item.quantity ?? 1)
+                  const unitPrice = Number(item.price ?? 0)
+                  const lineTotal = unitPrice * qty
                   const itemDiscount = Number(item.item_discount ?? 0)
-                  const netPrice = itemPrice - itemDiscount
+                  const netPrice = lineTotal - itemDiscount
                   const discountType = item.item_discount_type as string | null
                   const discountValue = Number(item.item_discount_value ?? 0)
                   const discountDisplay = itemDiscount > 0
@@ -871,18 +882,21 @@ export function PDFDetailedTemplate({
                     : null
                   return (
                     <View key={item.id} style={s.row}>
-                      <View style={s.colName}>
+                      <View style={{ width: '38%', paddingLeft: 6 }}>
                         <Text style={s.cellName}>{itemName ?? '—'}</Text>
                       </View>
-                      <View style={s.colPrice}>
-                        <Text style={s.cellPrice}>{formatPrice(itemPrice)}</Text>
+                      <View style={{ width: '8%', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 8, color: TEXT_BODY, textAlign: 'center' }}>{qty}</Text>
                       </View>
-                      <View style={s.colDisc}>
+                      <View style={{ width: '16%' }}>
+                        <Text style={s.cellPrice}>{formatPrice(unitPrice)}</Text>
+                      </View>
+                      <View style={{ width: '14%' }}>
                         {discountDisplay && (
                           <Text style={s.cellDisc}>{discountDisplay}</Text>
                         )}
                       </View>
-                      <View style={s.colNet}>
+                      <View style={{ width: '24%' }}>
                         <Text style={s.cellNet}>{formatPrice(netPrice)}</Text>
                       </View>
                     </View>
@@ -922,12 +936,20 @@ export function PDFDetailedTemplate({
               <Text style={s.pLbl}>{labels.equipmentTotal}</Text>
               <Text style={s.pVal}>{formatPrice(equipmentSubtotal)}</Text>
             </View>
-            {equipmentDiscountAmount > 0 && (
-              <View style={s.pRow}>
-                <Text style={s.pDiscLbl}>{labels.equipmentDiscounts}</Text>
-                <Text style={s.pDiscVal}>-{formatPrice(equipmentDiscountAmount)}</Text>
-              </View>
-            )}
+            {equipmentDiscountAmount > 0 && (() => {
+              const equipAllPctDiscount = quote.discounts?.find(
+                d => d.discount_level === 'equipment_all' && d.discount_type === 'percentage'
+              )
+              return (
+                <View style={s.pRow}>
+                  <Text style={s.pDiscLbl}>
+                    {labels.equipmentDiscounts}
+                    {equipAllPctDiscount ? ` (${Number(equipAllPctDiscount.value)}%)` : ''}
+                  </Text>
+                  <Text style={s.pDiscVal}>-{formatPrice(equipmentDiscountAmount)}</Text>
+                </View>
+              )
+            })()}
             <View style={s.pDiv} />
             <View style={s.pRow}>
               <Text style={s.pNetLbl}>{labels.equipmentNet}</Text>
@@ -939,6 +961,24 @@ export function PDFDetailedTemplate({
           <View style={s.pricingColTotal}>
             <Text style={s.pTotalLbl}>{labels.grandTotal}</Text>
             <Text style={s.pTotalVal}>{formatPrice(grandTotal)}</Text>
+            {quote.vat_included && (() => {
+              const vatPct = Number(quote.vat_percentage ?? 25)
+              const vatAmount = grandTotal * (vatPct / 100)
+              const totalWithVat = grandTotal + vatAmount
+              return (
+                <>
+                  <Text style={{ fontSize: 6, color: GOLD, marginTop: 4 }}>
+                    {lang === 'hr' ? 'PDV' : 'VAT'} ({vatPct}%): {formatPrice(vatAmount)}
+                  </Text>
+                  <Text style={{ fontFamily: 'Playfair Display', fontSize: 11, fontWeight: 700, color: '#ffffff', marginTop: 2 }}>
+                    {formatPrice(totalWithVat)}
+                  </Text>
+                  <Text style={{ fontSize: 5, color: GOLD, marginTop: 1 }}>
+                    {lang === 'hr' ? 'S PDV-om' : 'incl. VAT'}
+                  </Text>
+                </>
+              )
+            })()}
           </View>
         </View>
 
@@ -995,10 +1035,10 @@ export function PDFDetailedTemplate({
             )}
           </View>
 
-          {terms && (
+          {(paymentTermsText || terms) && (
             <View style={s.termsWrap}>
               <Text style={s.termsTitle}>{labels.termsOfPayment}</Text>
-              <Text style={s.termsBody}>{terms}</Text>
+              <Text style={s.termsBody}>{paymentTermsText || terms}</Text>
             </View>
           )}
 

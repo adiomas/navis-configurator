@@ -17,7 +17,7 @@ interface CompactEquipmentSelectorProps {
 
 export function CompactEquipmentSelector({ categories, searchQuery }: CompactEquipmentSelectorProps) {
   const { t, i18n } = useTranslation()
-  const { selectedEquipment, toggleEquipment, discounts, addDiscount, removeDiscount } = useConfiguratorStore()
+  const { selectedEquipment, toggleEquipment, setEquipmentQuantity, discounts, addDiscount, removeDiscount } = useConfiguratorStore()
 
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [activePopoverItemId, setActivePopoverItemId] = useState<string | null>(null)
@@ -186,6 +186,39 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                             )}
                           </div>
 
+                          {/* Quantity (optional items only, when selected) */}
+                          {isSelected && !isStandard && (
+                            <div
+                              className="flex shrink-0 items-center gap-0.5"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = selectedEquipment.get(item.id)?.quantity ?? 1
+                                  if (current > 1) setEquipmentQuantity(item.id, current - 1)
+                                }}
+                                className="flex h-6 w-6 items-center justify-center rounded border border-border text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-30"
+                                disabled={(selectedEquipment.get(item.id)?.quantity ?? 1) <= 1}
+                              >
+                                −
+                              </button>
+                              <span className="w-6 text-center text-xs font-medium text-foreground">
+                                {selectedEquipment.get(item.id)?.quantity ?? 1}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = selectedEquipment.get(item.id)?.quantity ?? 1
+                                  setEquipmentQuantity(item.id, current + 1)
+                                }}
+                                className="flex h-6 w-6 items-center justify-center rounded border border-border text-xs font-medium text-muted-foreground hover:bg-muted"
+                              >
+                                +
+                              </button>
+                            </div>
+                          )}
+
                           {/* Price + discount tag */}
                           <div className="flex shrink-0 items-center gap-1.5">
                             {isStandard && (
@@ -227,7 +260,7 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                                 isStandard ? 'text-muted-foreground' : 'text-foreground',
                               )}
                             >
-                              {formatPrice(item.price)}
+                              {formatPrice(item.price * (selectedEquipment.get(item.id)?.quantity ?? 1))}
                             </span>
                           </div>
                         </div>

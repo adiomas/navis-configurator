@@ -10,7 +10,8 @@ import { useTemplateGroup } from '@/hooks/useTemplateGroups'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import { CompactEquipmentSelector } from '@/components/configurator/CompactEquipmentSelector'
 import { CompactDiscountEditor } from '@/components/configurator/CompactDiscountEditor'
-import type { EquipmentItem, DiscountLevel, DiscountType, PriceBreakdown } from '@/types'
+import type { DiscountLevel, DiscountType, PriceBreakdown } from '@/types'
+import type { EquipmentEntry } from '@/stores/configurator-store'
 
 interface EquipmentStepProps {
   priceBreakdown: PriceBreakdown
@@ -42,10 +43,10 @@ export default function EquipmentStep({ priceBreakdown, discountableEquipmentSub
   useEffect(() => {
     if (!equipmentCategories) return
 
-    const standardItems: EquipmentItem[] = []
+    const standardItems: EquipmentEntry[] = []
     for (const cat of equipmentCategories) {
       for (const item of cat.items) {
-        if (item.is_standard) standardItems.push(item)
+        if (item.is_standard) standardItems.push({ ...item, quantity: 1 })
       }
     }
 
@@ -75,7 +76,7 @@ export default function EquipmentStep({ priceBreakdown, discountableEquipmentSub
       const next = new Map(selectedEquipment)
       for (const te of templateEquipment) {
         const item = allItems.find((i) => i.id === te.equipment_item_id)
-        if (item && !next.has(item.id)) next.set(item.id, item)
+        if (item && !next.has(item.id)) next.set(item.id, { ...item, quantity: 1 })
       }
       setSelectedEquipment(next)
     }

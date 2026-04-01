@@ -315,7 +315,12 @@
     "discountOnItem": "Popust na {{name}}",
     "selectContact": "Kontakt osoba",
     "primary": "Primarni",
-    "allBrands": "Sve marke"
+    "allBrands": "Sve marke",
+    "modelYear": "Godina modela",
+    "modelYearPlaceholder": "npr. 2026",
+    "paymentTerms": "Uvjeti plaćanja",
+    "paymentTermsPlaceholder": "Unesite uvjete plaćanja...",
+    "quantity": "Kol."
   },
   "clients": {
     "title": "Klijenti",
@@ -458,7 +463,20 @@
     "depositRemoved": "Barkod za plaćanje uklonjen",
     "removeBarcode": "Ukloni barkod",
     "changeLanguage": "Promijeni jezik ponude",
-    "languageUpdated": "Jezik ponude ažuriran"
+    "languageUpdated": "Jezik ponude ažuriran",
+    "modelYear": "Godina modela",
+    "year": "Godina",
+    "paymentTerms": "Uvjeti plaćanja",
+    "includeStandardEquipment": "Uključi standardnu opremu u PDF",
+    "includeVAT": "Uključi PDV u cijenu",
+    "vatPercentage": "PDV %",
+    "vatAmount": "PDV",
+    "grandTotalWithVAT": "UKUPNO s PDV-om",
+    "quoteOptions": "Opcije ponude",
+    "deliveryTermsSaved": "Uvjeti isporuke spremljeni",
+    "paymentTermsSaved": "Uvjeti plaćanja spremljeni",
+    "vatSaved": "PDV postavke spremljene",
+    "standardEquipmentToggled": "Vidljivost standardne opreme ažurirana"
   },
   "settings": {
     "title": "Postavke",
@@ -618,6 +636,11 @@
     "signature": "Potpis",
     "seller": "Prodavatelj",
     "buyer": "Kupac",
-    "scanToPay": "Skenirajte za uplatu"
+    "scanToPay": "Skenirajte za uplatu",
+    "quantity": "Kol.",
+    "unitPrice": "Cijena",
+    "paymentTerms": "Uvjeti plaćanja",
+    "netPrice": "Neto cijena",
+    "item": "Stavka"
   }
 }

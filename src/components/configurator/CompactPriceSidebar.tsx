@@ -124,12 +124,18 @@ export function PriceContent({
             {t('configurator.selectedEquipment')}
           </p>
           <div className="max-h-28 divide-y divide-border/30 overflow-y-auto">
-            {selectedOptionalItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between py-0.5 text-xs">
-                <span className="mr-2 truncate text-foreground">{getLocalizedName(item, lang)}</span>
-                <span className="shrink-0 text-muted-foreground">{formatPrice(item.price)}</span>
-              </div>
-            ))}
+            {selectedOptionalItems.map((item) => {
+              const qty = ('quantity' in item ? (item as Record<string, unknown>).quantity as number : null) ?? 1
+              return (
+                <div key={item.id} className="flex items-center justify-between py-0.5 text-xs">
+                  <span className="mr-2 truncate text-foreground">
+                    {getLocalizedName(item, lang)}
+                    {qty > 1 && <span className="ml-1 text-muted-foreground">×{qty}</span>}
+                  </span>
+                  <span className="shrink-0 text-muted-foreground">{formatPrice(item.price * qty)}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
@@ -222,12 +228,18 @@ export function CompactPriceSidebar({
             {t('configurator.selectedEquipment')}
           </p>
           <div className="max-h-36 divide-y divide-border/30 overflow-y-auto">
-            {selectedOptionalItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between py-0.5 text-xs">
-                <span className="mr-2 truncate text-foreground">{getLocalizedName(item, lang)}</span>
-                <span className="shrink-0 text-muted-foreground">{formatPrice(item.price)}</span>
-              </div>
-            ))}
+            {selectedOptionalItems.map((item) => {
+              const qty = ('quantity' in item ? (item as Record<string, unknown>).quantity as number : null) ?? 1
+              return (
+                <div key={item.id} className="flex items-center justify-between py-0.5 text-xs">
+                  <span className="mr-2 truncate text-foreground">
+                    {getLocalizedName(item, lang)}
+                    {qty > 1 && <span className="ml-1 text-muted-foreground">×{qty}</span>}
+                  </span>
+                  <span className="shrink-0 text-muted-foreground">{formatPrice(item.price * qty)}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

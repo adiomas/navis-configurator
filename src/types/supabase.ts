@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
@@ -564,6 +566,7 @@ export type Database = {
           name_en: string | null
           name_hr: string | null
           price: number
+          quantity: number | null
           quote_id: string
           sort_order: number
         }
@@ -580,6 +583,7 @@ export type Database = {
           name_en?: string | null
           name_hr?: string | null
           price?: number
+          quantity?: number | null
           quote_id: string
           sort_order?: number
         }
@@ -596,6 +600,7 @@ export type Database = {
           name_en?: string | null
           name_hr?: string | null
           price?: number
+          quantity?: number | null
           quote_id?: string
           sort_order?: number
         }
@@ -834,8 +839,12 @@ export type Database = {
           equipment_discount: number
           equipment_subtotal: number
           id: string
+          include_standard_in_pdf: boolean | null
           language: string
+          model_year: number | null
           notes: string | null
+          payment_terms_en: string | null
+          payment_terms_hr: string | null
           quote_number: string
           rejected_at: string | null
           sent_at: string | null
@@ -844,6 +853,8 @@ export type Database = {
           total_discount: number
           total_price: number | null
           updated_at: string
+          vat_included: boolean | null
+          vat_percentage: number | null
         }
         Insert: {
           accepted_at?: string | null
@@ -862,8 +873,12 @@ export type Database = {
           equipment_discount?: number
           equipment_subtotal?: number
           id?: string
+          include_standard_in_pdf?: boolean | null
           language?: string
+          model_year?: number | null
           notes?: string | null
+          payment_terms_en?: string | null
+          payment_terms_hr?: string | null
           quote_number: string
           rejected_at?: string | null
           sent_at?: string | null
@@ -872,6 +887,8 @@ export type Database = {
           total_discount?: number
           total_price?: number | null
           updated_at?: string
+          vat_included?: boolean | null
+          vat_percentage?: number | null
         }
         Update: {
           accepted_at?: string | null
@@ -890,8 +907,12 @@ export type Database = {
           equipment_discount?: number
           equipment_subtotal?: number
           id?: string
+          include_standard_in_pdf?: boolean | null
           language?: string
+          model_year?: number | null
           notes?: string | null
+          payment_terms_en?: string | null
+          payment_terms_hr?: string | null
           quote_number?: string
           rejected_at?: string | null
           sent_at?: string | null
@@ -900,6 +921,8 @@ export type Database = {
           total_discount?: number
           total_price?: number | null
           updated_at?: string
+          vat_included?: boolean | null
+          vat_percentage?: number | null
         }
         Relationships: [
           {
@@ -945,16 +968,13 @@ export type Database = {
     }
     Functions: {
       generate_quote_number: { Args: never; Returns: string }
-      import_boat_from_pricelist: {
-        Args: { payload: Json }
-        Returns: Json
-      }
       get_dashboard_stats: { Args: { p_date_from?: string }; Returns: Json }
       get_quote_status_counts: {
         Args: { p_template_group_id?: string }
         Returns: Json
       }
       get_template_group_quote_counts: { Args: never; Returns: Json }
+      import_boat_from_pricelist: { Args: { payload: Json }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       set_primary_boat_image: {
         Args: { p_boat_id: string; p_image_id: string }

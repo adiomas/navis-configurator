@@ -28,6 +28,10 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
     templateGroupId,
     deliveryTerms,
     setDeliveryTerms,
+    modelYear,
+    setModelYear,
+    paymentTerms,
+    setPaymentTerms,
     reset,
   } = useConfiguratorStore()
 
@@ -42,6 +46,16 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
       if (defaultTerms) setDeliveryTerms(defaultTerms)
     }
   }, [settings, lang, deliveryTerms, setDeliveryTerms])
+
+  // Prefill payment terms from company settings if store value is empty
+  useEffect(() => {
+    if (!paymentTerms && settings) {
+      const defaultPaymentTerms = lang === 'hr'
+        ? settings.terms_hr ?? settings.terms_en ?? ''
+        : settings.terms_en ?? settings.terms_hr ?? ''
+      if (defaultPaymentTerms) setPaymentTerms(defaultPaymentTerms)
+    }
+  }, [settings, lang, paymentTerms, setPaymentTerms])
 
   const equipmentArray = useMemo(
     () => [...selectedEquipment.values()],
@@ -62,6 +76,8 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
         status,
         categories: boatEquipment,
         deliveryTerms,
+        modelYear,
+        paymentTerms,
       })
 
       toast.success(
@@ -105,6 +121,24 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
         clientData={clientData}
       />
 
+      {/* Model Year (only for new boats) */}
+      {selectedBoat?.category === 'new' && (
+        <div className="rounded-lg border border-border bg-card p-4">
+          <label className={cn(ds.input.label, 'mb-1.5')}>
+            {t('configurator.modelYear')}
+          </label>
+          <input
+            type="number"
+            min={2024}
+            max={2035}
+            value={modelYear ?? ''}
+            onChange={(e) => setModelYear(e.target.value ? parseInt(e.target.value, 10) : null)}
+            placeholder={t('configurator.modelYearPlaceholder')}
+            className={cn(ds.input.base, 'w-32')}
+          />
+        </div>
+      )}
+
       {/* Delivery Terms */}
       <div className="rounded-lg border border-border bg-card p-4">
         <label className={cn(ds.input.label, 'mb-1.5')}>
@@ -115,6 +149,20 @@ export default function ReviewStep({ boatDetails, boatEquipment }: ReviewStepPro
           onChange={(e) => setDeliveryTerms(e.target.value)}
           rows={3}
           placeholder={t('configurator.deliveryTermsPlaceholder')}
+          className={ds.input.textarea}
+        />
+      </div>
+
+      {/* Payment Terms */}
+      <div className="rounded-lg border border-border bg-card p-4">
+        <label className={cn(ds.input.label, 'mb-1.5')}>
+          {t('configurator.paymentTerms')}
+        </label>
+        <textarea
+          value={paymentTerms}
+          onChange={(e) => setPaymentTerms(e.target.value)}
+          rows={3}
+          placeholder={t('configurator.paymentTermsPlaceholder')}
           className={ds.input.textarea}
         />
       </div>

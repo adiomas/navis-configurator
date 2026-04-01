@@ -235,7 +235,8 @@ export default function BoatStep() {
                   <div className="min-w-0 flex-1 p-2 lg:p-0">
                     <p className="truncate text-xs font-medium text-foreground lg:text-sm">{boat.name}</p>
                     <p className="text-[11px] text-muted-foreground lg:text-xs">
-                      {boat.brand} &middot; {boat.year}
+                      {boat.brand}
+                      {boat.category === 'used' && boat.year && <> &middot; {boat.year}</>}
                     </p>
                     <p className="mt-0.5 text-xs font-medium text-gold lg:mt-1">
                       {formatPrice(boat.base_price)}

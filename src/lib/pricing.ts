@@ -1,4 +1,4 @@
-import type { ConfiguratorDiscount, EquipmentItem, PriceBreakdown } from '@/types'
+import type { ConfiguratorDiscount, EquipmentItemWithQuantity, PriceBreakdown } from '@/types'
 
 /**
  * Apply a list of discounts to an amount.
@@ -31,12 +31,15 @@ export function calculateDiscountAmount(amount: number, discounts: ConfiguratorD
  * itemDiscountableMap: resolved per-item discountable flag (item.is_discountable ?? category.is_discountable ?? true)
  * Equipment-wide discounts apply ONLY to discountable items.
  * Per-item discounts apply to ALL items regardless of discountable flag.
+ * Quantity multiplies item price before discount calculation.
  */
 export function calculatePriceBreakdown(
   basePrice: number,
-  selectedEquipment: EquipmentItem[],
+  selectedEquipment: EquipmentItemWithQuantity[],
   discounts: ConfiguratorDiscount[],
   itemDiscountableMap?: Map<string, boolean>,
+  vatIncluded?: boolean,
+  vatPercentage?: number,
 ): PriceBreakdown {
   // 1. Boat discounts
   const boatDiscounts = discounts.filter(d => d.level === 'boat_base')
@@ -48,12 +51,14 @@ export function calculatePriceBreakdown(
   let equipmentItemDiscounts = 0
 
   for (const item of selectedEquipment) {
+    const qty = item.quantity ?? 1
+    const lineTotal = item.price * qty
     const itemDiscounts = discounts.filter(
       d => d.level === 'equipment_item' && d.equipmentItemId === item.id,
     )
-    const itemDiscount = calculateDiscountAmount(item.price, itemDiscounts)
+    const itemDiscount = calculateDiscountAmount(lineTotal, itemDiscounts)
     equipmentItemDiscounts += itemDiscount
-    equipmentSubtotal += item.price
+    equipmentSubtotal += lineTotal
   }
 
   // 3. Equipment-wide discounts — apply ONLY to discountable items (after per-item discounts)
@@ -63,11 +68,13 @@ export function calculatePriceBreakdown(
   let nonDiscountableAfterPerItem = 0
 
   for (const item of selectedEquipment) {
+    const qty = item.quantity ?? 1
+    const lineTotal = item.price * qty
     const isDiscountable = itemDiscountableMap?.get(item.id) ?? true
     const itemDiscounts = discounts.filter(
       d => d.level === 'equipment_item' && d.equipmentItemId === item.id,
     )
-    const itemAfterPerItem = item.price - calculateDiscountAmount(item.price, itemDiscounts)
+    const itemAfterPerItem = lineTotal - calculateDiscountAmount(lineTotal, itemDiscounts)
 
     if (isDiscountable) {
       discountableAfterPerItem += itemAfterPerItem
@@ -86,6 +93,9 @@ export function calculatePriceBreakdown(
   const totalDiscount = boatDiscountAmount + equipmentItemDiscounts + equipmentAllDiscountsAmount
   const grandTotal = boatFinalPrice + equipmentFinalTotal
 
+  const vatAmount = vatIncluded ? grandTotal * ((vatPercentage ?? 25) / 100) : 0
+  const grandTotalWithVat = grandTotal + vatAmount
+
   return {
     boatBasePrice: basePrice,
     boatDiscounts: boatDiscountAmount,
@@ -96,5 +106,7 @@ export function calculatePriceBreakdown(
     equipmentFinalTotal,
     totalDiscount,
     grandTotal,
+    vatAmount,
+    grandTotalWithVat,
   }
 }

@@ -65,7 +65,7 @@ export default function ConfiguratorPage() {
   const discountableEquipmentSubtotal = useMemo(() =>
     equipmentArray
       .filter(item => !item.is_standard && (itemDiscountableMap.get(item.id) ?? true))
-      .reduce((sum, item) => sum + item.price, 0),
+      .reduce((sum, item) => sum + item.price * (item.quantity ?? 1), 0),
     [equipmentArray, itemDiscountableMap],
   )
 

@@ -110,7 +110,11 @@ export interface PriceBreakdown {
   equipmentFinalTotal: number
   totalDiscount: number
   grandTotal: number
+  vatAmount: number
+  grandTotalWithVat: number
 }
+
+export type EquipmentItemWithQuantity = EquipmentItem & { quantity?: number }
 
 export interface ClientFormData {
   companyId?: string
