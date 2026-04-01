@@ -717,28 +717,28 @@ export function PDFDetailedTemplate({
           )}
           <Text style={s.footerText}>
             {settings.registration_number && (
-              <>{labels.registeredAt} <Text style={s.footerBold}>MB: {settings.registration_number}</Text></>
+              <>{labels.registeredAt} <Text style={s.footerBold}>MB:</Text> {settings.registration_number}</>
             )}
             {settings.registration_number && settings.oib ? ' | ' : ''}
             {settings.oib && (
-              <><Text style={s.footerBold}>OIB: {settings.oib}</Text></>
+              <><Text style={s.footerBold}>OIB:</Text> {settings.oib}</>
             )}
             {settings.oib && settings.iban ? ' | ' : ''}
             {settings.iban && (
-              <><Text style={s.footerBold}>IBAN: {settings.iban}</Text></>
+              <><Text style={s.footerBold}>IBAN:</Text> {settings.iban}</>
             )}
             {settings.iban && settings.bic ? ' | ' : ''}
             {settings.bic && (
-              <><Text style={s.footerBold}>SWIFT: {settings.bic}</Text>{settings.bank_name ? `, ${settings.bank_name}` : ''}</>
+              <><Text style={s.footerBold}>SWIFT:</Text> {settings.bic}{settings.bank_name ? `, ${settings.bank_name}` : ''}</>
             )}
           </Text>
           <Text style={s.footerText}>
             {settings.share_capital && (
-              <>{labels.shareCapitalLabel}: <Text style={s.footerBold}>{settings.share_capital}</Text></>
+              <><Text style={s.footerBold}>{labels.shareCapitalLabel}:</Text> {settings.share_capital}</>
             )}
             {settings.share_capital && settings.director_name ? ' | ' : ''}
             {settings.director_name && (
-              <>{labels.directorLabel}: <Text style={s.footerBold}>{settings.director_name}</Text></>
+              <><Text style={s.footerBold}>{labels.directorLabel}:</Text> {settings.director_name}</>
             )}
           </Text>
         </View>
