@@ -245,6 +245,7 @@ export type Database = {
           default_language: string
           delivery_terms_en: string | null
           delivery_terms_hr: string | null
+          director_name: string | null
           email: string | null
           iban: string | null
           id: string
@@ -253,6 +254,8 @@ export type Database = {
           oib: string | null
           phone: string | null
           postal_code: string | null
+          registration_number: string | null
+          share_capital: string | null
           terms_en: string | null
           terms_hr: string | null
           website: string | null
@@ -266,6 +269,7 @@ export type Database = {
           default_language?: string
           delivery_terms_en?: string | null
           delivery_terms_hr?: string | null
+          director_name?: string | null
           email?: string | null
           iban?: string | null
           id?: string
@@ -274,6 +278,8 @@ export type Database = {
           oib?: string | null
           phone?: string | null
           postal_code?: string | null
+          registration_number?: string | null
+          share_capital?: string | null
           terms_en?: string | null
           terms_hr?: string | null
           website?: string | null
@@ -287,6 +293,7 @@ export type Database = {
           default_language?: string
           delivery_terms_en?: string | null
           delivery_terms_hr?: string | null
+          director_name?: string | null
           email?: string | null
           iban?: string | null
           id?: string
@@ -295,6 +302,8 @@ export type Database = {
           oib?: string | null
           phone?: string | null
           postal_code?: string | null
+          registration_number?: string | null
+          share_capital?: string | null
           terms_en?: string | null
           terms_hr?: string | null
           website?: string | null
@@ -429,6 +438,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      partner_logos: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       pdf_templates: {
         Row: {

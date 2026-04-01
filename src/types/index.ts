@@ -57,6 +57,9 @@ export type QuoteTemplateGroupDiscountInsert = Tables['quote_template_group_disc
 
 export type PDFTemplate = Tables['pdf_templates']['Row']
 
+export type PartnerLogo = Tables['partner_logos']['Row']
+export type PartnerLogoInsert = Tables['partner_logos']['Insert']
+
 // Composite types for UI
 export type BoatWithSpecs = Boat & {
   specs: BoatSpec[]

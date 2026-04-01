@@ -76,7 +76,7 @@ interface PdfLabels {
   category: string
   type: string
   price: string
-  contactPerson: string
+  offerMadeBy: string
   net: string
   optional: string
   vesselDiscount: string
@@ -96,6 +96,14 @@ interface PdfLabels {
   deliveryTerms: string
   quantity: string
   unitPrice: string
+  exclVat: string
+  inclVat: string
+  signatureBuyer: string
+  signatureSeller: string
+  customer: string
+  registeredAt: string
+  shareCapitalLabel: string
+  directorLabel: string
 }
 
 const labelsHr: PdfLabels = {
@@ -126,7 +134,7 @@ const labelsHr: PdfLabels = {
   category: 'Kategorija',
   type: 'Tip',
   price: 'Cijena',
-  contactPerson: 'Kontakt osoba',
+  offerMadeBy: 'Ponudu izradio/la',
   net: 'Neto',
   optional: 'Opcionalno',
   vesselDiscount: 'Popust na plovilo',
@@ -146,13 +154,21 @@ const labelsHr: PdfLabels = {
   deliveryTerms: 'Uvjeti isporuke',
   quantity: 'Kol.',
   unitPrice: 'Cijena',
+  exclVat: 'bez PDV-a',
+  inclVat: 's PDV-om',
+  signatureBuyer: 'Potpis kupca',
+  signatureSeller: 'Potpis prodavatelja',
+  customer: 'Kupac',
+  registeredAt: 'Registrirano kod Trgovačkog suda u Zagrebu pod',
+  shareCapitalLabel: 'Temeljni kapital uplaćen u cijelosti',
+  directorLabel: 'Predsjednik Uprave',
 }
 
 const labelsEn: PdfLabels = {
   quote: 'QUOTE',
   date: 'Date',
   validUntil: 'Valid Until',
-  billTo: 'Bill To',
+  billTo: 'Customer',
   boatDetails: 'Boat Details',
   standardEquipment: 'Standard Equipment',
   optionalEquipment: 'Optional Equipment',
@@ -176,7 +192,7 @@ const labelsEn: PdfLabels = {
   category: 'Category',
   type: 'Type',
   price: 'Price',
-  contactPerson: 'Contact Person',
+  offerMadeBy: 'Offer Made By',
   net: 'Net',
   optional: 'Optional',
   vesselDiscount: 'Vessel Discount',
@@ -196,6 +212,14 @@ const labelsEn: PdfLabels = {
   deliveryTerms: 'Terms of Delivery',
   quantity: 'Qty',
   unitPrice: 'Price',
+  exclVat: 'excl. VAT',
+  inclVat: 'incl. VAT',
+  signatureBuyer: 'Signature for Buyer',
+  signatureSeller: 'Signature for Seller',
+  customer: 'Customer',
+  registeredAt: 'Registered at the Commercial Court in Zagreb under Reg. No.',
+  shareCapitalLabel: 'Share capital fully paid',
+  directorLabel: 'Director',
 }
 
 /**

@@ -529,7 +529,17 @@
     "invalidFileType": "Dozvoljene su samo PNG, JPG i SVG datoteke",
     "croatian": "Hrvatski (HR)",
     "english": "Engleski (EN)",
-    "saveCompanyFirst": "Prvo spremite podatke o tvrtki"
+    "saveCompanyFirst": "Prvo spremite podatke o tvrtki",
+    "registrationNumber": "Matični broj (MB)",
+    "shareCapital": "Temeljni kapital",
+    "directorName": "Direktor / Predsjednik uprave",
+    "partnerLogos": "Logovi partnera",
+    "partnerLogosHint": "Logovi koji se prikazuju na zadnjoj stranici PDF ponuda.",
+    "addPartnerLogo": "Dodaj logo",
+    "deletePartnerLogo": "Obriši",
+    "partnerLogoAdded": "Logo partnera dodan",
+    "partnerLogoDeleted": "Logo partnera obrisan",
+    "partnerLogoError": "Greška pri upravljanju logom partnera"
   },
   "templateGroups": {
     "title": "Grupe predložaka",

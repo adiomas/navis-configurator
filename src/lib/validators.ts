@@ -108,6 +108,9 @@ export const companySettingsSchema = z.object({
   bank_name: z.string().optional(),
   default_currency: z.string().default('EUR'),
   default_language: z.enum(['hr', 'en']).default('hr'),
+  registration_number: z.string().optional(),
+  share_capital: z.string().optional(),
+  director_name: z.string().optional(),
 })
 
 export const inviteUserSchema = z.object({

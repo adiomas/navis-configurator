@@ -8,25 +8,26 @@ import {
 } from '@react-pdf/renderer'
 import { formatPrice, formatDate } from '@/lib/formatters'
 import { getPdfLabels } from '@/lib/pdf-generator'
-import type { QuoteWithDetails, CompanySettings, BoatSpec } from '@/types'
+import type { QuoteWithDetails, CompanySettings, BoatSpec, PartnerLogo } from '@/types'
 
 interface PDFDetailedTemplateProps {
   quote: QuoteWithDetails
   settings: CompanySettings
   barcodeDataUrl?: string | null
   boatSpecs?: BoatSpec[]
+  partnerLogos?: PartnerLogo[]
 }
 
 const NAVY = '#1a1a2e'
 const GOLD = '#c9a961'
 const DISCOUNT_RED = '#c0392b'
-const TEXT_DARK = '#2a2a2a'
-const TEXT_MUTED = '#666666'
-const TEXT_LIGHT = '#999999'
-const TEXT_SECONDARY = '#777777'
-const TEXT_BODY = '#555555'
+const TEXT_DARK = '#1a1a1a'
+const TEXT_MUTED = '#333333'
+const TEXT_SECONDARY = '#333333'
+const TEXT_BODY = '#2a2a2a'
 const BG_LIGHT = '#f7f8fa'
 const BORDER_LIGHT = '#e8e9ec'
+const TOTAL_BG = '#2d3561'
 
 const s = StyleSheet.create({
   // ── Page ──
@@ -34,65 +35,66 @@ const s = StyleSheet.create({
     fontFamily: 'Plus Jakarta Sans',
     fontSize: 8.5,
     paddingTop: 28,
-    paddingBottom: 24,
+    paddingBottom: 58,
     paddingHorizontal: 36,
     color: TEXT_DARK,
+    display: 'flex',
+    flexDirection: 'column',
   },
 
-  // ── Top stripe ──
-  stripe: {
+  // ── Footer (fixed at bottom of every page) ──
+  footerWrap: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2.5,
-    backgroundColor: NAVY,
-  },
-
-  // ── Footer ──
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: NAVY,
-    paddingVertical: 3.5,
-    paddingHorizontal: 36,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    bottom: 6,
+    left: 36,
+    right: 36,
     alignItems: 'center',
   },
   footerText: {
     fontFamily: 'Plus Jakarta Sans',
-    fontSize: 6,
-    color: '#ffffff',
-    letterSpacing: 0.3,
+    fontSize: 5.5,
+    color: TEXT_MUTED,
+    textAlign: 'center',
+    lineHeight: 1.6,
   },
-  footerPage: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontSize: 6.5,
-    color: '#ffffff',
-    letterSpacing: 0.3,
+  footerBold: {
+    fontWeight: 700,
+  },
+
+  // ── Partner logos row ──
+  partnerLogosRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 6,
+  },
+  partnerLogo: {
+    height: 22,
+    width: 60,
+    objectFit: 'contain',
   },
 
   // ── Header ──
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 12,
     paddingBottom: 10,
     borderBottomWidth: 0.75,
     borderBottomColor: NAVY,
   },
+  logoWrap: {
+    alignItems: 'flex-start',
+  },
   logo: {
-    width: 110,
-    height: 36,
+    height: 62,
     objectFit: 'contain',
   },
   logoFallback: {
     fontFamily: 'Playfair Display',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 700,
     color: NAVY,
     letterSpacing: 1.5,
@@ -101,7 +103,7 @@ const s = StyleSheet.create({
     fontSize: 5.5,
     textTransform: 'uppercase',
     letterSpacing: 2.5,
-    color: '#999999',
+    color: TEXT_MUTED,
     marginTop: 1,
   },
   headerRight: {
@@ -136,7 +138,7 @@ const s = StyleSheet.create({
     fontWeight: 500,
   },
 
-  // ── Info columns (client + contact) ──
+  // ── Info columns (customer + offer made by) ──
   infoRow: {
     flexDirection: 'row',
     gap: 16,
@@ -154,7 +156,7 @@ const s = StyleSheet.create({
     fontWeight: 700,
     textTransform: 'uppercase',
     letterSpacing: 1.5,
-    color: TEXT_LIGHT,
+    color: TEXT_SECONDARY,
     marginBottom: 3,
   },
   infoName: {
@@ -166,7 +168,7 @@ const s = StyleSheet.create({
   },
   infoDetail: {
     fontSize: 7.5,
-    color: TEXT_MUTED,
+    color: TEXT_BODY,
     lineHeight: 1.45,
   },
 
@@ -180,20 +182,11 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  vesselLeft: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-  },
   vesselName: {
     fontFamily: 'Playfair Display',
-    fontSize: 11.5,
+    fontSize: 15,
     fontWeight: 700,
     color: NAVY,
-  },
-  vesselYear: {
-    fontSize: 7.5,
-    color: TEXT_LIGHT,
   },
   vesselRight: {
     alignItems: 'flex-end',
@@ -202,7 +195,7 @@ const s = StyleSheet.create({
     fontSize: 5.5,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    color: TEXT_LIGHT,
+    color: TEXT_SECONDARY,
     marginBottom: 0.5,
   },
   priceVal: {
@@ -238,7 +231,7 @@ const s = StyleSheet.create({
     fontSize: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
-    color: TEXT_LIGHT,
+    color: TEXT_SECONDARY,
   },
   specVal: {
     fontSize: 7.5,
@@ -338,22 +331,6 @@ const s = StyleSheet.create({
     borderBottomColor: '#f0f0f2',
     alignItems: 'center',
   },
-  colName: {
-    width: '50%',
-    paddingLeft: 6,
-  },
-  colPrice: {
-    width: '18%',
-    textAlign: 'right',
-  },
-  colDisc: {
-    width: '14%',
-    textAlign: 'right',
-  },
-  colNet: {
-    width: '18%',
-    textAlign: 'right',
-  },
   cellName: {
     fontSize: 8,
     fontWeight: 500,
@@ -401,19 +378,19 @@ const s = StyleSheet.create({
     borderRightColor: BORDER_LIGHT,
   },
   pricingColTotal: {
-    width: 145,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: NAVY,
+    width: 155,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: TOTAL_BG,
     justifyContent: 'center',
     alignItems: 'center',
   },
   pColTitle: {
-    fontSize: 5.5,
+    fontSize: 6,
     fontWeight: 700,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
-    color: TEXT_LIGHT,
+    color: TEXT_SECONDARY,
     marginBottom: 4,
   },
   pRow: {
@@ -455,15 +432,16 @@ const s = StyleSheet.create({
     color: TEXT_DARK,
   },
   pTotalLbl: {
-    fontSize: 6,
+    fontSize: 8,
+    fontWeight: 700,
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     color: GOLD,
-    marginBottom: 2,
+    marginBottom: 3,
   },
   pTotalVal: {
     fontFamily: 'Playfair Display',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 700,
     color: '#ffffff',
   },
@@ -501,16 +479,16 @@ const s = StyleSheet.create({
   payText: {
     fontSize: 7.5,
     lineHeight: 1.45,
-    color: TEXT_BODY,
+    color: TEXT_DARK,
   },
   payBold: {
     fontSize: 7.5,
     fontWeight: 700,
     color: TEXT_DARK,
   },
-  payMono: {
-    fontFamily: 'Courier',
+  payBankDetail: {
     fontSize: 7.5,
+    fontWeight: 700,
     color: TEXT_DARK,
   },
   barcodeWrap: {
@@ -552,15 +530,17 @@ const s = StyleSheet.create({
   },
   termsBody: {
     fontSize: 6.5,
-    color: TEXT_LIGHT,
+    color: TEXT_BODY,
     lineHeight: 1.45,
   },
 
   // ── Signatures ──
+  sigWrap: {
+    marginTop: 24,
+  },
   sigRow: {
     flexDirection: 'row',
     gap: 40,
-    marginTop: 20,
   },
   sigCol: {
     flex: 1,
@@ -575,7 +555,12 @@ const s = StyleSheet.create({
     fontSize: 6.5,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    color: TEXT_LIGHT,
+    color: TEXT_SECONDARY,
+  },
+  sigName: {
+    fontSize: 7,
+    color: TEXT_DARK,
+    marginTop: 2,
   },
 })
 
@@ -589,6 +574,7 @@ export function PDFDetailedTemplate({
   settings,
   barcodeDataUrl,
   boatSpecs,
+  partnerLogos,
 }: PDFDetailedTemplateProps) {
   const lang = (quote.language === 'hr' ? 'hr' : 'en') as 'hr' | 'en'
   const labels = getPdfLabels(lang)
@@ -596,7 +582,7 @@ export function PDFDetailedTemplate({
 
   const boat = quote.boat
   const company = quote.company
-  const contact = quote.contact
+  const createdByProfile = quote.created_by_profile as { id: string; full_name: string | null; email?: string } | null
 
   const validUntilDate = new Date(quote.created_at)
   validUntilDate.setDate(validUntilDate.getDate() + 30)
@@ -633,7 +619,7 @@ export function PDFDetailedTemplate({
   const stdCol1 = stdEntries.slice(0, stdMid)
   const stdCol2 = stdEntries.slice(stdMid)
 
-  // Top 5 specs — filter out price list region and prices note
+  // Top specs — filter out price list region and prices note
   const excludedLabels = ['price list region', 'prices note', 'regija cjenika', 'napomena o cijenama']
   const topSpecs = boatSpecs
     ? [...boatSpecs]
@@ -668,12 +654,8 @@ export function PDFDetailedTemplate({
   const terms = lang === 'hr' ? settings.terms_hr : settings.terms_en
   const isQR = lang !== 'hr'
 
-  // Footer
-  const footerParts: string[] = []
-  if (settings.name) footerParts.push(settings.name)
-  if (settings.address) footerParts.push(settings.address)
-  if (settings.oib) footerParts.push(`OIB: ${settings.oib}`)
-  if (settings.iban) footerParts.push(`IBAN: ${settings.iban}`)
+  // VAT label
+  const vatLabel = quote.vat_included ? `(${labels.inclVat})` : `(${labels.exclVat})`
 
   // Barcode label
   const barcodeLabelText = (() => {
@@ -686,6 +668,29 @@ export function PDFDetailedTemplate({
     }
     return labels.scanToPay
   })()
+
+  // Discount labels with percentage
+  const boatDiscountLabel = (() => {
+    const boatPctDiscount = quote.discounts?.find(
+      d => d.discount_level === 'boat_base' && d.discount_type === 'percentage'
+    )
+    if (boatPctDiscount) {
+      return `${labels.discount} (${Number(boatPctDiscount.value)}%)`
+    }
+    return labels.discount
+  })()
+
+  const equipmentDiscountLabel = (() => {
+    const equipAllPctDiscount = quote.discounts?.find(
+      d => d.discount_level === 'equipment_all' && d.discount_type === 'percentage'
+    )
+    if (equipAllPctDiscount) {
+      return `${labels.equipmentDiscounts} (${Number(equipAllPctDiscount.value)}%)`
+    }
+    return labels.equipmentDiscounts
+  })()
+
+  const hasPartnerLogos = partnerLogos && partnerLogos.length > 0
 
   const renderStdColumn = (entries: [string, string[]][], isFirst: boolean) => (
     <View style={s.stdCol}>
@@ -701,21 +706,46 @@ export function PDFDetailedTemplate({
   return (
     <Document>
       <Page size="A4" style={s.page}>
-        <View style={s.stripe} fixed />
-
-        <View style={s.footer} fixed>
-          <Text style={s.footerText}>{footerParts.join('  \u2022  ')}</Text>
-          <Text
-            style={s.footerPage}
-            render={({ pageNumber, totalPages }) =>
-              `${labels.page} ${pageNumber} / ${totalPages}`
-            }
-          />
+        {/* Fixed footer — partner logos + registration text on every page */}
+        <View style={s.footerWrap} fixed>
+          {hasPartnerLogos && (
+            <View style={s.partnerLogosRow}>
+              {partnerLogos!.map((pl) => (
+                <Image key={pl.id} src={pl.logo_url} style={s.partnerLogo} />
+              ))}
+            </View>
+          )}
+          <Text style={s.footerText}>
+            {settings.registration_number && (
+              <>{labels.registeredAt} <Text style={s.footerBold}>MB: {settings.registration_number}</Text></>
+            )}
+            {settings.registration_number && settings.oib ? ' | ' : ''}
+            {settings.oib && (
+              <><Text style={s.footerBold}>OIB: {settings.oib}</Text></>
+            )}
+            {settings.oib && settings.iban ? ' | ' : ''}
+            {settings.iban && (
+              <><Text style={s.footerBold}>IBAN: {settings.iban}</Text></>
+            )}
+            {settings.iban && settings.bic ? ' | ' : ''}
+            {settings.bic && (
+              <><Text style={s.footerBold}>SWIFT: {settings.bic}</Text>{settings.bank_name ? `, ${settings.bank_name}` : ''}</>
+            )}
+          </Text>
+          <Text style={s.footerText}>
+            {settings.share_capital && (
+              <>{labels.shareCapitalLabel}: <Text style={s.footerBold}>{settings.share_capital}</Text></>
+            )}
+            {settings.share_capital && settings.director_name ? ' | ' : ''}
+            {settings.director_name && (
+              <>{labels.directorLabel}: <Text style={s.footerBold}>{settings.director_name}</Text></>
+            )}
+          </Text>
         </View>
 
         {/* Header */}
         <View style={s.header}>
-          <View>
+          <View style={s.logoWrap}>
             {settings.logo_url ? (
               <Image src={settings.logo_url} style={s.logo} />
             ) : (
@@ -741,10 +771,10 @@ export function PDFDetailedTemplate({
           </View>
         </View>
 
-        {/* Client + Contact */}
+        {/* Customer + Offer Made By */}
         <View style={s.infoRow}>
           <View style={s.infoCard}>
-            <Text style={s.infoLabel}>{labels.billTo}</Text>
+            <Text style={s.infoLabel}>{labels.customer}</Text>
             {company && (
               <>
                 <Text style={s.infoName}>{company.name}</Text>
@@ -752,7 +782,10 @@ export function PDFDetailedTemplate({
                   {[
                     company.address,
                     [company.postal_code, company.city].filter(Boolean).join(' '),
+                    company.country,
                     company.registration_number ? `OIB: ${company.registration_number}` : null,
+                    company.email,
+                    company.phone,
                   ]
                     .filter(Boolean)
                     .join('\n')}
@@ -761,12 +794,12 @@ export function PDFDetailedTemplate({
             )}
           </View>
           <View style={s.infoCard}>
-            <Text style={s.infoLabel}>{labels.contactPerson}</Text>
-            {contact && (
+            <Text style={s.infoLabel}>{labels.offerMadeBy}</Text>
+            {createdByProfile && (
               <>
-                <Text style={s.infoName}>{contact.full_name}</Text>
+                <Text style={s.infoName}>{createdByProfile.full_name}</Text>
                 <Text style={s.infoDetail}>
-                  {[contact.email, contact.phone].filter(Boolean).join('\n')}
+                  {[createdByProfile.email].filter(Boolean).join('\n')}
                 </Text>
               </>
             )}
@@ -776,17 +809,9 @@ export function PDFDetailedTemplate({
         {/* Vessel bar */}
         {boat && (
           <View style={s.vessel}>
-            <View style={s.vesselLeft}>
-              <Text style={s.vesselName}>{boat.name}</Text>
-              {(() => {
-                const displayYear = boat.category === 'used' ? boat.year : quote.model_year
-                return displayYear ? (
-                  <Text style={s.vesselYear}>{labels.model} {displayYear}</Text>
-                ) : null
-              })()}
-            </View>
+            <Text style={s.vesselName}>{boat.name}</Text>
             <View style={s.vesselRight}>
-              <Text style={s.priceTag}>{labels.basePrice}</Text>
+              <Text style={s.priceTag}>{labels.basePrice} {vatLabel}</Text>
               <Text style={s.priceVal}>{formatPrice(boatBasePrice)}</Text>
             </View>
           </View>
@@ -918,7 +943,7 @@ export function PDFDetailedTemplate({
             </View>
             {boatDiscountAmount > 0 && (
               <View style={s.pRow}>
-                <Text style={s.pDiscLbl}>{labels.vesselDiscount}</Text>
+                <Text style={s.pDiscLbl}>{boatDiscountLabel}</Text>
                 <Text style={s.pDiscVal}>-{formatPrice(boatDiscountAmount)}</Text>
               </View>
             )}
@@ -936,20 +961,12 @@ export function PDFDetailedTemplate({
               <Text style={s.pLbl}>{labels.equipmentTotal}</Text>
               <Text style={s.pVal}>{formatPrice(equipmentSubtotal)}</Text>
             </View>
-            {equipmentDiscountAmount > 0 && (() => {
-              const equipAllPctDiscount = quote.discounts?.find(
-                d => d.discount_level === 'equipment_all' && d.discount_type === 'percentage'
-              )
-              return (
-                <View style={s.pRow}>
-                  <Text style={s.pDiscLbl}>
-                    {labels.equipmentDiscounts}
-                    {equipAllPctDiscount ? ` (${Number(equipAllPctDiscount.value)}%)` : ''}
-                  </Text>
-                  <Text style={s.pDiscVal}>-{formatPrice(equipmentDiscountAmount)}</Text>
-                </View>
-              )
-            })()}
+            {equipmentDiscountAmount > 0 && (
+              <View style={s.pRow}>
+                <Text style={s.pDiscLbl}>{equipmentDiscountLabel}</Text>
+                <Text style={s.pDiscVal}>-{formatPrice(equipmentDiscountAmount)}</Text>
+              </View>
+            )}
             <View style={s.pDiv} />
             <View style={s.pRow}>
               <Text style={s.pNetLbl}>{labels.equipmentNet}</Text>
@@ -957,28 +974,32 @@ export function PDFDetailedTemplate({
             </View>
           </View>
 
-          {/* Col 3: Grand Total (navy bg) */}
+          {/* Col 3: Grand Total */}
           <View style={s.pricingColTotal}>
             <Text style={s.pTotalLbl}>{labels.grandTotal}</Text>
             <Text style={s.pTotalVal}>{formatPrice(grandTotal)}</Text>
-            {quote.vat_included && (() => {
+            {quote.vat_included ? (() => {
               const vatPct = Number(quote.vat_percentage ?? 25)
               const vatAmount = grandTotal * (vatPct / 100)
               const totalWithVat = grandTotal + vatAmount
               return (
                 <>
-                  <Text style={{ fontSize: 6, color: GOLD, marginTop: 4 }}>
+                  <Text style={{ fontSize: 7, color: GOLD, marginTop: 4, fontWeight: 700 }}>
                     {lang === 'hr' ? 'PDV' : 'VAT'} ({vatPct}%): {formatPrice(vatAmount)}
                   </Text>
-                  <Text style={{ fontFamily: 'Playfair Display', fontSize: 11, fontWeight: 700, color: '#ffffff', marginTop: 2 }}>
+                  <Text style={{ fontFamily: 'Playfair Display', fontSize: 12, fontWeight: 700, color: '#ffffff', marginTop: 2 }}>
                     {formatPrice(totalWithVat)}
                   </Text>
-                  <Text style={{ fontSize: 5, color: GOLD, marginTop: 1 }}>
-                    {lang === 'hr' ? 'S PDV-om' : 'incl. VAT'}
+                  <Text style={{ fontSize: 6, color: GOLD, marginTop: 1, fontWeight: 700 }}>
+                    {labels.inclVat}
                   </Text>
                 </>
               )
-            })()}
+            })() : (
+              <Text style={{ fontSize: 6, color: GOLD, marginTop: 3, fontWeight: 700 }}>
+                {labels.exclVat}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -993,7 +1014,7 @@ export function PDFDetailedTemplate({
           </>
         )}
 
-        {/* Payment + Terms + Signatures (keep together) */}
+        {/* Payment + Terms (keep together) */}
         <View wrap={false}>
           <View style={s.secRow}>
             <Text style={s.secText}>{labels.paymentDetails}</Text>
@@ -1016,8 +1037,8 @@ export function PDFDetailedTemplate({
               </View>
               <View style={s.payBlock}>
                 <Text style={s.payTitle}>{labels.bankDetails}</Text>
-                {settings.iban && <Text style={s.payMono}>IBAN: {settings.iban}</Text>}
-                {settings.bic && <Text style={s.payMono}>BIC/SWIFT: {settings.bic}</Text>}
+                {settings.iban && <Text style={s.payBankDetail}>IBAN: {settings.iban}</Text>}
+                {settings.bic && <Text style={s.payBankDetail}>BIC/SWIFT: {settings.bic}</Text>}
                 {settings.bank_name && <Text style={s.payText}>{settings.bank_name}</Text>}
                 <Text style={s.payText}>
                   {labels.callNumber}: {quote.quote_number}
@@ -1041,21 +1062,23 @@ export function PDFDetailedTemplate({
               <Text style={s.termsBody}>{paymentTermsText || terms}</Text>
             </View>
           )}
+        </View>
 
+        {/* Signatures — pushed to bottom of page */}
+        <View style={s.sigWrap}>
           <View style={s.sigRow}>
             <View style={s.sigCol}>
               <View style={s.sigLine} />
-              <Text style={s.sigLabel}>
-                {labels.forSeller} — {settings.name ?? 'Navis Marine d.o.o.'}
-              </Text>
+              <Text style={s.sigLabel}>{labels.signatureBuyer}</Text>
+              <Text style={s.sigName}>{company?.name ?? ''}</Text>
             </View>
             <View style={s.sigCol}>
               <View style={s.sigLine} />
-              <Text style={s.sigLabel}>
-                {labels.forBuyer} — {company?.name ?? ''}
-              </Text>
+              <Text style={s.sigLabel}>{labels.signatureSeller}</Text>
+              <Text style={s.sigName}>{settings.name ?? 'Navis Marine d.o.o.'}</Text>
             </View>
           </View>
+
         </View>
       </Page>
     </Document>

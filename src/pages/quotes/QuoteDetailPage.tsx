@@ -32,7 +32,7 @@ import {
   useUpdateQuoteDeliveryTerms, useUpdateQuotePaymentTerms, useUpdateQuoteIncludeStandard, useUpdateQuoteVAT,
 } from '@/hooks/useQuotes'
 import { useBoat, useBoatEquipment } from '@/hooks/useBoats'
-import { useSettings } from '@/hooks/useSettings'
+import { useSettings, usePartnerLogos } from '@/hooks/useSettings'
 import { useConfiguratorStore } from '@/stores/configurator-store'
 import { QuoteStatusBadge } from '@/components/quotes/QuoteStatusBadge'
 import { QuoteTimeline } from '@/components/quotes/QuoteTimeline'
@@ -52,6 +52,7 @@ export default function QuoteDetailPage() {
   const { data: boatData } = useBoat(boatId)
   const { data: boatEquipment } = useBoatEquipment(boatId)
   const { data: settings } = useSettings()
+  const { data: partnerLogos } = usePartnerLogos()
   const copyQuote = useCopyQuote()
   const updateStatus = useUpdateQuoteStatus()
   const updateDeposit = useUpdateQuoteDeposit()
@@ -184,6 +185,7 @@ export default function QuoteDetailPage() {
         settings={settings!}
         barcodeDataUrl={barcodeDataUrl}
         boatSpecs={boatData?.specs}
+        partnerLogos={partnerLogos ?? []}
       />
     )
   }

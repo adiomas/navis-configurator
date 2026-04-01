@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { CompanySettings, PDFTemplate } from '@/types'
+import type { CompanySettings, PDFTemplate, PartnerLogo } from '@/types'
 import type { CompanySettingsFormData } from '@/lib/validators'
 
 export function useSettings() {
@@ -49,6 +49,9 @@ export function useUpdateCompanySettings() {
             bank_name: data.bank_name ?? null,
             default_currency: data.default_currency,
             default_language: data.default_language,
+            registration_number: data.registration_number ?? null,
+            share_capital: data.share_capital ?? null,
+            director_name: data.director_name ?? null,
           })
           .eq('id', existing.id)
           .select()
@@ -72,6 +75,9 @@ export function useUpdateCompanySettings() {
             bank_name: data.bank_name ?? null,
             default_currency: data.default_currency,
             default_language: data.default_language,
+            registration_number: data.registration_number ?? null,
+            share_capital: data.share_capital ?? null,
+            director_name: data.director_name ?? null,
           })
           .select()
           .single()
@@ -245,6 +251,87 @@ export function usePDFTemplates() {
       return data
     },
     staleTime: 10 * 60 * 1000,
+  })
+}
+
+export function usePartnerLogos() {
+  return useQuery<PartnerLogo[]>({
+    queryKey: ['partner-logos'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('partner_logos')
+        .select('*')
+        .order('sort_order')
+      if (error) throw error
+      return data
+    },
+    staleTime: 10 * 60 * 1000,
+  })
+}
+
+export function useAddPartnerLogo() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const ext = file.name.split('.').pop() ?? 'png'
+      const fileName = `partner-logos/${Date.now()}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('company-assets')
+        .upload(fileName, file, { upsert: true })
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('company-assets')
+        .getPublicUrl(fileName)
+
+      const name = file.name.replace(/\.[^.]+$/, '')
+
+      const { data: maxOrder } = await supabase
+        .from('partner_logos')
+        .select('sort_order')
+        .order('sort_order', { ascending: false })
+        .limit(1)
+        .single()
+
+      const nextOrder = (maxOrder?.sort_order ?? -1) + 1
+
+      const { data, error } = await supabase
+        .from('partner_logos')
+        .insert({ name, logo_url: urlData.publicUrl, sort_order: nextOrder })
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-logos'] })
+    },
+  })
+}
+
+export function useDeletePartnerLogo() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (logo: PartnerLogo) => {
+      // Extract storage path from URL
+      const url = new URL(logo.logo_url)
+      const pathMatch = url.pathname.match(/company-assets\/(.+)$/)
+      if (pathMatch) {
+        await supabase.storage.from('company-assets').remove([pathMatch[1]])
+      }
+
+      const { error } = await supabase
+        .from('partner_logos')
+        .delete()
+        .eq('id', logo.id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['partner-logos'] })
+    },
   })
 }
 

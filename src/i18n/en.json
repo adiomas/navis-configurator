@@ -529,7 +529,17 @@
     "invalidFileType": "Only PNG, JPG and SVG files are allowed",
     "croatian": "Croatian (HR)",
     "english": "English (EN)",
-    "saveCompanyFirst": "Save company details first"
+    "saveCompanyFirst": "Save company details first",
+    "registrationNumber": "Registration No. (MB)",
+    "shareCapital": "Share Capital",
+    "directorName": "Director / CEO",
+    "partnerLogos": "Partner Logos",
+    "partnerLogosHint": "Logos displayed on the last page of PDF offers.",
+    "addPartnerLogo": "Add Logo",
+    "deletePartnerLogo": "Delete",
+    "partnerLogoAdded": "Partner logo added",
+    "partnerLogoDeleted": "Partner logo deleted",
+    "partnerLogoError": "Failed to manage partner logo"
   },
   "templateGroups": {
     "title": "Template Groups",

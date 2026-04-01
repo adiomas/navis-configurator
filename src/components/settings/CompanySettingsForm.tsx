@@ -46,6 +46,9 @@ export const CompanySettingsForm = ({ initialData }: CompanySettingsFormProps) =
       bank_name: initialData?.bank_name ?? '',
       default_currency: initialData?.default_currency ?? 'EUR',
       default_language: (initialData?.default_language as 'hr' | 'en') ?? 'hr',
+      registration_number: initialData?.registration_number ?? '',
+      share_capital: initialData?.share_capital ?? '',
+      director_name: initialData?.director_name ?? '',
     },
   })
 
@@ -139,6 +142,18 @@ export const CompanySettingsForm = ({ initialData }: CompanySettingsFormProps) =
             <label htmlFor="settings-website" className={ds.input.label}>{t('settings.website')}</label>
             <input id="settings-website" {...register('website')} className={ds.input.base} placeholder="https://" />
             {errors.website && <p className={ds.input.error}>{errors.website.message}</p>}
+          </div>
+          <div>
+            <label htmlFor="settings-reg-number" className={ds.input.label}>{t('settings.registrationNumber')}</label>
+            <input id="settings-reg-number" {...register('registration_number')} className={ds.input.base} placeholder="MB" />
+          </div>
+          <div>
+            <label htmlFor="settings-share-capital" className={ds.input.label}>{t('settings.shareCapital')}</label>
+            <input id="settings-share-capital" {...register('share_capital')} className={ds.input.base} placeholder="347.710,00 €" />
+          </div>
+          <div>
+            <label htmlFor="settings-director" className={ds.input.label}>{t('settings.directorName')}</label>
+            <input id="settings-director" {...register('director_name')} className={ds.input.base} />
           </div>
         </div>
       </section>

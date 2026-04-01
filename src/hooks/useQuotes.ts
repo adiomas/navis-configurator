@@ -37,7 +37,7 @@ export function useQuotes(filters?: QuoteFilters) {
       let query = supabase
         .from('quotes')
         .select(
-          '*, boat:boats(id, name, hero_image_url), company:companies(id, name), contact:contacts(id, full_name), created_by_profile:profiles!quotes_created_by_fkey(id, full_name)',
+          '*, boat:boats(id, name, hero_image_url), company:companies(id, name), contact:contacts(id, full_name), created_by_profile:profiles!quotes_created_by_fkey(id, full_name, email)',
           { count: 'exact' }
         )
 
@@ -112,7 +112,7 @@ export function useQuote(quoteId?: string) {
             *,
             changed_by_profile:profiles!quote_status_history_changed_by_fkey(id, full_name)
           ),
-          created_by_profile:profiles!quotes_created_by_fkey(id, full_name)
+          created_by_profile:profiles!quotes_created_by_fkey(id, full_name, email)
         `)
         .eq('id', quoteId!)
         .order('created_at', { referencedTable: 'quote_status_history', ascending: false })
