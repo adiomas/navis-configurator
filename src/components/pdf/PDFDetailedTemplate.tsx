@@ -64,14 +64,13 @@ const s = StyleSheet.create({
   // ── Partner logos row ──
   partnerLogosRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 14,
     marginBottom: 6,
   },
   partnerLogo: {
     height: 22,
-    width: 60,
+    width: 55,
     objectFit: 'contain',
   },
 
