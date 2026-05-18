@@ -165,7 +165,10 @@
     "importSpecs": "Specifikacije",
     "importEquipment": "Oprema",
     "importDuplicateWarning": "Brod s ovim imenom već postoji",
-    "importSummary": "{{categories}} kategorija, {{items}} stavki, {{total}} ukupno"
+    "importSummary": "{{categories}} kategorija, {{items}} stavki, {{total}} ukupno",
+    "importTbqInfo": "stavki na upit (TBQ) — isključene iz totala",
+    "importZeroPrice": "opcionalna stavka/i bez cijene (nije označeno TBQ) — pregledaj",
+    "tbqBadge": "TBQ"
   },
   "equipment": {
     "title": "Oprema",
@@ -186,6 +189,8 @@
     "description": "Opis",
     "sortOrder": "Redoslijed",
     "isStandard": "Standardna (uključena u baznu cijenu)",
+    "tbqBadge": "Cijena na upit",
+    "tbqAdminHelp": "Upišite cijenu kad je dobijete od proizvođača — TBQ status će se ukloniti automatski.",
     "nameHr": "Naziv (Hrvatski)",
     "nameEn": "Naziv (Engleski)",
     "descriptionHr": "Opis (Hrvatski)",
@@ -262,6 +267,9 @@
     "searchEquipment": "Pretraži opremu...",
     "itemsSelected": "{{selected}}/{{total}} odabrano",
     "standardIncluded": "Uključeno",
+    "priceOnRequest": "Na upit",
+    "tbqBadge": "TBQ",
+    "tbqNote": "Cijena ne uključuje {{count}} stavki na upit (TBQ).",
     "searchClient": "Pretraži postojeće klijente...",
     "selectExistingOrNew": "Pretražite postojećeg klijenta ili unesite nove podatke",
     "newClient": "Novi klijent",

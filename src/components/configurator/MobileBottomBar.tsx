@@ -134,6 +134,11 @@ export function MobileBottomBar({
                   <span className="font-display text-sm font-bold text-gold">
                     {formatPrice(priceBreakdown.grandTotal)}
                   </span>
+                  {priceBreakdown.tbqItemsCount > 0 && (
+                    <span className="shrink-0 rounded bg-amber-50 px-1 py-px text-[10px] font-semibold text-amber-700 animate-fade-in">
+                      +{priceBreakdown.tbqItemsCount} {t('configurator.tbqBadge')}
+                    </span>
+                  )}
                   {hasAnyDiscount && (
                     <span className="shrink-0 rounded bg-red-50 px-1 py-px text-[10px] font-semibold text-red-600 animate-fade-in">
                       &minus;{formatPrice(priceBreakdown.totalDiscount)}

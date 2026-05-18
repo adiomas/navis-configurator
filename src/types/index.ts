@@ -115,6 +115,7 @@ export interface PriceBreakdown {
   grandTotal: number
   vatAmount: number
   grandTotalWithVat: number
+  tbqItemsCount: number
 }
 
 export type EquipmentItemWithQuantity = EquipmentItem & { quantity?: number }

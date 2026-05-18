@@ -28,6 +28,7 @@ export interface ImportedItem {
   manufacturer_code?: string
   is_standard: boolean
   is_discountable: boolean
+  is_price_on_request: boolean
 }
 
 export interface ImportedCategory {
@@ -53,7 +54,12 @@ const importedItemSchema = z.object({
   manufacturer_code: z.string().optional().nullable().transform((v) => v ?? undefined),
   is_standard: z.boolean(),
   is_discountable: z.boolean(),
-})
+  // Backwards compat: older payloads without the field default to false.
+  is_price_on_request: z.boolean().optional().default(false),
+}).refine(
+  (item) => !(item.is_standard && item.is_price_on_request),
+  { message: 'Item cannot be both standard and on-request (TBQ)' },
+)
 
 const importedCategorySchema = z.object({
   name_en: z.string().min(1),
@@ -86,7 +92,7 @@ export const importPayloadSchema = z.object({
 
 // --- Validation warnings ---
 
-export type ImportWarningType = 'missing_hr_translation' | 'zero_price' | 'duplicate_name'
+export type ImportWarningType = 'missing_hr_translation' | 'zero_price' | 'duplicate_name' | 'tbq_info'
 
 export interface ImportWarning {
   type: ImportWarningType
@@ -98,6 +104,7 @@ export interface ImportWarning {
 export function validateImportPayload(payload: ImportPayload): ImportWarning[] {
   const warnings: ImportWarning[] = []
   const seenNames = new Set<string>()
+  let tbqCount = 0
 
   for (const cat of payload.categories) {
     if (!cat.name_hr) {
@@ -118,12 +125,15 @@ export function validateImportPayload(payload: ImportPayload): ImportWarning[] {
         })
       }
 
-      if (item.price === 0 && !item.is_standard) {
+      if (item.is_price_on_request) {
+        tbqCount += 1
+      } else if (item.price === 0 && !item.is_standard) {
+        // Genuinely missing price (AI couldn't tell) — keep as warning.
         warnings.push({
           type: 'zero_price',
           category: cat.name_en,
           item: item.name_en,
-          message: `Optional item "${item.name_en}" has zero price`,
+          message: `Optional item "${item.name_en}" has zero price (not marked TBQ)`,
         })
       }
 
@@ -138,6 +148,13 @@ export function validateImportPayload(payload: ImportPayload): ImportWarning[] {
       }
       seenNames.add(key)
     }
+  }
+
+  if (tbqCount > 0) {
+    warnings.unshift({
+      type: 'tbq_info',
+      message: `${tbqCount} item(s) marked as "On request" (TBQ) — these will not contribute to quote totals.`,
+    })
   }
 
   return warnings

@@ -893,13 +893,14 @@ export function PDFDetailedTemplate({
                 {items.map((item) => {
                   const itemName = lang === 'hr' ? item.name_hr : item.name_en
                   const qty = Number(item.quantity ?? 1)
+                  const isTbq = item.is_price_on_request === true
                   const unitPrice = Number(item.price ?? 0)
                   const lineTotal = unitPrice * qty
                   const itemDiscount = Number(item.item_discount ?? 0)
                   const netPrice = lineTotal - itemDiscount
                   const discountType = item.item_discount_type as string | null
                   const discountValue = Number(item.item_discount_value ?? 0)
-                  const discountDisplay = itemDiscount > 0
+                  const discountDisplay = !isTbq && itemDiscount > 0
                     ? discountType === 'percentage'
                       ? `-${discountValue}%`
                       : `-${formatPrice(itemDiscount)}`
@@ -913,7 +914,7 @@ export function PDFDetailedTemplate({
                         <Text style={{ fontSize: 8, color: TEXT_BODY, textAlign: 'center' }}>{qty}</Text>
                       </View>
                       <View style={{ width: '16%' }}>
-                        <Text style={s.cellPrice}>{formatPrice(unitPrice)}</Text>
+                        <Text style={s.cellPrice}>{isTbq ? labels.priceOnRequest : formatPrice(unitPrice)}</Text>
                       </View>
                       <View style={{ width: '14%' }}>
                         {discountDisplay && (
@@ -921,7 +922,7 @@ export function PDFDetailedTemplate({
                         )}
                       </View>
                       <View style={{ width: '24%' }}>
-                        <Text style={s.cellNet}>{formatPrice(netPrice)}</Text>
+                        <Text style={s.cellNet}>{isTbq ? labels.priceOnRequest : formatPrice(netPrice)}</Text>
                       </View>
                     </View>
                   )
@@ -1001,6 +1002,13 @@ export function PDFDetailedTemplate({
             )}
           </View>
         </View>
+
+        {/* TBQ note (after pricing summary, before notes) */}
+        {quote.items.some((i) => i.is_price_on_request) && (
+          <Text style={{ fontSize: 7, color: '#92400e', fontStyle: 'italic', marginTop: 4, paddingHorizontal: 6 }}>
+            * {labels.tbqNote}
+          </Text>
+        )}
 
         {/* Notes */}
         {quote.notes && (

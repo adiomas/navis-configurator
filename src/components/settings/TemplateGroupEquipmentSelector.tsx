@@ -181,9 +181,15 @@ function BoatEquipmentSection({ boatId, value, onChange }: BoatEquipmentSectionP
                                 {t('configurator.standardIncluded')}
                               </span>
                             )}
-                            <span className="text-sm text-muted-foreground">
-                              {formatPrice(item.price)}
-                            </span>
+                            {item.is_price_on_request ? (
+                              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold italic text-amber-800">
+                                {t('configurator.priceOnRequest')}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                {formatPrice(item.price)}
+                              </span>
+                            )}
                           </div>
                         </button>
 

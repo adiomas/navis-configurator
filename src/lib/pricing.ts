@@ -28,9 +28,13 @@ export function calculateDiscountAmount(amount: number, discounts: ConfiguratorD
 
 /**
  * Calculate full price breakdown for a quote.
+ *
+ * TBQ items (is_price_on_request=true) are excluded from all subtotals and discount calculations
+ * — only counted in `tbqItemsCount` so UI can render a "X items on request" note.
+ *
  * itemDiscountableMap: resolved per-item discountable flag (item.is_discountable ?? category.is_discountable ?? true)
  * Equipment-wide discounts apply ONLY to discountable items.
- * Per-item discounts apply to ALL items regardless of discountable flag.
+ * Per-item discounts apply to ALL items regardless of discountable flag (except TBQ).
  * Quantity multiplies item price before discount calculation.
  */
 export function calculatePriceBreakdown(
@@ -46,11 +50,16 @@ export function calculatePriceBreakdown(
   const boatDiscountAmount = calculateDiscountAmount(basePrice, boatDiscounts)
   const boatFinalPrice = basePrice - boatDiscountAmount
 
-  // 2. Equipment with per-item discounts (apply to ALL items)
+  // 2. Equipment with per-item discounts (apply to ALL non-TBQ items)
   let equipmentSubtotal = 0
   let equipmentItemDiscounts = 0
+  let tbqItemsCount = 0
 
   for (const item of selectedEquipment) {
+    if (item.is_price_on_request) {
+      tbqItemsCount += 1
+      continue
+    }
     const qty = item.quantity ?? 1
     const lineTotal = item.price * qty
     const itemDiscounts = discounts.filter(
@@ -61,13 +70,14 @@ export function calculatePriceBreakdown(
     equipmentSubtotal += lineTotal
   }
 
-  // 3. Equipment-wide discounts — apply ONLY to discountable items (after per-item discounts)
+  // 3. Equipment-wide discounts — apply ONLY to discountable items (after per-item discounts), excluding TBQ
   const equipAllDiscounts = discounts.filter(d => d.level === 'equipment_all')
 
   let discountableAfterPerItem = 0
   let nonDiscountableAfterPerItem = 0
 
   for (const item of selectedEquipment) {
+    if (item.is_price_on_request) continue
     const qty = item.quantity ?? 1
     const lineTotal = item.price * qty
     const isDiscountable = itemDiscountableMap?.get(item.id) ?? true
@@ -108,5 +118,6 @@ export function calculatePriceBreakdown(
     grandTotal,
     vatAmount,
     grandTotalWithVat,
+    tbqItemsCount,
   }
 }

@@ -104,6 +104,8 @@ interface PdfLabels {
   registeredAt: string
   shareCapitalLabel: string
   directorLabel: string
+  priceOnRequest: string
+  tbqNote: string
 }
 
 const labelsHr: PdfLabels = {
@@ -162,6 +164,8 @@ const labelsHr: PdfLabels = {
   registeredAt: 'Registrirano kod Trgovačkog suda u Zagrebu pod',
   shareCapitalLabel: 'Temeljni kapital uplaćen u cijelosti',
   directorLabel: 'Predsjednik Uprave',
+  priceOnRequest: 'Na upit',
+  tbqNote: 'Cijena ne uključuje stavke označene s "Na upit" (TBQ).',
 }
 
 const labelsEn: PdfLabels = {
@@ -220,6 +224,8 @@ const labelsEn: PdfLabels = {
   registeredAt: 'Registered at the Commercial Court in Zagreb under Reg. No.',
   shareCapitalLabel: 'Share capital fully paid',
   directorLabel: 'Director',
+  priceOnRequest: 'On request',
+  tbqNote: 'Price excludes items marked "On request" (TBQ).',
 }
 
 /**

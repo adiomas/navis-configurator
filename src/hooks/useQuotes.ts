@@ -383,8 +383,14 @@ export function useCreateQuote() {
         itemDiscountableMap.set(item.id, effective)
       }
 
-      // Calculate pricing
-      const breakdown = calculatePriceBreakdown(boatBasePrice, selectedEquipment, discounts, itemDiscountableMap)
+      // Filter out per-item discounts targeting TBQ items (they don't apply to non-priced items)
+      const tbqItemIds = new Set(selectedEquipment.filter(i => i.is_price_on_request).map(i => i.id))
+      const effectiveDiscounts = discounts.filter(d =>
+        d.level !== 'equipment_item' || !d.equipmentItemId || !tbqItemIds.has(d.equipmentItemId)
+      )
+
+      // Calculate pricing (TBQ items are excluded from subtotal inside calculatePriceBreakdown)
+      const breakdown = calculatePriceBreakdown(boatBasePrice, selectedEquipment, effectiveDiscounts, itemDiscountableMap)
 
       // Resolve company & contact — create new if needed
       let companyId = clientData.companyId ?? null
@@ -465,9 +471,11 @@ export function useCreateQuote() {
         const quoteItems: QuoteItemInsert[] = selectedEquipment.map((item, index) => {
           const qty = item.quantity ?? 1
           const lineTotal = item.price * qty
-          const itemDiscounts = discounts.filter(
-            d => d.level === 'equipment_item' && d.equipmentItemId === item.id,
-          )
+          const itemDiscounts = item.is_price_on_request
+            ? []
+            : effectiveDiscounts.filter(
+                d => d.level === 'equipment_item' && d.equipmentItemId === item.id,
+              )
           const itemDiscountAmount = itemDiscounts.length > 0
             ? calculateDiscountAmount(lineTotal, itemDiscounts)
             : 0
@@ -480,12 +488,13 @@ export function useCreateQuote() {
             equipment_item_id: item.id,
             name_hr: item.name_hr,
             name_en: item.name_en,
-            price: item.price,
+            price: item.is_price_on_request ? 0 : item.price,
             quantity: qty,
             item_discount: itemDiscountAmount,
             item_discount_type: singleDiscount?.type ?? (itemDiscounts.length > 1 ? 'fixed' : null),
             item_discount_value: singleDiscount?.value ?? itemDiscountAmount,
             item_type: item.is_standard ? 'equipment_standard' : 'equipment_optional',
+            is_price_on_request: item.is_price_on_request ?? false,
             sort_order: index,
             category_name_hr: categoryMap.get(item.id)?.name_hr ?? null,
             category_name_en: categoryMap.get(item.id)?.name_en ?? null,
@@ -500,9 +509,9 @@ export function useCreateQuote() {
         if (itemsError) throw itemsError
       }
 
-      // Insert quote discounts
-      if (discounts.length > 0) {
-        const quoteDiscounts: QuoteDiscountInsert[] = discounts.map((d, index) => ({
+      // Insert quote discounts (TBQ-targeted per-item discounts already filtered out)
+      if (effectiveDiscounts.length > 0) {
+        const quoteDiscounts: QuoteDiscountInsert[] = effectiveDiscounts.map((d, index) => ({
           quote_id: quote.id,
           discount_level: d.level,
           discount_type: d.type,

@@ -394,6 +394,7 @@ export type Database = {
           description_hr: string | null
           id: string
           is_discountable: boolean | null
+          is_price_on_request: boolean
           is_standard: boolean
           manufacturer_code: string | null
           name_en: string | null
@@ -408,6 +409,7 @@ export type Database = {
           description_hr?: string | null
           id?: string
           is_discountable?: boolean | null
+          is_price_on_request?: boolean
           is_standard?: boolean
           manufacturer_code?: string | null
           name_en?: string | null
@@ -422,6 +424,7 @@ export type Database = {
           description_hr?: string | null
           id?: string
           is_discountable?: boolean | null
+          is_price_on_request?: boolean
           is_standard?: boolean
           manufacturer_code?: string | null
           name_en?: string | null
@@ -592,6 +595,7 @@ export type Database = {
           equipment_item_id: string | null
           id: string
           is_discountable: boolean
+          is_price_on_request: boolean
           item_discount: number
           item_discount_type: string | null
           item_discount_value: number
@@ -609,6 +613,7 @@ export type Database = {
           equipment_item_id?: string | null
           id?: string
           is_discountable?: boolean
+          is_price_on_request?: boolean
           item_discount?: number
           item_discount_type?: string | null
           item_discount_value?: number
@@ -626,6 +631,7 @@ export type Database = {
           equipment_item_id?: string | null
           id?: string
           is_discountable?: boolean
+          is_price_on_request?: boolean
           item_discount?: number
           item_discount_type?: string | null
           item_discount_value?: number
@@ -1006,7 +1012,10 @@ export type Database = {
         Args: { p_template_group_id?: string }
         Returns: Json
       }
-      get_template_group_quote_counts: { Args: never; Returns: Json }
+      get_template_group_quote_counts: {
+        Args: { p_template_group_id?: string }
+        Returns: Json
+      }
       import_boat_from_pricelist: { Args: { payload: Json }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       set_primary_boat_image: {

@@ -132,7 +132,11 @@ export function PriceContent({
                     {getLocalizedName(item, lang)}
                     {qty > 1 && <span className="ml-1 text-muted-foreground">×{qty}</span>}
                   </span>
-                  <span className="shrink-0 text-muted-foreground">{formatPrice(item.price * qty)}</span>
+                  <span className="shrink-0 text-muted-foreground">
+                    {item.is_price_on_request
+                      ? <em className="text-amber-700 not-italic">{t('configurator.priceOnRequest')}</em>
+                      : formatPrice(item.price * qty)}
+                  </span>
                 </div>
               )
             })}
@@ -150,6 +154,13 @@ export function PriceContent({
             {formatPrice(priceBreakdown.grandTotal)}
           </span>
         </div>
+      )}
+
+      {/* TBQ note */}
+      {priceBreakdown.tbqItemsCount > 0 && (
+        <p className="text-[10px] italic text-amber-700">
+          * {t('configurator.tbqNote', { count: priceBreakdown.tbqItemsCount })}
+        </p>
       )}
     </>
   )
@@ -212,7 +223,7 @@ export function CompactPriceSidebar({
       </div>
 
       {/* Grand total - premium gold gradient */}
-      <div className="mx-3 mb-3 flex items-center justify-between rounded-lg border border-gold/20 bg-gradient-to-br from-gold/5 to-gold/10 p-3">
+      <div className="mx-3 mb-1 flex items-center justify-between rounded-lg border border-gold/20 bg-gradient-to-br from-gold/5 to-gold/10 p-3">
         <span className="text-xs font-semibold text-navy">
           {t('configurator.grandTotal')}
         </span>
@@ -220,6 +231,11 @@ export function CompactPriceSidebar({
           {formatPrice(priceBreakdown.grandTotal)}
         </span>
       </div>
+      {priceBreakdown.tbqItemsCount > 0 && (
+        <p className="mx-3 mb-3 text-[10px] italic text-amber-700">
+          * {t('configurator.tbqNote', { count: priceBreakdown.tbqItemsCount })}
+        </p>
+      )}
 
       {/* Optional equipment list */}
       {selectedOptionalItems.length > 0 && (
@@ -236,7 +252,11 @@ export function CompactPriceSidebar({
                     {getLocalizedName(item, lang)}
                     {qty > 1 && <span className="ml-1 text-muted-foreground">×{qty}</span>}
                   </span>
-                  <span className="shrink-0 text-muted-foreground">{formatPrice(item.price * qty)}</span>
+                  <span className="shrink-0 text-muted-foreground">
+                    {item.is_price_on_request
+                      ? <em className="text-amber-700 not-italic">{t('configurator.priceOnRequest')}</em>
+                      : formatPrice(item.price * qty)}
+                  </span>
                 </div>
               )
             })}

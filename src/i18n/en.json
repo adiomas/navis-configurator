@@ -165,7 +165,10 @@
     "importSpecs": "Specifications",
     "importEquipment": "Equipment",
     "importDuplicateWarning": "A boat with this name already exists",
-    "importSummary": "{{categories}} categories, {{items}} items, {{total}} total"
+    "importSummary": "{{categories}} categories, {{items}} items, {{total}} total",
+    "importTbqInfo": "item(s) on request (TBQ) — excluded from totals",
+    "importZeroPrice": "optional item(s) have no price (not marked TBQ) — review needed",
+    "tbqBadge": "TBQ"
   },
   "equipment": {
     "title": "Equipment",
@@ -186,6 +189,8 @@
     "description": "Description",
     "sortOrder": "Sort Order",
     "isStandard": "Standard (included in base price)",
+    "tbqBadge": "Price on request",
+    "tbqAdminHelp": "Enter the price when received from the manufacturer — the TBQ flag will be removed automatically.",
     "nameHr": "Name (Croatian)",
     "nameEn": "Name (English)",
     "descriptionHr": "Description (Croatian)",
@@ -262,6 +267,9 @@
     "searchEquipment": "Search equipment...",
     "itemsSelected": "{{selected}}/{{total}} selected",
     "standardIncluded": "Included",
+    "priceOnRequest": "On request",
+    "tbqBadge": "TBQ",
+    "tbqNote": "Price excludes {{count}} item(s) on request (TBQ).",
     "searchClient": "Search existing clients...",
     "selectExistingOrNew": "Search for an existing client or enter new details",
     "newClient": "New Client",

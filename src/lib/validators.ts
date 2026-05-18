@@ -31,6 +31,7 @@ export const equipmentItemSchema = z.object({
   is_standard: z.boolean().default(false),
   manufacturer_code: z.string().optional(),
   is_discountable: z.boolean().nullable().default(null),
+  is_price_on_request: z.boolean().default(false),
 })
 
 export const companySchema = z.object({

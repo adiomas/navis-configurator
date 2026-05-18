@@ -152,6 +152,11 @@ export function CompactReviewSummary({
                 {formatPrice(priceBreakdown.grandTotal)}
               </span>
             </div>
+            {priceBreakdown.tbqItemsCount > 0 && (
+              <p className="mt-1 text-[10px] italic text-amber-700">
+                * {t('configurator.tbqNote', { count: priceBreakdown.tbqItemsCount })}
+              </p>
+            )}
           </div>
         </div>
       </Card>
@@ -219,7 +224,7 @@ export function CompactReviewSummary({
               if (catSelectedItems.length === 0) return null
 
               const categoryTotal = catSelectedItems
-                .filter((i) => !i.is_standard)
+                .filter((i) => !i.is_standard && !i.is_price_on_request)
                 .reduce((sum, i) => {
                   const qty = selectedEquipment.get(i.id)?.quantity ?? 1
                   return sum + i.price * qty
@@ -254,6 +259,10 @@ export function CompactReviewSummary({
                           {item.is_standard ? (
                             <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
                               {t('configurator.standardIncluded')}
+                            </span>
+                          ) : item.is_price_on_request ? (
+                            <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold italic text-amber-800">
+                              {t('configurator.priceOnRequest')}
                             </span>
                           ) : (
                             <span className="font-medium text-foreground">

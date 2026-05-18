@@ -119,9 +119,10 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                   {category.items.map((item) => {
                     const isSelected = selectedEquipment.has(item.id)
                     const isStandard = item.is_standard
+                    const isTbq = item.is_price_on_request
                     const itemDiscount = getItemDiscount(item.id)
                     const isDiscountable = item.is_discountable ?? category.is_discountable ?? true
-                    const showDiscountTag = isSelected && !isStandard && isDiscountable
+                    const showDiscountTag = isSelected && !isStandard && !isTbq && isDiscountable
 
                     return (
                       <div key={item.id} className="relative">
@@ -169,7 +170,7 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                                 {lang === 'hr' ? item.description_hr : item.description_en}
                               </p>
                             )}
-                            {itemDiscount && (
+                            {itemDiscount && !isTbq && (
                               <p className="text-[11px] text-red-600">
                                 <span className="line-through text-muted-foreground">
                                   {formatPrice(item.price)}
@@ -186,8 +187,8 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                             )}
                           </div>
 
-                          {/* Quantity (optional items only, when selected) */}
-                          {isSelected && !isStandard && (
+                          {/* Quantity (optional items only, when selected, not TBQ) */}
+                          {isSelected && !isStandard && !isTbq && (
                             <div
                               className="flex shrink-0 items-center gap-0.5"
                               onClick={(e) => e.stopPropagation()}
@@ -226,7 +227,7 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                                 {t('configurator.standardIncluded')}
                               </span>
                             )}
-                            {!isStandard && !isDiscountable && (
+                            {!isStandard && !isTbq && !isDiscountable && (
                               <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
                                 {t('equipment.noDiscount')}
                               </span>
@@ -254,14 +255,20 @@ export function CompactEquipmentSelector({ categories, searchQuery }: CompactEqu
                                 <Tag className="h-3 w-3" />
                               </button>
                             )}
-                            <span
-                              className={cn(
-                                'text-xs font-medium',
-                                isStandard ? 'text-muted-foreground' : 'text-foreground',
-                              )}
-                            >
-                              {formatPrice(item.price * (selectedEquipment.get(item.id)?.quantity ?? 1))}
-                            </span>
+                            {isTbq ? (
+                              <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold italic text-amber-800">
+                                {t('configurator.priceOnRequest')}
+                              </span>
+                            ) : (
+                              <span
+                                className={cn(
+                                  'text-xs font-medium',
+                                  isStandard ? 'text-muted-foreground' : 'text-foreground',
+                                )}
+                              >
+                                {formatPrice(item.price * (selectedEquipment.get(item.id)?.quantity ?? 1))}
+                              </span>
+                            )}
                           </div>
                         </div>
 

@@ -464,6 +464,14 @@ export default function QuoteDetailPage() {
                   {formatPrice(Number(quote.total_price ?? 0))}
                 </span>
               </div>
+              {(() => {
+                const tbqCount = quote.items.filter((i) => i.is_price_on_request).length
+                return tbqCount > 0 ? (
+                  <p className="mt-1 text-[10px] italic text-amber-700">
+                    * {t('configurator.tbqNote', { count: tbqCount })}
+                  </p>
+                ) : null
+              })()}
               {quote.vat_included && (
                 <div className="mt-2 space-y-1 border-t border-gold/20 pt-2">
                   <div className="flex justify-between text-xs">
@@ -573,7 +581,7 @@ export default function QuoteDetailPage() {
               {Array.from(equipmentByCategory.entries()).map(([category, items]) => {
                 const isAllStandard = items.every((i) => i.item_type === 'equipment_standard')
                 const categoryTotal = items
-                  .filter((i) => i.item_type !== 'equipment_standard')
+                  .filter((i) => i.item_type !== 'equipment_standard' && !i.is_price_on_request)
                   .reduce((sum, i) => sum + Number(i.price ?? 0) * (i.quantity ?? 1), 0)
                 const isExpanded = expandedCategories.has(category)
 
@@ -616,6 +624,10 @@ export default function QuoteDetailPage() {
                               </span>
                               {isStandard ? (
                                 <span className="shrink-0 text-[10px] text-emerald-600">{t('quotes.standard')}</span>
+                              ) : item.is_price_on_request ? (
+                                <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold italic text-amber-800">
+                                  {t('configurator.priceOnRequest')}
+                                </span>
                               ) : (
                                 <span className="shrink-0 font-medium text-foreground">
                                   {formatPrice(Number(item.price ?? 0) * (item.quantity ?? 1))}

@@ -54,17 +54,18 @@ const OPENAI_JSON_SCHEMA = {
               type: 'array',
               items: {
                 type: 'object',
-                required: ['name_en', 'name_hr', 'description_en', 'description_hr', 'price', 'manufacturer_code', 'is_standard', 'is_discountable'],
+                required: ['name_en', 'name_hr', 'description_en', 'description_hr', 'price', 'manufacturer_code', 'is_standard', 'is_discountable', 'is_price_on_request'],
                 additionalProperties: false,
                 properties: {
                   name_en: { type: 'string' },
                   name_hr: { type: ['string', 'null'] },
                   description_en: { type: ['string', 'null'] },
                   description_hr: { type: ['string', 'null'] },
-                  price: { type: 'number', description: 'Price in EUR. Use 0 for standard/included items.' },
+                  price: { type: 'number', description: 'Price in EUR. Use 0 for standard/included items AND for TBQ (price on request) items.' },
                   manufacturer_code: { type: ['string', 'null'], description: 'Manufacturer item code if present (e.g. CC00025516)' },
                   is_standard: { type: 'boolean', description: 'true if included in base price' },
                   is_discountable: { type: 'boolean', description: 'true unless explicitly marked as non-discountable' },
+                  is_price_on_request: { type: 'boolean', description: 'true if the price column shows "TBQ", "To Be Quoted", "Na upit", "On Request", or is empty/dash for an optional item' },
                 },
               },
             },
@@ -82,8 +83,10 @@ Rules:
 - If there are multiple base prices (engine variants), use the lowest as base_price and add other variants as equipment items in an "Engine Options" category.
 - Extract ALL specifications (dimensions, engines, performance, capacity).
 - Extract ALL equipment items grouped by category exactly as they appear in the PDF.
-- Standard/included equipment: is_standard=true, price=0.
-- Optional equipment with prices: is_standard=false, price=actual price.
+- Standard/included equipment: is_standard=true, price=0, is_price_on_request=false.
+- Optional equipment with prices: is_standard=false, price=actual price, is_price_on_request=false.
+- TBQ (To Be Quoted) equipment: if the price column shows "TBQ", "To Be Quoted", "Na upit", "On Request", "Po dogovoru", an empty cell, or a dash for an OPTIONAL item, set is_price_on_request=true, price=0, is_standard=false.
+- TBQ items are ALWAYS optional — NEVER set is_standard=true together with is_price_on_request=true. Standard items (included in base price) always have is_price_on_request=false.
 - If an item is marked as non-discountable (e.g., "No Discount", "ND"), set is_discountable=false.
 - Preserve manufacturer codes (e.g., CC00025516) in manufacturer_code field.
 - If a package contains multiple items with one total price, keep it as one item with contents in description.

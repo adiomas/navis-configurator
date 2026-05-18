@@ -173,6 +173,18 @@ export const EquipmentItemForm = ({
           />
         </div>
 
+        {/* TBQ badge (read-only flag from AI import) */}
+        {defaultValues?.is_price_on_request && (
+          <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-2.5">
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+              {t('equipment.tbqBadge')}
+            </span>
+            <p className="text-[11px] leading-snug text-amber-800">
+              {t('equipment.tbqAdminHelp')}
+            </p>
+          </div>
+        )}
+
         {/* Price + Standard toggle */}
         <div className={ds.form.grid}>
           <div>

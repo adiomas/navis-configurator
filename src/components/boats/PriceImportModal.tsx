@@ -244,11 +244,21 @@ function PreviewStep({ payload, warnings, onChange }: PreviewStepProps) {
 
   const totalEquipmentValue = useMemo(() =>
     payload.categories.reduce((sum, cat) =>
-      sum + cat.items.reduce((s, item) => s + (item.is_standard ? 0 : item.price), 0), 0),
+      sum + cat.items.reduce((s, item) => {
+        if (item.is_standard || item.is_price_on_request) return s
+        return s + item.price
+      }, 0), 0),
+    [payload.categories]
+  )
+
+  const tbqCount = useMemo(() =>
+    payload.categories.reduce((sum, cat) =>
+      sum + cat.items.filter((i) => i.is_price_on_request).length, 0),
     [payload.categories]
   )
 
   const missingHrCount = warnings.filter((w) => w.type === 'missing_hr_translation').length
+  const zeroPriceCount = warnings.filter((w) => w.type === 'zero_price').length
 
   const updateBoatField = useCallback((field: keyof ImportPayload['boat'], value: string | number) => {
     onChange({ ...payload, boat: { ...payload.boat, [field]: value } })
@@ -277,8 +287,22 @@ function PreviewStep({ payload, warnings, onChange }: PreviewStepProps) {
   return (
     <div className="space-y-4">
       {/* Warnings banner */}
+      {tbqCount > 0 && (
+        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          {tbqCount} {t('boats.importTbqInfo')}
+        </div>
+      )}
+
+      {zeroPriceCount > 0 && (
+        <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-2.5 text-xs text-red-700">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          {zeroPriceCount} {t('boats.importZeroPrice')}
+        </div>
+      )}
+
       {missingHrCount > 0 && (
-        <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-700">
+        <div className="flex items-center gap-2 rounded-lg bg-yellow-50 border border-yellow-200 p-2.5 text-xs text-yellow-700">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
           {missingHrCount} {t('boats.importMissingHr')}
         </div>
@@ -302,6 +326,11 @@ function PreviewStep({ payload, warnings, onChange }: PreviewStepProps) {
         <span className={cn(ds.badge.base, ds.badge.success)}>
           {t('boats.importTotal')}: {formatPrice(totalEquipmentValue)}
         </span>
+        {tbqCount > 0 && (
+          <span className={cn(ds.badge.base, ds.badge.warning)}>
+            {tbqCount} {t('boats.tbqBadge')}
+          </span>
+        )}
       </div>
 
       {/* Boat info */}
@@ -460,14 +489,20 @@ function CategoryAccordion({ category, catIdx, warnings, onUpdateCategory, onUpd
                         />
                       </td>
                       <td className={cn(ds.table.cell, 'text-right')}>
-                        <input
-                          type="number"
-                          value={item.price}
-                          onChange={(e) => onUpdateItem(catIdx, itemIdx, 'price', parseFloat(e.target.value) || 0)}
-                          className={cn(ds.input.base, 'text-xs h-7 text-right w-24',
-                            item.price === 0 && !item.is_standard && 'border-red-300'
-                          )}
-                        />
+                        {item.is_price_on_request ? (
+                          <div className="flex h-7 w-24 ml-auto items-center justify-end gap-1 rounded-md border border-amber-300 bg-amber-50 px-2 text-[10px] font-medium text-amber-800">
+                            <span>{t('boats.tbqBadge')}</span>
+                          </div>
+                        ) : (
+                          <input
+                            type="number"
+                            value={item.price}
+                            onChange={(e) => onUpdateItem(catIdx, itemIdx, 'price', parseFloat(e.target.value) || 0)}
+                            className={cn(ds.input.base, 'text-xs h-7 text-right w-24',
+                              item.price === 0 && !item.is_standard && 'border-red-300'
+                            )}
+                          />
+                        )}
                       </td>
                       <td className={cn(ds.table.cell, 'text-center')}>
                         <span className="text-[10px] text-muted-foreground">{item.manufacturer_code || '-'}</span>
@@ -504,7 +539,12 @@ function ConfirmStep({ payload, error }: ConfirmStepProps) {
 
   const totalItems = payload.categories.reduce((sum, cat) => sum + cat.items.length, 0)
   const totalEquipmentValue = payload.categories.reduce((sum, cat) =>
-    sum + cat.items.reduce((s, item) => s + (item.is_standard ? 0 : item.price), 0), 0)
+    sum + cat.items.reduce((s, item) => {
+      if (item.is_standard || item.is_price_on_request) return s
+      return s + item.price
+    }, 0), 0)
+  const tbqCount = payload.categories.reduce((sum, cat) =>
+    sum + cat.items.filter((i) => i.is_price_on_request).length, 0)
 
   return (
     <div className="space-y-4">
@@ -542,6 +582,11 @@ function ConfirmStep({ payload, error }: ConfirmStepProps) {
         <div className="mt-3 pt-3 border-t border-border text-center">
           <p className={ds.text.muted}>{t('boats.importTotal')}</p>
           <p className="text-lg font-semibold text-primary">{formatPrice(totalEquipmentValue)}</p>
+          {tbqCount > 0 && (
+            <p className="mt-1 text-[11px] text-amber-700">
+              + {tbqCount} {t('boats.importTbqInfo')}
+            </p>
+          )}
         </div>
       </div>
 
