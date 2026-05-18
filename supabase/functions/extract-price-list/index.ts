@@ -80,6 +80,7 @@ const SYSTEM_PROMPT = `You are a marine yacht price list extraction expert. Extr
 
 Rules:
 - Extract the boat name, brand, model, year, and base price.
+- For year: if a model year is explicitly stated, use it. Otherwise look for the price list date (e.g. "03.03.2026") and use that year. If neither is present, use the current year. The year MUST be between 2000 and 2035.
 - If there are multiple base prices (engine variants), use the lowest as base_price and add other variants as equipment items in an "Engine Options" category.
 - Extract ALL specifications (dimensions, engines, performance, capacity).
 - Extract ALL equipment items grouped by category exactly as they appear in the PDF.

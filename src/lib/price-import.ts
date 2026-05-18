@@ -74,11 +74,14 @@ const importedSpecSchema = z.object({
   value: z.string(),
 })
 
+const CURRENT_YEAR = new Date().getFullYear()
+
 const importedBoatSchema = z.object({
   name: z.string().min(1),
   brand: z.string().min(1),
   model: z.string(),
-  year: z.number().int().min(2000).max(2035),
+  // Some price lists don't list a model year (only a price-list date). Fall back to current year.
+  year: z.number().int().transform((y) => (y >= 2000 && y <= 2035 ? y : CURRENT_YEAR)),
   base_price: z.number().positive(),
   description_en: z.string().optional().nullable().transform((v) => v ?? undefined),
   description_hr: z.string().optional().nullable().transform((v) => v ?? undefined),
